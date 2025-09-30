@@ -6,6 +6,18 @@
 #include "TheAscendance/Game/DataLoaders/ItemLoader.h"
 #include "TheAscendance/Game/DataLoaders/SpellLoader.h"
 #include "TheAscendance/Game/DataLoaders/EnemyLoader.h"
+#include "TheAscendance/Game/DataLoaders/EffectLoader.h"
+
+UBaseEffect* APlayableGameMode::CreateEffectFromTag(const FGameplayTag& effectTag)
+{
+	if (m_EffectLoader == nullptr)
+	{
+		LOG_ERROR("PlayableGameMode has invalid EffectLoader");
+		return nullptr;
+	}
+
+	return m_EffectLoader->CreateEffectFromTag(effectTag);
+}
 
 FItemData* APlayableGameMode::GetItemData(int id)
 {
@@ -100,6 +112,15 @@ void APlayableGameMode::InitGameState()
 	else
 	{
 		LOG_ERROR("PlayableGameMode failed to create EnemyLoader");
+	}
+
+	if (m_EffectLoader = NewObject<UEffectLoader>())
+	{
+		m_EffectLoader->Init();
+	}
+	else
+	{
+		LOG_ERROR("PlayableGameMode failed to create EffectLoader");
 	}
 }
 

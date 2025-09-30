@@ -11,6 +11,7 @@
 #include "BaseCharacter.generated.h"
 
 class UCharacterStatsComponent;
+class UEffectHandlerComponent;
 class AHeldItem;
 
 UCLASS()
@@ -27,6 +28,8 @@ public:
 	virtual void ReduceStamina(int amount) override;
 	virtual int GetStat(ECharacterStat stat) override;
 	virtual bool IsDead() override;
+	virtual void AddEffect(UBaseEffect* effect) override;
+	virtual void AdjustStat(ECharacterStat stat, int amount) override;
 
 	bool MainHandPrimaryAttack();
 	bool MainHandSecondaryAttack();
@@ -74,8 +77,9 @@ protected:
 protected:
 	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Character Stats Component"))
 	TObjectPtr<UCharacterStatsComponent> m_CharacterStatsComponent = nullptr;
+	UPROPERTY(meta = (DisplayName = "Effect Handler Component"))
+	TObjectPtr<UEffectHandlerComponent> m_EffectHandlerComponent = nullptr;
 
-protected:
 	UPROPERTY()
 	TObjectPtr<AHeldItem> m_MainHandItem = nullptr;
 	UPROPERTY()

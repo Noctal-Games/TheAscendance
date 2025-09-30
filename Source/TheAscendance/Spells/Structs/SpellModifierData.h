@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Spells/Enums/SpellModifierType.h"
+#include "GameplayTagContainer.h"
 #include "SpellModifierData.generated.h"
 
 // GENERIC MODIFIERS
@@ -26,7 +27,7 @@ struct FApplyCasterEffectModifier : public FGenericSpellModifier
 	FApplyCasterEffectModifier() : FGenericSpellModifier(EGenericSpellModifierType::APPLY_CASTER_EFFECT) {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int EffectID = 0;
+	FGameplayTag EffectTag;
 };
 
 USTRUCT(BlueprintType, meta = (ToolTip = "Applies damage and effects to all valid actors within a specified ranged. This is instant and is separate from spawned AOEs. This is applied on hit with HitScan spells, when the projectile is destroyed with ProjectileSpells, and when casting LocalSpells."))

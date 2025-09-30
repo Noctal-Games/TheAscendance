@@ -5,6 +5,7 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "Components/CharacterStatsComponent.h"
+#include "TheAscendance/Effects/Components/EffectHandlerComponent.h"
 #include "TheAscendance/Items/HeldItem.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
@@ -18,7 +19,9 @@ ABaseCharacter::ABaseCharacter()
 
 	m_CharacterStatsComponent = CreateDefaultSubobject<UCharacterStatsComponent>(TEXT("Character Stats Component"));
 	checkf(m_CharacterStatsComponent, TEXT("Character Stats Component failed to initialise"));
-
+	m_EffectHandlerComponent = CreateDefaultSubobject<UEffectHandlerComponent>(TEXT("Effect Handler Component"));
+	checkf(m_EffectHandlerComponent, TEXT("Effect Handler Component failed to initialise"));
+	
 	SetRootComponent(GetCapsuleComponent());
 
 	GetMesh()->SetCollisionProfileName(FName("NoCollision"));
@@ -29,6 +32,7 @@ void ABaseCharacter::Heal(int amount)
 {
 	if (m_CharacterStatsComponent == nullptr)
 	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
 		return;
 	}
 
@@ -39,10 +43,10 @@ void ABaseCharacter::Damage(int amount)
 {
 	if (m_CharacterStatsComponent == nullptr)
 	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
 		return;
 	}
 
-	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "%s took %i damage", *GetFName().ToString(), amount);
 	m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::HEALTH, -amount);
 }
 
@@ -50,6 +54,7 @@ void ABaseCharacter::ReduceStamina(int amount)
 {
 	if (m_CharacterStatsComponent == nullptr)
 	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
 		return;
 	}
 
@@ -60,6 +65,7 @@ int ABaseCharacter::GetStat(ECharacterStat stat)
 {
 	if (m_CharacterStatsComponent == nullptr)
 	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
 		return 0;
 	}
 
@@ -69,6 +75,50 @@ int ABaseCharacter::GetStat(ECharacterStat stat)
 bool ABaseCharacter::IsDead()
 {
 	return GetStat(ECharacterStat::HEALTH) <= 0.0f;
+}
+
+void ABaseCharacter::AddEffect(UBaseEffect* effect)
+{
+	if (m_EffectHandlerComponent == nullptr)
+	{
+		LOG_ERROR("BaseCharacter has no EffectHandlerComponent");
+		return;
+	}
+
+	m_EffectHandlerComponent->AddEffect(effect);
+}
+
+void ABaseCharacter::AdjustStat(ECharacterStat stat, int amount)
+{
+	if (m_CharacterStatsComponent == nullptr)
+	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
+		return;
+	}
+
+	switch (stat)
+	{ 
+		case ECharacterStat::WALK_SPEED:
+		{
+			m_CharacterStatsComponent->AdjustStatByPercentage(stat, amount);
+			break;
+		}
+		case ECharacterStat::SPRINT_SPEED_BONUS:
+		{
+			m_CharacterStatsComponent->AdjustStatByPercentage(stat, amount);
+			break;
+		}
+		case ECharacterStat::CROUCH_SPEED_PENALITY:
+		{
+			m_CharacterStatsComponent->AdjustStatByPercentage(stat, amount);
+			break;
+		}
+
+		default:
+		{
+			m_CharacterStatsComponent->AdjustStatByValue(stat, amount);
+		}
+	}
 }
 
 bool ABaseCharacter::MainHandPrimaryAttack()
@@ -255,6 +305,8 @@ void ABaseCharacter::Tick(float DeltaTime)
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	m_EffectHandlerComponent->Init(this);
 
 	if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
 	{

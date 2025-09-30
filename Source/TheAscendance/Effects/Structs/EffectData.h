@@ -20,13 +20,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag EffectTag;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	ECharacterStat AffectedStat = ECharacterStat::NONE;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int Potency = 0;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSoftObjectPtr<UNiagaraSystem> EffectNiagara = nullptr;
 
 	EEffectType EffectType = EEffectType::INSTANT;
 };
@@ -37,6 +30,13 @@ class THEASCENDANCE_API UCoreEffectData : public UEffectData
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	ECharacterStat AffectedStat = ECharacterStat::NONE;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int Potency = 0;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UNiagaraSystem> EffectNiagara = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool CanStack = false;

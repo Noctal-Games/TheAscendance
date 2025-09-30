@@ -11,6 +11,7 @@
 #include "Decorators/AOESpellDecorator.h"
 #include "Decorators/KnockbackSpellDecorator.h"
 #include "Decorators/PenetrationSpellDecorator.h"
+#include "Decorators/ApplyCasterEffectSpellDecorator.h"
 
 #include "InstancedStruct.h"
 
@@ -68,6 +69,15 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 
 			case EGenericSpellModifierType::APPLY_CASTER_EFFECT:
 			{
+				if (modifier.GetScriptStruct() != FApplyCasterEffectModifier::StaticStruct())
+				{
+					LOG_ERROR("A GenericSpellModifierType struct with type APPLY_CASTER_EFFECT isn't of type ApplyCasterEffectModifier");
+					continue;
+				}
+
+				const FApplyCasterEffectModifier& applyCasterEffectModifier = modifier.Get<FApplyCasterEffectModifier>();
+				spell = UApplyCasterEffectSpellDecorator::Builder(spell.GetInterface(), applyCasterEffectModifier).Build()->_getUObject();
+
 				break;
 			}
 		}
