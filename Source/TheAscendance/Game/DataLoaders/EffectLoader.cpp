@@ -29,9 +29,37 @@ void UEffectLoader::Init()
 
 UBaseEffect* UEffectLoader::CreateEffectFromTag(const FGameplayTag& effectTag)
 {
-	if (m_EffectTable == nullptr || m_EffectFactory == nullptr)
+	if (m_EffectFactory == nullptr)
 	{
-		LOG_ERROR("EffectLoader tried to create Effect without a valid EffectTable or without a EffectFactory");
+		LOG_ERROR("EffectLoader tried to create Effect without an EffectFactory");
+		return nullptr;
+	}
+
+	if (UEffectData* effectData = LoadEffectData(effectTag))
+	{
+		return m_EffectFactory->CreateEffect(effectData);
+	}
+
+	LOG_ERROR("EffectLoader failed to create EffectData for Effect Tag: %s", *effectTag.ToString());
+	return nullptr;
+}
+
+UBaseEffect* UEffectLoader::CreateEffectFromEffectData(UEffectData* effectData)
+{
+	if (effectData == nullptr || m_EffectFactory == nullptr)
+	{
+		LOG_ERROR("EffectLoader tried to create Effect without a valid EffectData or without a EffectFactory");
+		return nullptr;
+	}
+
+	return m_EffectFactory->CreateEffect(effectData);
+}
+
+UEffectData* UEffectLoader::LoadEffectData(const FGameplayTag& effectTag)
+{
+	if (m_EffectTable == nullptr)
+	{
+		LOG_ERROR("EffectLoader tried to load EffectData without a valid EffectTable");
 		return nullptr;
 	}
 
@@ -63,10 +91,10 @@ UBaseEffect* UEffectLoader::CreateEffectFromTag(const FGameplayTag& effectTag)
 
 		if (UEffectData* effectData = Cast<UEffectData>(pathObject))
 		{
-			return m_EffectFactory->CreateEffect(effectData);
+			return effectData;
 		}
 	}
 
-	LOG_ERROR("EffectLoader failed to create EffectData for Effect Tag: %s", *effectTag.ToString());
+	LOG_ERROR("EffectLoader failed to load EffectData for Effect Tag: %s", *effectTag.ToString());
 	return nullptr;
 }

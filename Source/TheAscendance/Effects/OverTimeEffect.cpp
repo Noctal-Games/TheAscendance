@@ -22,7 +22,7 @@ bool UOverTimeEffect::Init(UEffectData* effectData)
 
 void UOverTimeEffect::StartEffect(ISusceptible* target)
 {
-	UBaseEffect::StartEffect(target);
+	UCoreEffect::StartEffect(target);
 
 	if (m_EffectData == nullptr || target == nullptr)
 	{

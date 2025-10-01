@@ -8,7 +8,7 @@
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
 #include "TheAscendance/Spells/Interfaces/SpellCaster.h"
 #include "TheAscendance/Spells/Structs/SpellModifierData.h"
-#include "TheAscendance/Effects/BaseEffect.h"
+#include "TheAscendance/Effects/CoreEffect.h"
 
 bool UApplyCasterEffectSpellDecorator::CastSpell()
 {
@@ -45,7 +45,10 @@ bool UApplyCasterEffectSpellDecorator::CastSpell()
 			return true;
 		}
 
-		target->AddEffect(casterEffect);
+		if (UCoreEffect* coreEffect = Cast<UCoreEffect>(casterEffect))
+		{
+			target->AddEffect(coreEffect);
+		}
 	}
 
 	return true;

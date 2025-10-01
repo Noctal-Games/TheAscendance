@@ -13,7 +13,7 @@ class USusceptible : public UInterface
 	GENERATED_BODY()
 };
 
-class UBaseEffect;
+class UCoreEffect;
 class UCharacterStatComponent;
 
 class THEASCENDANCE_API ISusceptible
@@ -35,7 +35,7 @@ public:
 	virtual bool IsDead() { return true; };
 
 	UFUNCTION(BlueprintCallable, Category = "Susceptible Interface")
-	virtual void AddEffect(UBaseEffect* effect) {};
+	virtual void AddEffect(UCoreEffect* effect) {};
 
 	virtual void AdjustStat(ECharacterStat stat, int amount) {};
 };

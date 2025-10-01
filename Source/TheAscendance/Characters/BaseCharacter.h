@@ -28,7 +28,7 @@ public:
 	virtual void ReduceStamina(int amount) override;
 	virtual int GetStat(ECharacterStat stat) override;
 	virtual bool IsDead() override;
-	virtual void AddEffect(UBaseEffect* effect) override;
+	virtual void AddEffect(UCoreEffect* effect) override;
 	virtual void AdjustStat(ECharacterStat stat, int amount) override;
 
 	bool MainHandPrimaryAttack();

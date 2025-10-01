@@ -19,6 +19,28 @@ UBaseEffect* APlayableGameMode::CreateEffectFromTag(const FGameplayTag& effectTa
 	return m_EffectLoader->CreateEffectFromTag(effectTag);
 }
 
+UBaseEffect* APlayableGameMode::CreateEffectFromEffectData(UEffectData* effectData)
+{
+	if (m_EffectLoader == nullptr)
+	{
+		LOG_ERROR("PlayableGameMode has invalid EffectLoader");
+		return nullptr;
+	}
+
+	return m_EffectLoader->CreateEffectFromEffectData(effectData);
+}
+
+UEffectData* APlayableGameMode::LoadEffectData(const FGameplayTag& effectTag)
+{
+	if (m_EffectLoader == nullptr)
+	{
+		LOG_ERROR("PlayableGameMode has invalid EffectLoader");
+		return nullptr;
+	}
+
+	return m_EffectLoader->LoadEffectData(effectTag);
+}
+
 FItemData* APlayableGameMode::GetItemData(int id)
 {
 	if (m_ItemLoader == nullptr)

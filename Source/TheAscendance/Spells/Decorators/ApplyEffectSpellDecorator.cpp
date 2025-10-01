@@ -7,7 +7,9 @@
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
 #include "TheAscendance/Spells/Structs/SpellModifierData.h"
-#include "TheAscendance/Effects/BaseEffect.h"
+#include "TheAscendance/Effects/CoreEffect.h"
+#include "TheAscendance/Effects/DeliveryEffects/ChainDeliveryEffect.h"
+#include "TheAscendance/Effects/Structs/EffectData.h"
 
 void UApplyEffectSpellDecorator::ApplyEffects(AActor* hitActor)
 {
@@ -19,6 +21,11 @@ void UApplyEffectSpellDecorator::ApplyEffects(AActor* hitActor)
 		return;
 	}
 
+	if (m_ModifierData->HasRNG == true && (FMath::FRandRange(0.0f, 100.0f) > m_ModifierData->ChanceToApply))
+	{
+		return;
+	}
+
 	ISusceptible* target = Cast<ISusceptible>(hitActor);
 
 	if (target == nullptr)
@@ -27,35 +34,53 @@ void UApplyEffectSpellDecorator::ApplyEffects(AActor* hitActor)
 		return;
 	}
 
+	UBaseEffect* effect = nullptr;
+
 	if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
 	{
-		if (m_ModifierData->HasRNG == false)
-		{
-			UBaseEffect* effect = gameMode->CreateEffectFromTag(m_ModifierData->EffectTag);
+		effect = gameMode->CreateEffectFromTag(m_ModifierData->EffectTag);
+	}
+	else
+	{
+		LOG_ERROR("Tried to apply Effect in invalid Gamemode");
+		return;
+	}
 
-			if (effect == nullptr)
+	if (effect == nullptr)
+	{
+		return;
+	}
+
+	if (UEffectData* effectData = effect->GetEffectData())
+	{
+		FString subType = UGameplayTagHelpers::GetTagSubtype(effectData->EffectTag);
+
+		if (subType == "AOE")
+		{
+
+		}
+		else if (subType == "Chain")
+		{
+			if (UChainDeliveryEffect* chainEffect = Cast<UChainDeliveryEffect>(effect))
 			{
-				return;
+				chainEffect->Root();
+				chainEffect->StartEffect(target);
 			}
-
-			target->AddEffect(effect);
-			return;
 		}
-
-		float rand = FMath::FRandRange(0.0f, 100.0f);
-
-		if (rand > m_ModifierData->ChanceToApply)
+		else
 		{
-			return;
+			if (UCoreEffect* coreEffect = Cast<UCoreEffect>(effect))
+			{
+				target->AddEffect(coreEffect);
+			}
+			else
+			{
+				LOG_ERROR("Tried to apply an Effect with no subtype but failed to Cast to CoreEffect");
+			}
 		}
-
-		UBaseEffect* effect = gameMode->CreateEffectFromTag(m_ModifierData->EffectTag);
-
-		if (effect == nullptr)
-		{
-			return;
-		}
-
-		target->AddEffect(effect);
+	}
+	else
+	{
+		LOG_ERROR("Tried to apply Effect but failed to get the EffectData");
 	}
 }

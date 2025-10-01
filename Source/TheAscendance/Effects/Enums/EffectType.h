@@ -14,7 +14,7 @@ enum class EEffectType : uint8
 	DURATION UMETA(DisplayName = "Duration"),
 	AOE UMETA(DisplayName = "Area of Effect"),
 	AURA UMETA(DisplayName = "Aura"),
-//	CHAIN UMETA(DisplayName = "Chain"),
+	CHAIN UMETA(DisplayName = "Chain"),
 
 	MAX UMETA(Hidden)
 };

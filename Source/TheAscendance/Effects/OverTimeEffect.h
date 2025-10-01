@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BaseEffect.h"
+#include "CoreEffect.h"
 #include "OverTimeEffect.generated.h"
 
 class UOverTimeEffectData;
 
 UCLASS()
-class THEASCENDANCE_API UOverTimeEffect : public UBaseEffect
+class THEASCENDANCE_API UOverTimeEffect : public UCoreEffect
 {
 	GENERATED_BODY()
 	

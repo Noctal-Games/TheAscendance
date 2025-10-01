@@ -5,7 +5,7 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Effects/Structs/EffectData.h"
-#include "TheAscendance/Effects/BaseEffect.h"
+#include "TheAscendance/Effects/CoreEffect.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
 
 // Sets default values for this component's properties
@@ -29,7 +29,7 @@ void UEffectHandlerComponent::Init(ISusceptible* owner)
 	m_Owner = owner->_getUObject();
 }
 
-void UEffectHandlerComponent::AddEffect(UBaseEffect* effect)
+void UEffectHandlerComponent::AddEffect(UCoreEffect* effect)
 {
 	if (effect == nullptr || m_Owner == nullptr)
 	{
@@ -62,7 +62,7 @@ void UEffectHandlerComponent::AddEffect(UBaseEffect* effect)
 	{
 		if (m_Effects[*tag].Effects.Num() == effectData->StackCap)
 		{
-			if (UBaseEffect* oldEffect = m_Effects[*tag].Effects[0])
+			if (UCoreEffect* oldEffect = m_Effects[*tag].Effects[0])
 			{
 				oldEffect->EndEffect();
 			}
@@ -72,7 +72,7 @@ void UEffectHandlerComponent::AddEffect(UBaseEffect* effect)
 	{
 		if (m_Effects[*tag].Effects.Num() != 0)
 		{
-			if (UBaseEffect* oldEffect = m_Effects[*tag].Effects[0])
+			if (UCoreEffect* oldEffect = m_Effects[*tag].Effects[0])
 			{
 				oldEffect->EndEffect();
 			}
@@ -80,11 +80,18 @@ void UEffectHandlerComponent::AddEffect(UBaseEffect* effect)
 	}
 
 	m_Effects[*tag].Effects.Add(effect);
-	effect->OnEffectEnd.BindLambda([this](UBaseEffect* toRemove) { QueueRemoval(toRemove); });
+	effect->OnEffectEnd.BindLambda([this](UBaseEffect* toRemove) {     
+
+		if (UCoreEffect* Core = Cast<UCoreEffect>(toRemove))
+		{
+			QueueRemoval(Core);
+		};
+	});
+
 	effect->StartEffect(m_Owner.GetInterface());
 }
 
-void UEffectHandlerComponent::QueueRemoval(UBaseEffect* effect)
+void UEffectHandlerComponent::QueueRemoval(UCoreEffect* effect)
 {
 	if (effect == nullptr)
 	{
@@ -121,7 +128,7 @@ void UEffectHandlerComponent::RemoveEffects()
 
 	for (const FGameplayTag& effectTag : tags)
 	{
-		for (UBaseEffect* effect : m_EffectsToRemove[effectTag].Effects)
+		for (UCoreEffect* effect : m_EffectsToRemove[effectTag].Effects)
 		{
 			m_Effects[effectTag].Effects.Remove(effect);
 		}
@@ -152,7 +159,7 @@ void UEffectHandlerComponent::ClearEffects()
 
 	for (const FGameplayTag& effectTag : tags)
 	{
-		for (UBaseEffect* effect : m_Effects[effectTag].Effects)
+		for (UCoreEffect* effect : m_Effects[effectTag].Effects)
 		{
 			effect->EndEffect();
 		}
@@ -192,7 +199,7 @@ void UEffectHandlerComponent::TickComponent(float deltaTime, ELevelTick tickType
 			continue;
 		}
 
-		for (UBaseEffect* effect : m_Effects[effectTag].Effects)
+		for (UCoreEffect* effect : m_Effects[effectTag].Effects)
 		{
 			if (effect == nullptr)
 			{

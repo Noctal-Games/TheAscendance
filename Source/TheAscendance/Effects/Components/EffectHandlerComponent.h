@@ -7,7 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "EffectHandlerComponent.generated.h"
 
-class UBaseEffect;
+class UCoreEffect;
 class UCoreEffectData;
 class ISusceptible;
 
@@ -17,7 +17,7 @@ struct FEffectList
 	GENERATED_BODY()
 
 	UPROPERTY()
-	TArray<TObjectPtr<UBaseEffect>> Effects;
+	TArray<TObjectPtr<UCoreEffect>> Effects;
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -31,7 +31,7 @@ public:
 
 	void Init(ISusceptible* owner);
 
-	void AddEffect(UBaseEffect* effect);
+	void AddEffect(UCoreEffect* effect);
 	void ClearEffects();
 
 	// Called every frame
@@ -42,7 +42,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	void QueueRemoval(UBaseEffect* effect);
+	void QueueRemoval(UCoreEffect* effect);
 	void RemoveEffects();
 
 private:

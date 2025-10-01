@@ -9,6 +9,7 @@
 #include "PlayableGameMode.generated.h"
 
 class UEffectLoader;
+class UEffectData;
 class UBaseEffect;
 class UEnemyLoader;
 class ABaseEnemy;
@@ -27,6 +28,8 @@ class THEASCENDANCE_API APlayableGameMode : public AGameModeBase
 	
 public:
 	UBaseEffect* CreateEffectFromTag(const FGameplayTag& effectTag);
+	UBaseEffect* CreateEffectFromEffectData(UEffectData* effectData);
+	UEffectData* LoadEffectData(const FGameplayTag& effectTag);
 
 	FItemData* GetItemData(int id);
 	FWeaponData* GetWeaponData(int itemID);

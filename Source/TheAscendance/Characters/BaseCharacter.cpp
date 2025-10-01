@@ -77,7 +77,7 @@ bool ABaseCharacter::IsDead()
 	return GetStat(ECharacterStat::HEALTH) <= 0.0f;
 }
 
-void ABaseCharacter::AddEffect(UBaseEffect* effect)
+void ABaseCharacter::AddEffect(UCoreEffect* effect)
 {
 	if (m_EffectHandlerComponent == nullptr)
 	{

@@ -91,6 +91,33 @@ public:
 	float Duration = 0.0f;
 };
 
+UCLASS(Abstract, BlueprintType)
+class THEASCENDANCE_API UDeliveryEffectData : public UEffectData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float DeliveryRange = 0.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UNiagaraSystem> DeliveryNiagara = nullptr;
+};
+
+UCLASS(BlueprintType)
+class THEASCENDANCE_API UChainDeliveryEffectData : public UDeliveryEffectData
+{
+	GENERATED_BODY()
+
+public:
+	UChainDeliveryEffectData()
+	{
+		EffectType = EEffectType::CHAIN;
+	}
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 0.1f))
+	float BounceDelay = 0.1f;
+};
 
 USTRUCT(BlueprintType)
 struct FEffectTableData : public FTableRowBase

@@ -5,6 +5,7 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Effects/Structs/EffectData.h"
 #include "TheAscendance/Effects/OverTimeEffect.h"
+#include "TheAscendance/Effects/DeliveryEffects/ChainDeliveryEffect.h"
 
 UBaseEffect* EffectFactory::CreateEffect(UEffectData* effectData)
 {
@@ -21,6 +22,11 @@ UBaseEffect* EffectFactory::CreateEffect(UEffectData* effectData)
 		case EEffectType::OVERTIME:
 		{
 			effect = NewObject<UOverTimeEffect>();
+			break;
+		}
+		case EEffectType::CHAIN:
+		{
+			effect = NewObject<UChainDeliveryEffect>();
 			break;
 		}
 	}

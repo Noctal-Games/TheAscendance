@@ -9,6 +9,7 @@
 #include "EffectLoader.generated.h"
 
 class UBaseEffect;
+class UEffectData;
 
 UCLASS()
 class THEASCENDANCE_API UEffectLoader : public UObject
@@ -19,6 +20,9 @@ public:
 	void Init();
 
 	UBaseEffect* CreateEffectFromTag(const FGameplayTag& effectTag);
+	UBaseEffect* CreateEffectFromEffectData(UEffectData* effectData);
+
+	UEffectData* LoadEffectData(const FGameplayTag& effectTag);
 
 private:
 	UPROPERTY()
