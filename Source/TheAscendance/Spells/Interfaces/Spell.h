@@ -44,7 +44,9 @@ public:
 	virtual void ProcessOverlapDamage(int& damage) {};
 	virtual void ProcessHitDamage(int& damage, FVector targetLocation, FVector hitLocation) {};
 
-	virtual void DealDamage(AActor* hitActor, int damage) {};
+	virtual bool DealDamage(AActor* hitActor, int damage) { return true; };
+	virtual void ApplyEffects(AActor* hitActor) {};
+
 	virtual void DecorateProjectile(IProjectile* projectile) {};
 
 };

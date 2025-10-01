@@ -75,6 +75,8 @@ void UCharacterStatsComponent::SetStat(ECharacterStat stat, float amount)
 		return;
 	}
 
+	m_StatsBase[stat] = amount;
+	m_StatsMax[stat] = amount;
 	m_Stats[stat] = amount;
 
 	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA && stat != ECharacterStat::WALK_SPEED)
@@ -92,6 +94,8 @@ void UCharacterStatsComponent::AdjustStatByValue(ECharacterStat stat, float amou
 		LogStatError(stat);
 		return;
 	}
+
+	LOG_ONSCREEN(-1, 3.0f, FColor::Green, "STAT: %s CHANGED FROM %.0f TO %.0f", *UEnum::GetValueAsString(stat), m_Stats[stat], m_Stats[stat] + amount);
 
 	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA)
 	{

@@ -62,11 +62,10 @@ void UBaseSpell::Update(float deltaTime)
 
 void UBaseSpell::OnOverlap(AActor* overlapActor, FVector spellOverlapLocation, int damage)
 {		
-	LOG_ONSCREEN(-1, 5.0f, FColor::Green, "OnOverlap");
-	DealDamage(overlapActor, damage);
-
-	//Check if Dead
-	//Handle Effects
+	if (m_DecoratedSelf->DealDamage(overlapActor, damage) == false)
+	{
+		m_DecoratedSelf->ApplyEffects(overlapActor);
+	}
 }
 
 void UBaseSpell::OnHit(AActor* hitActor, FVector spellHitLocation)
@@ -84,10 +83,10 @@ void UBaseSpell::ProcessHit(FVector spellHitLocation)
 		int damage = 0;
 		m_DecoratedSelf->ProcessHitDamage(damage, actor->GetActorLocation(), spellHitLocation);
 
-		DealDamage(actor, damage);
-
-		//Check if Dead
-		//Handle Effects
+		if (m_DecoratedSelf->DealDamage(actor, damage) == false)
+		{
+			m_DecoratedSelf->ApplyEffects(actor);
+		}
 	}
 
 	//Play Sounds/VFX
@@ -96,7 +95,10 @@ void UBaseSpell::ProcessHit(FVector spellHitLocation)
 
 void UBaseSpell::Fire(FVector direction)
 {
-	LOG_ONSCREEN(-1, 1.0f, FColor::Cyan, "Base: Fire");
+}
+
+void UBaseSpell::ApplyEffects(AActor* hitActor)
+{
 }
 
 ISpellCaster* UBaseSpell::GetSpellOwner()

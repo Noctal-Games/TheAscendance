@@ -17,15 +17,15 @@ class THEASCENDANCE_API UCoreFunctionLibrary : public UObject
 	GENERATED_BODY()
 	
 public:
-	UFUNCTION(BlueprintCallable, Category = "Core")
+	UFUNCTION(BlueprintPure, Category = "Core")
 	static UWorld* GetGameWorld();
 
-	UFUNCTION(BlueprintCallable, Category = "Core")
+	UFUNCTION(BlueprintPure, Category = "Core")
 	static APlayableGameMode* GetPlayableGameMode();
 
-	UFUNCTION(BlueprintCallable, Category = "Core")
+	UFUNCTION(BlueprintPure, Category = "Core")
 	static APlayerCharacter* GetPlayerCharacter();
-	UFUNCTION(BlueprintCallable, Category = "Core")
+	UFUNCTION(BlueprintPure, Category = "Core")
 	static ATAPlayerController* GetPlayerController();
 
 	UFUNCTION(BlueprintCallable, Category = "Core - Logging")

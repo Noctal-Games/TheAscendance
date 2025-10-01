@@ -22,5 +22,7 @@ enum class ECharacterStat : uint8
 	PHYSICAL_RESISTANCE UMETA(DisplayName = "Physical Resistance (%)"),
 	MAGIC_RESISTANCE UMETA(DisplayName = "Magic Resistance (%)"),
 
+	SHIELD UMETA(Hidden),
+
 	MAX UMETA(Hidden)
 };
