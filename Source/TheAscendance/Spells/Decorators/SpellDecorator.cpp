@@ -147,7 +147,18 @@ void USpellDecorator::ProcessHitDamage(int& damage, FVector targetLocation, FVec
 	m_DecoratedSpell->ProcessHitDamage(damage, targetLocation, hitLocation);
 }
 
-void USpellDecorator::DealDamage(AActor* hitActor, int damage)
+bool USpellDecorator::DealDamage(AActor* hitActor, int damage)
+{
+	if (m_DecoratedSpell == nullptr)
+	{
+		LOG_ERROR("Spell decorator has invalid DecoratedSpell pointer");
+		return true;
+	}
+
+	return m_DecoratedSpell->DealDamage(hitActor, damage);
+}
+
+void USpellDecorator::ApplyEffects(AActor* hitActor)
 {
 	if (m_DecoratedSpell == nullptr)
 	{
@@ -155,7 +166,7 @@ void USpellDecorator::DealDamage(AActor* hitActor, int damage)
 		return;
 	}
 
-	m_DecoratedSpell->DealDamage(hitActor, damage);
+	m_DecoratedSpell->ApplyEffects(hitActor);
 }
 
 void USpellDecorator::DecorateProjectile(IProjectile* projectile)

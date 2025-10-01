@@ -30,6 +30,21 @@ struct FApplyCasterEffectModifier : public FGenericSpellModifier
 	FGameplayTag EffectTag;
 };
 
+USTRUCT(BlueprintType, meta = (ToolTip = "Applies a specified effect to hit targets."))
+struct FApplyEffectModifier : public FGenericSpellModifier
+{
+	GENERATED_BODY()
+
+	FApplyEffectModifier() : FGenericSpellModifier(EGenericSpellModifierType::APPLY_EFFECT) {};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag EffectTag;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "If the effect has a chance to land, and isn't guaranteed"))
+	bool HasRNG = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "HasRNG == true", EditConditionHides, ClampMin = 0.0f, ClampMax = 100.0f))
+	float ChanceToApply = 0.0f;
+};
+
 USTRUCT(BlueprintType, meta = (ToolTip = "Applies damage and effects to all valid actors within a specified ranged. This is instant and is separate from spawned AOEs. This is applied on hit with HitScan spells, when the projectile is destroyed with ProjectileSpells, and when casting LocalSpells."))
 struct FAreaOfEffectModifier : public FGenericSpellModifier
 {

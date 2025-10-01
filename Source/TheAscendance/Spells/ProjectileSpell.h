@@ -23,7 +23,7 @@ public:
 	virtual void ProcessOverlapDamage(int& damage) override;
 	virtual void ProcessHitDamage(int& damage, FVector targetLocation, FVector hitLocation) override;
 
-	virtual void DealDamage(AActor* hitActor, int damage) override;
+	virtual bool DealDamage(AActor* hitActor, int damage) override;
 	virtual void DecorateProjectile(IProjectile* projectile) override;
 
 private:

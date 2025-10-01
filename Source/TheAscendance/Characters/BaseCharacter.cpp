@@ -251,7 +251,7 @@ void ABaseCharacter::EndOffHandAttack()
 	return m_OffHandItem->EndAttack();
 }
 
-AActor* ABaseCharacter::GetSpellOwner()
+AActor* ABaseCharacter::GetActor()
 {
 	return this;
 }

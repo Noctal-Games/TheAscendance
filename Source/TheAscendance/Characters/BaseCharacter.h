@@ -62,7 +62,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EndOffHandAttack();
 
-	virtual AActor* GetSpellOwner() override;
+	virtual AActor* GetActor() override;
 	const virtual FVector GetSpellOwnerLocation() override;
 	const virtual FVector GetSpellOwnerForward() override;
 	const virtual FVector GetCastStartLocation() override;

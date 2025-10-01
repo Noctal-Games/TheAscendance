@@ -12,6 +12,7 @@
 #include "Decorators/KnockbackSpellDecorator.h"
 #include "Decorators/PenetrationSpellDecorator.h"
 #include "Decorators/ApplyCasterEffectSpellDecorator.h"
+#include "Decorators/ApplyEffectSpellDecorator.h"
 
 #include "InstancedStruct.h"
 
@@ -61,8 +62,8 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 					continue;
 				}
 
-				const FAreaOfEffectModifier& aoeModifier = modifier.Get<FAreaOfEffectModifier>();
-				spell = UAOESpellDecorator::Builder(spell.GetInterface(), aoeModifier).Build()->_getUObject();
+				const FAreaOfEffectModifier& modifierData = modifier.Get<FAreaOfEffectModifier>();
+				spell = UAOESpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
 
 				break;
 			}
@@ -75,8 +76,22 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 					continue;
 				}
 
-				const FApplyCasterEffectModifier& applyCasterEffectModifier = modifier.Get<FApplyCasterEffectModifier>();
-				spell = UApplyCasterEffectSpellDecorator::Builder(spell.GetInterface(), applyCasterEffectModifier).Build()->_getUObject();
+				const FApplyCasterEffectModifier& modifierData = modifier.Get<FApplyCasterEffectModifier>();
+				spell = UApplyCasterEffectSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
+
+				break;
+			}
+
+			case EGenericSpellModifierType::APPLY_EFFECT:
+			{
+				if (modifier.GetScriptStruct() != FApplyEffectModifier::StaticStruct())
+				{
+					LOG_ERROR("A GenericSpellModifierType struct with type APPLY_EFFECT isn't of type ApplyEffectModifier");
+					continue;
+				}
+
+				const FApplyEffectModifier& modifierData = modifier.Get<FApplyEffectModifier>();
+				spell = UApplyEffectSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
 
 				break;
 			}
@@ -141,8 +156,8 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 								continue;
 							}
 
-							const FPenetrationSpellModifier& penetrationModifier = modifier.Get<FPenetrationSpellModifier>();
-							spell = UPenetrationSpellDecorator::Builder(spell.GetInterface(), penetrationModifier).Build()->_getUObject();
+							const FPenetrationSpellModifier& modifierData = modifier.Get<FPenetrationSpellModifier>();
+							spell = UPenetrationSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
 							break;
 						}
 					}

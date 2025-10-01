@@ -2,12 +2,12 @@
 
 
 #include "ApplyCasterEffectSpellDecorator.h"
-#include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
-#include "TheAscendance/Spells/Interfaces/SpellCaster.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
+#include "TheAscendance/Spells/Interfaces/SpellCaster.h"
+#include "TheAscendance/Spells/Structs/SpellModifierData.h"
 #include "TheAscendance/Effects/BaseEffect.h"
 
 bool UApplyCasterEffectSpellDecorator::CastSpell()
@@ -27,7 +27,7 @@ bool UApplyCasterEffectSpellDecorator::CastSpell()
 
 	if (ISpellCaster* caster = GetSpellOwner())
 	{
-		target = Cast<ISusceptible>(caster->GetSpellOwner());
+		target = Cast<ISusceptible>(caster->GetActor());
 	}
 
 	if (target == nullptr)

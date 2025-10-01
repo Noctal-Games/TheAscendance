@@ -75,6 +75,8 @@ void UCharacterStatsComponent::SetStat(ECharacterStat stat, float amount)
 		return;
 	}
 
+	m_StatsBase[stat] = amount;
+	m_StatsMax[stat] = amount;
 	m_Stats[stat] = amount;
 
 	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA && stat != ECharacterStat::WALK_SPEED)

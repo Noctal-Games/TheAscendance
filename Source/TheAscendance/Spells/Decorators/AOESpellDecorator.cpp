@@ -22,7 +22,7 @@ void UAOESpellDecorator::OnHit(AActor* hitActor, FVector spellHitLocation)
 	m_DecoratedSpell->ProcessHitDamage(damage, hitActor->GetActorLocation(), spellHitLocation);
 	m_DecoratedSpell->DealDamage(hitActor, damage);
 
-	AActor* owner = GetSpellOwner()->GetSpellOwner();
+	AActor* owner = GetSpellOwner()->GetActor();
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> types;
 	types.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody));

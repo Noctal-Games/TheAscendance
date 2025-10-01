@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "SpellDecorator.h"
-#include "TheAscendance/Spells/Structs/SpellModifierData.h"
 #include "ApplyCasterEffectSpellDecorator.generated.h"
+
+struct FApplyCasterEffectModifier;
 
 UCLASS()
 class THEASCENDANCE_API UApplyCasterEffectSpellDecorator : public USpellDecorator
