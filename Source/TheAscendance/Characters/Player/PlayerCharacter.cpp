@@ -2,11 +2,17 @@
 
 
 #include "PlayerCharacter.h"
+#include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "PlayerMovementComponent.h"
 #include "TheAscendance/Characters/Components/CharacterStatsComponent.h"
+#include "TheAscendance/Game/GameModes/PlayableGameMode.h"
+#include "TheAscendance/Items/HeldItem.h"
+#include "TheAscendance/Spells/Interfaces/Spell.h"
+
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
-#include "TheAscendance/Core/CoreMacros.h"
+
 
 // Sets default values
 APlayerCharacter::APlayerCharacter() : ABaseCharacter()
@@ -126,6 +132,11 @@ UCameraComponent* APlayerCharacter::GetCamera()
 	return m_Camera;
 }
 
+const FVector APlayerCharacter::GetCastStartForward()
+{
+	return m_Camera->GetForwardVector();
+}
+
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
@@ -138,12 +149,65 @@ void APlayerCharacter::BeginPlay()
 	m_DefaultCapsuleHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
 	m_CurrentCapsuleHeight = m_DefaultCapsuleHeight;
 	m_CrouchCapsuleHeight = m_DefaultCapsuleHeight / 2;
+
+	//Test
+	if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
+	{
+		if (ISpell* spell = gameMode->CreateSpellFromID(1, this))
+		{
+			m_TestSpell = spell->_getUObject();
+		}
+	}
 }
 
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	ABaseCharacter::Tick(DeltaTime);
+
+	LOG_ONSCREEN(0, 1, FColor::Yellow, "USING ANIMATIONS: %s", m_AnimTest ? TEXT("TRUE") : TEXT("FALSE"));
 }
 
+void APlayerCharacter::TestFunction1()
+{
+	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 1");
+	m_AnimTest = !m_AnimTest;
+}
+
+void APlayerCharacter::TestFunction2()
+{
+	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 2");
+	//EndMainHandAttack();
+	//EndOffHandAttack();
+
+	if (m_TestSpell == nullptr)
+	{
+		LOG_ONSCREEN(-1, 1.0f, FColor::Red, "TestSpell is invalid");
+		return;
+	}
+
+	if (m_TestSpell->CanCast() == true)
+	{
+		m_TestSpell->CastSpell();
+	}
+}
+
+void APlayerCharacter::TestFunction3()
+{
+	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 3");
+
+	if (m_TestEquipToggle == false)
+	{
+		if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
+		{
+			m_MainHandItem->Init(gameMode->GetItemData(2));
+		}
+	}
+	else
+	{
+		m_MainHandItem->UnEquip();
+	}
+
+	m_TestEquipToggle = !m_TestEquipToggle;
+}
 

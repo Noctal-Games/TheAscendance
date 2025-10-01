@@ -16,6 +16,7 @@ AItem::AItem()
 	m_MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Component"));
 	checkf(m_MeshComponent, TEXT("Item failed to initialise StaticMeshComponent"));
 	m_MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	m_MeshComponent->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
 	m_MeshComponent->SetEnableGravity(true);
 	m_MeshComponent->SetSimulatePhysics(true);
 }
