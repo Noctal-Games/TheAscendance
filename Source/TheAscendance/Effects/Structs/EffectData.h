@@ -119,6 +119,29 @@ public:
 	float BounceDelay = 0.1f;
 };
 
+UCLASS(BlueprintType)
+class THEASCENDANCE_API UAreaOfEffectDeliveryEffectData : public UDeliveryEffectData
+{
+	GENERATED_BODY()
+
+public:
+	UAreaOfEffectDeliveryEffectData()
+	{
+		EffectType = EEffectType::AOE;
+	}
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Duration = 0.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 0.1f))
+	float EffectInterval = 0.1f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool ApplyPhysics = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "ApplyPhysics == true", EditConditionHides, ToolTip = "True for Push physics, False for Pull physics"))
+	bool PushOrPull = true;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "ApplyPhysics == true", EditConditionHides))
+	float Strength = 0.0f;
+};
+
 USTRUCT(BlueprintType)
 struct FEffectTableData : public FTableRowBase
 {

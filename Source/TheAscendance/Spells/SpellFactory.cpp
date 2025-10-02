@@ -13,6 +13,7 @@
 #include "Decorators/PenetrationSpellDecorator.h"
 #include "Decorators/ApplyCasterEffectSpellDecorator.h"
 #include "Decorators/ApplyEffectSpellDecorator.h"
+#include "Decorators/SpawnEffectSpellDecorator.h"
 
 #include "InstancedStruct.h"
 
@@ -92,6 +93,20 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 
 				const FApplyEffectModifier& modifierData = modifier.Get<FApplyEffectModifier>();
 				spell = UApplyEffectSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
+
+				break;
+			}
+
+			case EGenericSpellModifierType::SPAWN_EFFECT:
+			{
+				if (modifier.GetScriptStruct() != FSpawnEffectModifier::StaticStruct())
+				{
+					LOG_ERROR("A GenericSpellModifierType struct with type SPAWN_EFFECT isn't of type SpawnEffectModifier");
+					continue;
+				}
+
+				const FSpawnEffectModifier& modifierData = modifier.Get<FSpawnEffectModifier>();
+				spell = USpawnEffectSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
 
 				break;
 			}

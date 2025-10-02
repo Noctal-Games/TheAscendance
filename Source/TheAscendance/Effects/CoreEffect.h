@@ -14,6 +14,6 @@ class THEASCENDANCE_API UCoreEffect : public UBaseEffect
 	GENERATED_BODY()
 	
 public:
-	virtual void StartEffect(ISusceptible* target) override;
+	virtual void StartEffect(ISusceptible* target, FVector location = FVector::Zero()) override;
 	virtual void EndEffect() override;
 };

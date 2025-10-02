@@ -3,8 +3,11 @@
 
 #include "OverTimeEffect.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
 #include "Structs/EffectData.h"
+
+#include "TimerManager.h"
 
 bool UOverTimeEffect::Init(UEffectData* effectData)
 {
@@ -20,7 +23,7 @@ bool UOverTimeEffect::Init(UEffectData* effectData)
 	}
 }
 
-void UOverTimeEffect::StartEffect(ISusceptible* target)
+void UOverTimeEffect::StartEffect(ISusceptible* target, FVector location)
 {
 	UCoreEffect::StartEffect(target);
 
@@ -30,10 +33,43 @@ void UOverTimeEffect::StartEffect(ISusceptible* target)
 	}
 
 	m_Timer = m_EffectData->Duration;
-	m_IntervalTimer = m_EffectData->EffectInterval;
+	m_Interval = m_EffectData->EffectInterval;
+
+	DoEffect();
+
+	if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
+	{
+		world->GetTimerManager().SetTimer(m_TimerHandle, this, &UOverTimeEffect::DoEffect, m_Interval, true);
+	}
 }
 
-void UOverTimeEffect::Update(float deltaTime)
+void UOverTimeEffect::EndEffect()
+{
+	if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
+	{
+		world->GetTimerManager().ClearTimer(m_TimerHandle);
+	}
+
+	UCoreEffect::EndEffect();
+}
+
+void UOverTimeEffect::ResetEffect()
+{
+	m_Timer = m_EffectData->Duration;
+}
+
+UEffectData* UOverTimeEffect::GetEffectData()
+{
+	if (m_EffectData.IsValid() == false)
+	{
+		LOG_ERROR("Effect has no valid EffectData");
+		return nullptr;
+	}
+
+	return m_EffectData.Get();
+}
+
+void UOverTimeEffect::DoEffect()
 {
 	if (m_EffectData.IsValid() == false)
 	{
@@ -46,35 +82,19 @@ void UOverTimeEffect::Update(float deltaTime)
 		return;
 	}
 
-	m_Timer -= deltaTime;
-	m_IntervalTimer -= deltaTime;
+	m_Timer -= m_Interval;
 
-	if (m_IntervalTimer <= 0.0f)
+	if (m_Target == nullptr)
 	{
-		if (m_Target == nullptr)
-		{
-			EndEffect();
-			return;
-		}
-
-		m_Target->AdjustStat(m_EffectData->AffectedStat, m_EffectData->Potency);
-		m_IntervalTimer += m_EffectData->EffectInterval;
+		EndEffect();
+		return;
 	}
+
+	m_Target->AdjustStat(m_EffectData->AffectedStat, m_EffectData->Potency);
 
 	if (m_Timer <= 0.0f)
 	{
 		EndEffect();
 		return;
 	}
-}
-
-UEffectData* UOverTimeEffect::GetEffectData()
-{
-	if (m_EffectData.IsValid() == false)
-	{
-		LOG_ERROR("Effect has no valid EffectData");
-		return nullptr;
-	}
-
-	return m_EffectData.Get();
 }

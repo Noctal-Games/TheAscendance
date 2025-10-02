@@ -11,8 +11,9 @@ enum class EGenericSpellModifierType : uint8
 {
 	NONE,
 
-	APPLY_CASTER_EFFECT UMETA(DisplayName = "Apply Effect to Caster"),
-	APPLY_EFFECT UMETA(DisplayName = "Apply Effec to hit Targets"),
+	APPLY_CASTER_EFFECT UMETA(DisplayName = "Apply Effect to caster"),
+	APPLY_EFFECT UMETA(DisplayName = "Apply Effect to hit targets"),
+	SPAWN_EFFECT UMETA(DisplayName = "Spawn Effect at hit location"),
 	AOE UMETA(DisplayName = "Area of Effect"),
 
 	MAX UMETA(Hidden)

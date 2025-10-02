@@ -34,16 +34,12 @@ public:
 	void AddEffect(UCoreEffect* effect);
 	void ClearEffects();
 
-	// Called every frame
-	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 private:
-	void QueueRemoval(UCoreEffect* effect);
-	void RemoveEffects();
+	void RemoveEffect(UCoreEffect* effect);
 
 private:
 	UPROPERTY()
@@ -51,6 +47,4 @@ private:
 
 	UPROPERTY()
 	TMap<FGameplayTag, FEffectList> m_Effects;
-	UPROPERTY()
-	TMap<FGameplayTag, FEffectList> m_EffectsToRemove;
 };
