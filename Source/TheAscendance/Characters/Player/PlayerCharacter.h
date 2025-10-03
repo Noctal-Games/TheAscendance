@@ -9,6 +9,7 @@
 class UPlayerMovementComponent;
 class UCameraComponent;
 class ATAPlayerController;
+class ISpell;
 
 UCLASS()
 class THEASCENDANCE_API APlayerCharacter : public ABaseCharacter
@@ -40,6 +41,12 @@ public:
 
 	UCameraComponent* GetCamera();
 
+	const virtual FVector GetCastStartForward() override;
+
+	void TestFunction1();
+	void TestFunction2();
+	void TestFunction3();
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
@@ -63,4 +70,8 @@ private:
 	bool m_IsSprinting = false;
 	bool m_IsCrouching = false;
 	bool m_IsJumping = false;
+
+	//Test
+	UPROPERTY()
+	TScriptInterface<ISpell> m_TestSpell = nullptr;
 };

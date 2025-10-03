@@ -71,6 +71,27 @@ void UCoreFunctionLibrary::LogError(FString string)
 	LOG_ERROR("%s", *string);
 }
 
+void UCoreFunctionLibrary::DrawDebugLine(const FVector& start, const FVector& end, const FColor colour, const float duration)
+{
+#if WITH_EDITOR || UE_BUILD_DEVELOPMENT
+	::DrawDebugLine(GetGameWorld(), start, end, colour, false, duration);
+#endif
+}
+
+void UCoreFunctionLibrary::DrawDebugSphere(const FVector& centre, const float radius, const int32 segments, const FColor colour, const float duration)
+{
+#if WITH_EDITOR || UE_BUILD_DEVELOPMENT
+	::DrawDebugSphere(GetGameWorld(), centre, radius, segments, colour, false, duration);
+#endif
+}
+
+void UCoreFunctionLibrary::DrawDebugBox(const FVector& centre, const FVector& extent, const FRotator& rotation, const FColor colour, const float duration)
+{
+#if WITH_EDITOR || UE_BUILD_DEVELOPMENT
+	::DrawDebugBox(GetGameWorld(), centre, extent, FQuat(rotation), colour, false, duration);
+#endif
+}
+
 UDataHandlerSubsystem* UCoreFunctionLibrary::GetDataHandlerSubsystem()
 {
 	if (UWorld* world = GetGameWorld())
@@ -86,11 +107,69 @@ void UCoreFunctionLibrary::RequestAsyncLoad(const FSoftObjectPath& targetToStrea
 {
 	LOG_INFO("Requesting ASync Load for: %s", *targetToStream.ToString());
 
-	if (delegate == nullptr)
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(targetToStream, FStreamableDelegate::CreateLambda([delegate = MoveTemp(delegate), targetToStream]()
+		{
+			UObject* loadedObject = targetToStream.ResolveObject();
+
+			if (loadedObject != nullptr)
+			{
+				LOG_INFO("Successful ASync Load for: %s", *targetToStream.ToString());
+			}
+			else
+			{
+				LOG_ERROR("Failed ASync Load for: %s", *targetToStream.ToString());
+			}
+
+			if (delegate.IsSet())
+			{
+				delegate();
+			}
+		}
+	));
+}
+
+void UCoreFunctionLibrary::RequestAsyncLoad(const TArray<FSoftObjectPath>& targetsToStream, TFunction<void()> delegate)
+{
+	if (targetsToStream.Num() == 0)
 	{
-		UAssetManager::GetStreamableManager().RequestAsyncLoad(targetToStream);
+		LOG_WARNING("Tried to RequestASyncLoad for multiple items, but the array was empty");
+
+		if (delegate.IsSet())
+		{
+			delegate();
+		}
+
 		return;
 	}
+	else if (targetsToStream.Num() == 1)
+	{
+		LOG_WARNING("Requesting ASync Load for multiple items, but the array only contains one item. Consider using the single load alternative.");
+	}
 
-	UAssetManager::GetStreamableManager().RequestAsyncLoad(targetToStream, FStreamableDelegate::CreateLambda(delegate));
+	for (const FSoftObjectPath& path : targetsToStream)
+	{
+		LOG_INFO("Requesting ASync Load for: %s", *path.ToString());
+	}
+
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(targetsToStream, FStreamableDelegate::CreateLambda([delegate = MoveTemp(delegate), targetsToStream]()
+		{
+			for (const FSoftObjectPath& path : targetsToStream)
+			{
+				UObject* loadedObject = path.ResolveObject();
+
+				if (loadedObject != nullptr)
+				{
+					LOG_INFO("Successful ASync Load for: %s", *path.ToString());
+					continue;
+				}
+				
+				LOG_ERROR("Failed ASync Load for: %s", *path.ToString());
+			}
+
+			if (delegate.IsSet())
+			{
+				delegate();
+			}
+		}
+	));
 }

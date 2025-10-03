@@ -30,4 +30,7 @@ public:
 	virtual void ReduceStamina(int amount) {};
 	UFUNCTION(BlueprintCallable, Category = "Susceptible Interface")
 	virtual int GetStat(ECharacterStat stat) { return 0; }
+
+	UFUNCTION(BlueprintCallable, Category = "Susceptible Interface")
+	virtual bool IsDead() { return true; };
 };

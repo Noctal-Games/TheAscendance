@@ -2,13 +2,13 @@
 
 
 #include "BaseCharacter.h"
+#include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "Components/CharacterStatsComponent.h"
 #include "TheAscendance/Items/HeldItem.h"
-#include "TheAscendance/Game/GameModes/PlayableGameMode.h"
-#include "TheAscendance/Core/CoreMacros.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -18,6 +18,11 @@ ABaseCharacter::ABaseCharacter()
 
 	m_CharacterStatsComponent = CreateDefaultSubobject<UCharacterStatsComponent>(TEXT("Character Stats Component"));
 	checkf(m_CharacterStatsComponent, TEXT("Character Stats Component failed to initialise"));
+
+	SetRootComponent(GetCapsuleComponent());
+
+	GetMesh()->SetCollisionProfileName(FName("NoCollision"));
+	GetMesh()->SetupAttachment(GetRootComponent());
 }
 
 void ABaseCharacter::Heal(int amount)
@@ -37,6 +42,7 @@ void ABaseCharacter::Damage(int amount)
 		return;
 	}
 
+	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "%s took %i damage", *GetFName().ToString(), amount);
 	m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::HEALTH, -amount);
 }
 
@@ -58,6 +64,11 @@ int ABaseCharacter::GetStat(ECharacterStat stat)
 	}
 
 	return m_CharacterStatsComponent->GetStatAsValue(stat);
+}
+
+bool ABaseCharacter::IsDead()
+{
+	return GetStat(ECharacterStat::HEALTH) <= 0.0f;
 }
 
 bool ABaseCharacter::MainHandPrimaryAttack()
@@ -190,44 +201,35 @@ void ABaseCharacter::EndOffHandAttack()
 	return m_OffHandItem->EndAttack();
 }
 
-void ABaseCharacter::TestFunction1()
+AActor* ABaseCharacter::GetSpellOwner()
 {
-	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 1");
-	m_AnimTest = !m_AnimTest;
+	return this;
 }
 
-void ABaseCharacter::TestFunction2()
+const FVector ABaseCharacter::GetSpellOwnerLocation()
 {
-	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 2");
-	EndMainHandAttack();
-	EndOffHandAttack();
+	return GetActorLocation();
 }
 
-void ABaseCharacter::TestFunction3()
+const FVector ABaseCharacter::GetSpellOwnerForward()
 {
-	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 3");
+	return GetActorForwardVector();
+}
 
-	if (m_TestEquipToggle == false)
-	{
-		if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
-		{
-			m_MainHandItem->Init(gameMode->GetItemData(2));
-		}
-	}
-	else
-	{
-		m_MainHandItem->UnEquip();
-	}
+const FVector ABaseCharacter::GetCastStartLocation()
+{
+	return GetActorLocation();
+}
 
-	m_TestEquipToggle = !m_TestEquipToggle;
+const FVector ABaseCharacter::GetCastStartForward()
+{
+	return GetActorForwardVector();
 }
 
 // Called every frame
 void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	LOG_ONSCREEN(0, 1, FColor::Yellow, "USING ANIMATIONS: %s", m_AnimTest ? TEXT("TRUE") : TEXT("FALSE"));
 
 	if (m_AnimTest == false && IsAttacking() == true)
 	{

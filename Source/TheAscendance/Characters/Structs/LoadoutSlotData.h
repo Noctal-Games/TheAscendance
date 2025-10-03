@@ -6,11 +6,13 @@
 #include "TheAscendance/Characters/Enums/EquippablePart.h"
 #include "LoadoutSlotData.generated.h"
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FLoadoutSlotData
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int ItemID = 0;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EEquippablePart EquippedPart = EEquippablePart::NONE;
 };
