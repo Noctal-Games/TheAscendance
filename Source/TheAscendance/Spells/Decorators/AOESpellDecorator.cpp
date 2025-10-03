@@ -22,7 +22,7 @@ void UAOESpellDecorator::OnHit(AActor* hitActor, FVector spellHitLocation)
 	m_DecoratedSpell->ProcessHitDamage(damage, hitActor->GetActorLocation(), spellHitLocation);
 	m_DecoratedSpell->DealDamage(hitActor, damage);
 
-	AActor* owner = GetSpellOwner()->GetSpellOwner();
+	AActor* owner = GetSpellOwner()->GetActor();
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> types;
 	types.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody));
@@ -100,27 +100,4 @@ void UAOESpellDecorator::ProcessHitDamage(int& damage, FVector targetLocation, F
 	damageWithFalloff = FMath::Clamp(damageWithFalloff, m_ModifierData->DamageMinimum, m_ModifierData->Damage);
 
 	damage += damageWithFalloff;
-}
-
-bool UAOESpellDecorator::CastSpell()
-{
-	if (m_DecoratedSpell == nullptr)
-	{
-		LOG_ERROR("AOESpellDecorator has no decorated spell");
-		return false;
-	}
-
-	FVector unitDirection = m_DecoratedSpell->GetSpellOwner()->GetCastStartForward();
-	unitDirection.Normalize();
-
-	Fire(unitDirection);
-
-	return true;
-}
-
-void UAOESpellDecorator::Fire(FVector direction)
-{
-	m_DecoratedSpell->Fire(direction);
-
-	LOG_ONSCREEN(-1, 1.0f, FColor::Cyan, "AOE Decorator: Fire");
 }

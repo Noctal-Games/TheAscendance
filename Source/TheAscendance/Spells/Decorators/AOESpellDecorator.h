@@ -41,10 +41,6 @@ public:
 	virtual void ProcessHit(FVector spellHitLocation) override;
 	virtual void ProcessHitDamage(int& damage, FVector targetLocation, FVector hitLocation) override;
 
-	//Test
-	virtual bool CastSpell() override;
-	virtual void Fire(FVector direction) override;
-
 private:
 	TSharedPtr<FAreaOfEffectModifier> m_ModifierData = nullptr;
 };

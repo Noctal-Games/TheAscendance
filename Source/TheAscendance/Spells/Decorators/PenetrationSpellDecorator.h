@@ -40,10 +40,6 @@ public:
 
 	virtual void DecorateProjectile(IProjectile* projectile) override;
 
-	//Test
-	virtual bool CastSpell() override;
-	virtual void Fire(FVector direction) override;
-
 private:
 	TSharedPtr<FPenetrationSpellModifier> m_ModifierData = nullptr;
 };
