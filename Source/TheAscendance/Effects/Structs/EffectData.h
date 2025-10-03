@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Effects/Enums/EffectType.h"
+#include "TheAscendance/Effects/Enums/AffectableStats.h"
 #include "TheAscendance/Characters/Enums/CharacterStat.h"
 #include "InstancedStruct.h"
 #include "GameplayTagContainer.h"
@@ -31,8 +32,6 @@ class THEASCENDANCE_API UCoreEffectData : public UEffectData
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	ECharacterStat AffectedStat = ECharacterStat::NONE;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int Potency = 0;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -57,6 +56,9 @@ public:
 	{
 		EffectType = EEffectType::INSTANT;
 	}
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EInstantAffectableStat AffectedStat = EInstantAffectableStat::MAX;
 };
 
 UCLASS(BlueprintType)
@@ -70,6 +72,8 @@ public:
 		EffectType = EEffectType::OVERTIME;
 	}
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EOverTimeAffectableStat AffectedStat = EOverTimeAffectableStat::MAX;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Duration = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -87,6 +91,8 @@ public:
 		EffectType = EEffectType::DURATION;
 	}
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EDurationAffectableStat AffectedStat = EDurationAffectableStat::MAX;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Duration = 0.0f;
 };

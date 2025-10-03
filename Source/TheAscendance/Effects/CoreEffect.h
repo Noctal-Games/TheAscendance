@@ -16,4 +16,7 @@ class THEASCENDANCE_API UCoreEffect : public UBaseEffect
 public:
 	virtual void StartEffect(ISusceptible* target, FVector location = FVector::Zero()) override;
 	virtual void EndEffect() override;
+
+protected:
+	virtual void ProcessAffectedStat();
 };

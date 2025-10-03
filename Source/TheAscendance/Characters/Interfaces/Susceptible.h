@@ -39,6 +39,7 @@ public:
 	virtual void AddEffect(UCoreEffect* effect) {};
 
 	virtual void AdjustStat(ECharacterStat stat, int amount) {};
+	virtual void AdjustMaxStat(ECharacterStat stat, int amount) {};
 	virtual bool HasMatchingGameplayTag(FGameplayTag tagToCheck) const { return false; };
 
 	virtual void AddImmunity(const FGameplayTag& immunity) {};

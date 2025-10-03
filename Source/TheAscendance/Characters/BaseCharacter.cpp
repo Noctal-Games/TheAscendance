@@ -108,7 +108,7 @@ void ABaseCharacter::AdjustStat(ECharacterStat stat, int amount)
 			m_CharacterStatsComponent->AdjustStatByPercentage(stat, amount);
 			break;
 		}
-		case ECharacterStat::CROUCH_SPEED_PENALITY:
+		case ECharacterStat::CROUCH_SPEED_PENALTY:
 		{
 			m_CharacterStatsComponent->AdjustStatByPercentage(stat, amount);
 			break;
@@ -119,6 +119,17 @@ void ABaseCharacter::AdjustStat(ECharacterStat stat, int amount)
 			m_CharacterStatsComponent->AdjustStatByValue(stat, amount);
 		}
 	}
+}
+
+void ABaseCharacter::AdjustMaxStat(ECharacterStat stat, int amount)
+{
+	if (m_CharacterStatsComponent == nullptr)
+	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
+		return;
+	}
+
+	m_CharacterStatsComponent->AdjustMaxStatByValue(stat, amount);
 }
 
 void ABaseCharacter::AddImmunity(const FGameplayTag& immunity)

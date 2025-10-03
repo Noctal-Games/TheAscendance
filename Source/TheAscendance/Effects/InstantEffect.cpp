@@ -1,30 +1,26 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "OverTimeEffect.h"
+#include "InstantEffect.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
 #include "Structs/EffectData.h"
 #include "Enums/AffectableStats.h"
 
-#include "TimerManager.h"
-
-bool UOverTimeEffect::Init(UEffectData* effectData)
+bool UInstantEffect::Init(UEffectData* effectData)
 {
-	if (UOverTimeEffectData* data = Cast<UOverTimeEffectData>(effectData))
+	if (UInstantEffectData* data = Cast<UInstantEffectData>(effectData))
 	{
 		m_EffectData = data;
 		return true;
 	}
 	else
 	{
-		LOG_ERROR("Tried to Init OverTimeEffect with invalid EffectData");
+		LOG_ERROR("Tried to Init InstantEffect with invalid EffectData");
 		return false;
 	}
 }
 
-void UOverTimeEffect::StartEffect(ISusceptible* target, FVector location)
+void UInstantEffect::StartEffect(ISusceptible* target, FVector location)
 {
 	UCoreEffect::StartEffect(target);
 
@@ -33,8 +29,6 @@ void UOverTimeEffect::StartEffect(ISusceptible* target, FVector location)
 		return;
 	}
 
-	m_Timer = m_EffectData->Duration;
-	m_Interval = m_EffectData->EffectInterval;
 	m_Potency = m_EffectData->Potency;
 
 	if (m_Target->HasResistance(m_EffectData->EffectTag) == true)
@@ -43,29 +37,9 @@ void UOverTimeEffect::StartEffect(ISusceptible* target, FVector location)
 	}
 
 	DoEffect();
-
-	if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
-	{
-		world->GetTimerManager().SetTimer(m_TimerHandle, this, &UOverTimeEffect::DoEffect, m_Interval, true);
-	}
 }
 
-void UOverTimeEffect::EndEffect()
-{
-	if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
-	{
-		world->GetTimerManager().ClearTimer(m_TimerHandle);
-	}
-
-	UCoreEffect::EndEffect();
-}
-
-void UOverTimeEffect::ResetEffect()
-{
-	m_Timer = m_EffectData->Duration;
-}
-
-UEffectData* UOverTimeEffect::GetEffectData()
+UEffectData* UInstantEffect::GetEffectData()
 {
 	if (m_EffectData.IsValid() == false)
 	{
@@ -76,7 +50,7 @@ UEffectData* UOverTimeEffect::GetEffectData()
 	return m_EffectData.Get();
 }
 
-void UOverTimeEffect::DoEffect()
+void UInstantEffect::DoEffect()
 {
 	if (m_EffectData.IsValid() == false)
 	{
@@ -88,41 +62,32 @@ void UOverTimeEffect::DoEffect()
 	{
 		return;
 	}
-
-	m_Timer -= m_Interval;
-
-	if (m_Target == nullptr)
-	{
-		EndEffect();
-		return;
-	}
-
+	
 	ProcessAffectedStat();
-
-	if (m_Timer <= 0.0f)
-	{
-		EndEffect();
-		return;
-	}
 }
 
-void UOverTimeEffect::ProcessAffectedStat()
+void UInstantEffect::ProcessAffectedStat()
 {
 	switch (m_EffectData->AffectedStat)
 	{
-		case EOverTimeAffectableStat::HEALTH:
+		case EInstantAffectableStat::HEALTH:
 		{
 			m_Target->AdjustStat(ECharacterStat::HEALTH, m_Potency);
 			break;
 		}
-		case EOverTimeAffectableStat::MANA:
+		case EInstantAffectableStat::MANA:
 		{
 			m_Target->AdjustStat(ECharacterStat::MANA, m_Potency);
 			break;
 		}
-		case EOverTimeAffectableStat::STAMINA:
+		case EInstantAffectableStat::STAMINA:
 		{
 			m_Target->AdjustStat(ECharacterStat::STAMINA, m_Potency);
+			break;
+		}
+		case EInstantAffectableStat::SHIELD:
+		{
+			m_Target->AdjustStat(ECharacterStat::SHIELD, m_Potency);
 			break;
 		}
 	}

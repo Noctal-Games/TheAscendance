@@ -11,6 +11,7 @@
 
 #include "TimerManager.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 bool UAOEDeliveryEffect::Init(UEffectData* effectData)
 {
@@ -163,7 +164,20 @@ void UAOEDeliveryEffect::DoEffect()
 
 			if (ACharacter* character = Cast<ACharacter>(actor))
 			{
-				character->LaunchCharacter(direction * strength, true, true);
+				float deltaSeconds = 0.0f;
+
+				if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
+				{
+					deltaSeconds = world->GetDeltaSeconds();
+				}
+
+				if (UCharacterMovementComponent* moveComp = character->GetCharacterMovement())
+				{
+					FVector force = direction * strength;
+					moveComp->Velocity += force;
+				}
+
+				//character->LaunchCharacter(direction * strength, true, true);
 				continue;
 			}
 

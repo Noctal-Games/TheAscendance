@@ -33,3 +33,7 @@ void UCoreEffect::EndEffect()
 		OnEffectEnd.Execute(this);
 	}
 }
+
+void UCoreEffect::ProcessAffectedStat()
+{
+}

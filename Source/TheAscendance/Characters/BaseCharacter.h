@@ -32,6 +32,7 @@ public:
 	virtual bool IsDead() override;
 	virtual void AddEffect(UCoreEffect* effect) override;
 	virtual void AdjustStat(ECharacterStat stat, int amount) override;
+	virtual void AdjustMaxStat(ECharacterStat stat, int amount) override;
 
 	virtual void AddImmunity(const FGameplayTag& immunity) override;
 	virtual void AddResistance(const FGameplayTag& resistance) override;

@@ -22,7 +22,7 @@ void UCharacterStatsComponent::Init()
 
 	AddStat(ECharacterStat::WALK_SPEED, m_BaseWalkSpeed);
 	AddStat(ECharacterStat::SPRINT_SPEED_BONUS, m_SprintSpeedBonus);
-	AddStat(ECharacterStat::CROUCH_SPEED_PENALITY, m_CrouchSpeedPenalty);
+	AddStat(ECharacterStat::CROUCH_SPEED_PENALTY, m_CrouchSpeedPenalty);
 
 	AddStat(ECharacterStat::PHYSICAL_ATTACK, 0);
 	AddStat(ECharacterStat::PHYSICAL_RESISTANCE, 0);
@@ -32,24 +32,6 @@ void UCharacterStatsComponent::Init()
 
 void UCharacterStatsComponent::AddStat(ECharacterStat stat, float maxValue)
 {
-	if (m_StatsBase.Contains(stat) == true)
-	{
-		m_StatsBase[stat] = maxValue;
-	}
-	else
-	{
-		m_StatsBase.Add(stat, maxValue);
-	}
-
-	if (m_StatsMax.Contains(stat) == true)
-	{
-		m_StatsMax[stat] = maxValue;
-	}
-	else
-	{
-		m_StatsMax.Add(stat, maxValue);
-	}
-
 	if (m_Stats.Contains(stat) == true)
 	{
 		m_Stats[stat] = maxValue;
@@ -59,9 +41,31 @@ void UCharacterStatsComponent::AddStat(ECharacterStat stat, float maxValue)
 		m_Stats.Add(stat, maxValue);
 	}
 
+	if (m_StatsBase.Contains(stat) == true)
+	{
+		m_StatsBase[stat] = maxValue;
+	}
+	else
+	{
+		m_StatsBase.Add(stat, maxValue);
+	}
+
 	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA && stat != ECharacterStat::WALK_SPEED)
 	{
 		return;
+	}
+
+	if (stat != ECharacterStat::WALK_SPEED)
+	{
+
+		if (m_StatsMax.Contains(stat) == true)
+		{
+			m_StatsMax[stat] = maxValue;
+		}
+		else
+		{
+			m_StatsMax.Add(stat, maxValue);
+		}
 	}
 
 	ExecuteBindings(stat);
@@ -76,12 +80,16 @@ void UCharacterStatsComponent::SetStat(ECharacterStat stat, float amount)
 	}
 
 	m_StatsBase[stat] = amount;
-	m_StatsMax[stat] = amount;
 	m_Stats[stat] = amount;
 
 	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA && stat != ECharacterStat::WALK_SPEED)
 	{
 		return;
+	}
+
+	if (stat != ECharacterStat::WALK_SPEED)
+	{
+		m_StatsMax[stat] = amount;
 	}
 
 	ExecuteBindings(stat);
@@ -130,7 +138,7 @@ void UCharacterStatsComponent::AdjustStatByValue(ECharacterStat stat, float amou
 
 void UCharacterStatsComponent::AdjustStatByPercentage(ECharacterStat stat, float percentage)
 {
-	if (m_Stats.Contains(stat) == false)
+	if (m_Stats.Contains(stat) == false || m_StatsBase.Contains(stat) == false)
 	{
 		LogStatError(stat);
 		return;
@@ -169,6 +177,11 @@ void UCharacterStatsComponent::AdjustStatByPercentage(ECharacterStat stat, float
 
 void UCharacterStatsComponent::AdjustMaxStatByValue(ECharacterStat stat, int amount)
 {
+	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA)
+	{
+		return;
+	}
+
 	if (m_StatsMax.Contains(stat) == false)
 	{
 		LogStatError(stat);
@@ -176,12 +189,7 @@ void UCharacterStatsComponent::AdjustMaxStatByValue(ECharacterStat stat, int amo
 	}
 
 	m_StatsMax[stat] += amount;
-	AdjustStatByValue(stat, amount);
-
-	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA && stat != ECharacterStat::WALK_SPEED)
-	{
-		return;
-	}
+	AdjustStatByValue(stat, 0);
 
 	ExecuteBindings(stat);
 }

@@ -15,7 +15,7 @@ enum class ECharacterStat : uint8
 
 	WALK_SPEED UMETA(DisplayName = "Walk Speed"),
 	SPRINT_SPEED_BONUS UMETA(DisplayName = "Sprint Speed Bonus"),
-	CROUCH_SPEED_PENALITY UMETA(DisplayName = "Crouch Speed Penalty"),
+	CROUCH_SPEED_PENALTY UMETA(DisplayName = "Crouch Speed Penalty"),
 
 	PHYSICAL_ATTACK UMETA(DisplayName = "Physical Attack (%)"),
 	MAGIC_ATTACK UMETA(DisplayName = "Magic Attack (%)"),
