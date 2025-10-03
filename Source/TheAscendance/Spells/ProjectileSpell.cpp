@@ -53,7 +53,7 @@ void UProjectileSpell::Fire(FVector direction)
 		return;
 	}
 
-	AActor* owner = m_SpellOwner->GetSpellOwner();
+	AActor* owner = m_SpellOwner->GetActor();
 
 	FActorSpawnParameters spawnParams;
 	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -86,17 +86,17 @@ void UProjectileSpell::ProcessHitDamage(int& damage, FVector targetLocation, FVe
 	damage += m_SpellData->HitDamage;
 }
 
-void UProjectileSpell::DealDamage(AActor* hitActor, int damage)
+bool UProjectileSpell::DealDamage(AActor* hitActor, int damage)
 {
 	if (ISusceptible* target = Cast<ISusceptible>(hitActor))
 	{
 		target->Damage(damage);
 
-		if (target->IsDead() == true)
-		{
-			return;
-		}
+		LOG_ONSCREEN(-1, 5.0f, FColor::Green, "%s", *FString(target->IsDead() ? "TARGET DEAD" : "TARGET ALIVE"));
+		return target->IsDead();
 	}
+
+	return true;
 }
 
 void UProjectileSpell::DecorateProjectile(IProjectile* projectile)

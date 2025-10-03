@@ -9,6 +9,7 @@
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Items/HeldItem.h"
 #include "TheAscendance/Spells/Interfaces/Spell.h"
+#include "TheAscendance/Characters/CharacterGameplayTags.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -141,6 +142,8 @@ const FVector APlayerCharacter::GetCastStartForward()
 void APlayerCharacter::BeginPlay()
 {
 	ABaseCharacter::BeginPlay();
+
+	OwnedTags.AddTag(CHARACTER_PLAYER);
 
 	m_MovementComponent = Cast<UPlayerMovementComponent>(GetMovementComponent());
 	checkf(m_MovementComponent, TEXT("Movement Component is an invalid value"));

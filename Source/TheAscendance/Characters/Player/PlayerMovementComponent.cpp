@@ -208,9 +208,9 @@ float UPlayerMovementComponent::GetMaxSpeed() const
 	case CMOVE_SPRINTING:
 		return  maxSpeed + m_PlayerCharacter->GetStat(ECharacterStat::SPRINT_SPEED_BONUS);
 	case CMOVE_CROUCHING:
-		return maxSpeed - m_PlayerCharacter->GetStat(ECharacterStat::CROUCH_SPEED_PENALITY);
+		return maxSpeed - m_PlayerCharacter->GetStat(ECharacterStat::CROUCH_SPEED_PENALTY);
 	case CMOVE_CROUCH_SPRINTING:
-		return (maxSpeed - m_PlayerCharacter->GetStat(ECharacterStat::CROUCH_SPEED_PENALITY)) + m_PlayerCharacter->GetStat(ECharacterStat::SPRINT_SPEED_BONUS);
+		return (maxSpeed - m_PlayerCharacter->GetStat(ECharacterStat::CROUCH_SPEED_PENALTY)) + m_PlayerCharacter->GetStat(ECharacterStat::SPRINT_SPEED_BONUS);
 	default:
 		return maxSpeed;
 	}

@@ -5,8 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "TheAscendance/Items/Enums/WeaponType.h"
+#include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "PlayableGameMode.generated.h"
 
+class UEffectLoader;
+class UEffectData;
+class UBaseEffect;
 class UEnemyLoader;
 class ABaseEnemy;
 class USpellLoader;
@@ -23,6 +27,10 @@ class THEASCENDANCE_API APlayableGameMode : public AGameModeBase
 	GENERATED_BODY()
 	
 public:
+	UBaseEffect* CreateEffectFromTag(const FGameplayTag& effectTag);
+	UBaseEffect* CreateEffectFromEffectData(UEffectData* effectData);
+	UEffectData* LoadEffectData(const FGameplayTag& effectTag);
+
 	FItemData* GetItemData(int id);
 	FWeaponData* GetWeaponData(int itemID);
 	const FWeaponTypeData* GetWeaponTypeData(EWeaponType type);
@@ -46,6 +54,8 @@ private:
 	TObjectPtr<USpellLoader> m_SpellLoader = nullptr;
 	UPROPERTY()
 	TObjectPtr<UEnemyLoader> m_EnemyLoader = nullptr;
+	UPROPERTY()
+	TObjectPtr<UEffectLoader> m_EffectLoader = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Enemy Default"))
 	TSubclassOf<ABaseEnemy> m_EnemyDefault;

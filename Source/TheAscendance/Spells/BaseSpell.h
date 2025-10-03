@@ -31,6 +31,8 @@ public:
 
 	virtual void Fire(FVector direction) override;
 
+	virtual void ApplyEffects(AActor* hitActor) override;
+
 	virtual ISpellCaster* GetSpellOwner() override;
 
 protected:

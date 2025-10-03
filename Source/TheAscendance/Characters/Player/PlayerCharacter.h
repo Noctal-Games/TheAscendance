@@ -24,7 +24,6 @@ public:
 	ATAPlayerController* GetPlayerController();
 
 	void SetIsSprinting(bool val);
-	bool IsSprinting();
 
 	void SetIsCrouching(bool val);
 	bool IsCrouching();
@@ -47,6 +46,8 @@ public:
 	void TestFunction2();
 	void TestFunction3();
 
+	virtual bool IsSprinting() override;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
@@ -67,9 +68,7 @@ private:
 	float m_DefaultCapsuleHeight = 0.0f;
 	float m_DefaultCapsuleRadius = 0.0f;
 
-	bool m_IsSprinting = false;
-	bool m_IsCrouching = false;
-	bool m_IsJumping = false;
+
 
 	//Test
 	UPROPERTY()

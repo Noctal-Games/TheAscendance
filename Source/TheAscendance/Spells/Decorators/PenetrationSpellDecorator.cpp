@@ -19,26 +19,3 @@ void UPenetrationSpellDecorator::DecorateProjectile(IProjectile* projectile)
 	projectile = UPenetrationProjectileDecorator::Builder(projectile, *m_ModifierData.Get()).Build();
 	projectile->SetDecoratedSelf(projectile);
 }
-
-bool UPenetrationSpellDecorator::CastSpell()
-{
-	if (m_DecoratedSpell == nullptr)
-	{
-		LOG_ERROR("PenetrationSpellDecorator has no decorated spell");
-		return false;
-	}
-
-	FVector unitDirection = m_DecoratedSpell->GetSpellOwner()->GetCastStartForward();
-	unitDirection.Normalize();
-
-	Fire(unitDirection);
-
-	return true;
-}
-
-void UPenetrationSpellDecorator::Fire(FVector direction)
-{
-	m_DecoratedSpell->Fire(direction);
-
-	LOG_ONSCREEN(-1, 1.0f, FColor::Cyan, "Penetration Decorator: Fire");
-}
