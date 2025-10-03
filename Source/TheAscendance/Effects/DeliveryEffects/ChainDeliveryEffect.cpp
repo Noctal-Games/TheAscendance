@@ -53,11 +53,14 @@ bool UChainDeliveryEffect::Init(UEffectData* effectData)
 
 void UChainDeliveryEffect::StartEffect(ISusceptible* target, FVector location)
 {
+	AddToRoot();
+	LOG_ONSCREEN(-1, 5.0f, FColor::Red, "ChainDeliveryEffect is being added to root");
+
 	m_HasEnded = false;
 
 	if (m_EffectData == nullptr || m_EffectToApply == nullptr || target == nullptr)
 	{
-		UnRoot();
+		EndEffect();
 		return;
 	}
 
@@ -66,7 +69,7 @@ void UChainDeliveryEffect::StartEffect(ISusceptible* target, FVector location)
 
 	m_BounceQueue.Enqueue(FChainBounce(target, m_EffectData->DeliveryRange, 0));
 
-	ProcessNextBounce();
+	DoEffect();
 }
 
 UEffectData* UChainDeliveryEffect::GetEffectData()
@@ -79,15 +82,8 @@ UEffectData* UChainDeliveryEffect::GetEffectData()
 
 	return m_EffectData.Get();
 }
-void UChainDeliveryEffect::Root()
-{
-	AddToRoot();
 
-	//Debug
-	LOG_ONSCREEN(-1, 5.0f, FColor::Red, "ChainDeliveryEffect is being added to root");
-}
-
-void UChainDeliveryEffect::UnRoot()
+void UChainDeliveryEffect::EndEffect()
 {
 	if (m_HasEnded == true)
 	{
@@ -120,7 +116,7 @@ void UChainDeliveryEffect::BeginDestroy()
 	LOG_ONSCREEN(-1, 5.0f, FColor::Red, "ChainDeliveryEffect is being destroyed");
 }
 
-void UChainDeliveryEffect::ProcessNextBounce()
+void UChainDeliveryEffect::DoEffect()
 {
 	if (m_HasEnded == true)
 	{
@@ -132,25 +128,30 @@ void UChainDeliveryEffect::ProcessNextBounce()
 	if (m_BounceQueue.Dequeue(currentBounce) == false)
 	{
 		LOG_ERROR("Chain BounceQueue failed to Dequeue");
-		UnRoot();
+		EndEffect();
 		return;
 	}
 
 	if (currentBounce.Source == nullptr)
 	{
+		EndEffect();
 		return;
 	}
 
 	ISusceptible* current = currentBounce.Source.GetInterface();
 
-	if (current == nullptr || m_AffectedTargets.Contains(current->_getUObject()))
+	if (current == nullptr || m_AffectedTargets.Contains(current->_getUObject()) || current->HasImmunity(m_EffectToApply->EffectTag) == true)
 	{
 		if (m_BounceQueue.IsEmpty() == false)
 		{
 			if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
 			{
-				world->GetTimerManager().SetTimerForNextTick(this, &UChainDeliveryEffect::ProcessNextBounce);
+				world->GetTimerManager().SetTimerForNextTick(this, &UChainDeliveryEffect::DoEffect);
 			}
+		}
+		else
+		{
+			EndEffect();
 		}
 
 		return;
@@ -177,11 +178,11 @@ void UChainDeliveryEffect::ProcessNextBounce()
 	{
 		if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
 		{
-			world->GetTimerManager().SetTimer(m_BounceTimerHandle, this, &UChainDeliveryEffect::ProcessNextBounce, m_EffectData == nullptr ? 0.5f : m_EffectData->BounceDelay, false);
+			world->GetTimerManager().SetTimer(m_BounceTimerHandle, this, &UChainDeliveryEffect::DoEffect, m_EffectData == nullptr ? 0.5f : m_EffectData->BounceDelay, false);
 		}
 	}
 	else
 	{
-		UnRoot();
+		EndEffect();
 	}
 }

@@ -65,7 +65,6 @@ void UApplyEffectSpellDecorator::ApplyEffects(AActor* hitActor)
 		{
 			if (UChainDeliveryEffect* chainEffect = Cast<UChainDeliveryEffect>(effect))
 			{
-				chainEffect->Root();
 				chainEffect->StartEffect(target);
 			}
 		}

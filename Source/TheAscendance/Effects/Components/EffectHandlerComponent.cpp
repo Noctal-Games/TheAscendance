@@ -52,6 +52,11 @@ void UEffectHandlerComponent::AddEffect(UCoreEffect* effect)
 
 	FGameplayTag* tag = &effectData->EffectTag;
 
+	if (m_Owner->HasImmunity(*tag) == true)
+	{
+		return;
+	}
+
 	if (m_Effects.Contains(*tag) == false)
 	{
 		m_Effects.Add(effectData->EffectTag, FEffectList());

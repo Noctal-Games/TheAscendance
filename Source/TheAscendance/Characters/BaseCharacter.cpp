@@ -121,6 +121,26 @@ void ABaseCharacter::AdjustStat(ECharacterStat stat, int amount)
 	}
 }
 
+void ABaseCharacter::AddImmunity(const FGameplayTag& immunity)
+{
+	m_EffectImmunities.AddTag(immunity);
+}
+
+void ABaseCharacter::AddResistance(const FGameplayTag& resistance)
+{
+	m_EffectResistances.AddTag(resistance);
+}
+
+bool ABaseCharacter::HasImmunity(const FGameplayTag& immunity) const
+{
+	return m_EffectImmunities.HasTag(immunity);
+}
+
+bool ABaseCharacter::HasResistance(const FGameplayTag& resistance) const
+{
+	return m_EffectResistances.HasTag(resistance);
+}
+
 bool ABaseCharacter::MainHandPrimaryAttack()
 {
 	if (IsAttacking() == true || m_MainHandItem == nullptr/* Can attack checks*/)
@@ -274,6 +294,26 @@ const FVector ABaseCharacter::GetCastStartLocation()
 const FVector ABaseCharacter::GetCastStartForward()
 {
 	return GetActorForwardVector();
+}
+
+void ABaseCharacter::GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const
+{
+	tagContainer.AppendTags(OwnedTags);
+}
+
+bool ABaseCharacter::HasMatchingGameplayTag(FGameplayTag tagToCheck) const
+{
+	return OwnedTags.HasTag(tagToCheck);
+}
+
+bool ABaseCharacter::HasAllMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const
+{
+	return OwnedTags.HasAll(tagContainer);
+}
+
+bool ABaseCharacter::HasAnyMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const
+{
+	return OwnedTags.HasAny(tagContainer);
 }
 
 // Called every frame

@@ -13,10 +13,6 @@ class THEASCENDANCE_API UBaseDeliveryEffect : public UBaseEffect
 {
 	GENERATED_BODY()
 	
-public:
-	virtual void Root();
-	virtual void UnRoot();
-
 protected:
 	virtual void ApplyEffect(ISusceptible* target);
 	virtual void ScanForTargets(const FVector& origin, float radius, TArray<AActor*>& targets);

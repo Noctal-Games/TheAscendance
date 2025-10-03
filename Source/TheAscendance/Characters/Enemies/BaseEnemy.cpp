@@ -5,6 +5,7 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Characters/Components/CharacterStatsComponent.h"
+#include "TheAscendance/Characters/CharacterGameplayTags.h"
 #include "Structs/EnemyData.h"
 
 #include "Components/CapsuleComponent.h"
@@ -63,6 +64,16 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 	m_CharacterStatsComponent->SetStat(ECharacterStat::MANA, 999999);
 	m_CharacterStatsComponent->SetStat(ECharacterStat::STAMINA, 999999);
 
+	for (const FGameplayTag& immunity : stats.EffectImmunities)
+	{
+		AddImmunity(immunity);
+	}
+
+	for (const FGameplayTag& resistance : stats.EffectResistances)
+	{
+		AddResistance(resistance);
+	}
+
 	const FEnemyEquipmentData& equipment = data->EnemyData.EnemyEquipment;
 
 	TArray<int> spells;
@@ -107,4 +118,11 @@ void ABaseEnemy::SetSkeletalMesh()
 	{
 		LOG_ERROR("BaseEnemy SkeletalMesh is invalid");
 	}
+}
+
+void ABaseEnemy::BeginPlay()
+{
+	ABaseCharacter::BeginPlay();
+
+	OwnedTags.AddTag(CHARACTER_ENEMY);
 }

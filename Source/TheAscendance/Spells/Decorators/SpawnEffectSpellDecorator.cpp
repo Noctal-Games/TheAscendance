@@ -51,7 +51,6 @@ void USpawnEffectSpellDecorator::OnHit(AActor* hitActor, FVector spellHitLocatio
 		{
 			if (UAOEDeliveryEffect* aoeEffect = Cast<UAOEDeliveryEffect>(effect))
 			{
-				aoeEffect->Root();
 				aoeEffect->StartEffect(nullptr, spellHitLocation);
 			}
 		}

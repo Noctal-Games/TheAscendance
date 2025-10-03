@@ -54,11 +54,14 @@ bool UAOEDeliveryEffect::Init(UEffectData* effectData)
 
 void UAOEDeliveryEffect::StartEffect(ISusceptible* target, FVector location)
 {
+	AddToRoot();
+	LOG_ONSCREEN(-1, 5.0f, FColor::Red, "AOEDeliveryEffect is being added to root");
+
 	m_HasEnded = false;
 
 	if (m_EffectData == nullptr || (m_EffectToApply == nullptr && m_EffectData->ApplyPhysics == false))
 	{
-		UnRoot();
+		EndEffect();
 		return;
 	}
 
@@ -86,15 +89,7 @@ UEffectData* UAOEDeliveryEffect::GetEffectData()
 	return m_EffectData.Get();
 }
 
-void UAOEDeliveryEffect::Root()
-{
-	AddToRoot();
-
-	//Debug
-	LOG_ONSCREEN(-1, 5.0f, FColor::Red, "AOEDeliveryEffect is being added to root");
-}
-
-void UAOEDeliveryEffect::UnRoot()
+void UAOEDeliveryEffect::EndEffect()
 {
 	if (m_HasEnded == true)
 	{
@@ -128,7 +123,7 @@ void UAOEDeliveryEffect::DoEffect()
 	if (m_EffectData.IsValid() == false)
 	{
 		LOG_ERROR("AOEDeliveryEffect has no valid EffectData");
-		UnRoot();
+		EndEffect();
 		return;
 	}
 
@@ -186,7 +181,7 @@ void UAOEDeliveryEffect::DoEffect()
 
 	if (m_Timer <= 0.0f)
 	{
-		UnRoot();
+		EndEffect();
 		return;
 	}
 }

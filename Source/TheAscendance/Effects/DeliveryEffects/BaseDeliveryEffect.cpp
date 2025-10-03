@@ -12,19 +12,14 @@
 
 #include "Kismet/KismetSystemLibrary.h"
 
-void UBaseDeliveryEffect::Root()
-{
-	AddToRoot();
-}
-
-void UBaseDeliveryEffect::UnRoot()
-{
-	RemoveFromRoot();
-}
-
 void UBaseDeliveryEffect::ApplyEffect(ISusceptible* target)
 {
 	if (target == nullptr || m_EffectToApply == nullptr)
+	{
+		return;
+	}
+
+	if (target->HasImmunity(m_EffectToApply->EffectTag) == true)
 	{
 		return;
 	}

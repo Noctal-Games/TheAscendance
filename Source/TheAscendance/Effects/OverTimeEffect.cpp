@@ -34,6 +34,12 @@ void UOverTimeEffect::StartEffect(ISusceptible* target, FVector location)
 
 	m_Timer = m_EffectData->Duration;
 	m_Interval = m_EffectData->EffectInterval;
+	m_Potency = m_EffectData->Potency;
+
+	if (m_Target->HasResistance(m_EffectData->EffectTag) == true)
+	{
+		m_Potency *= 0.5f;
+	}
 
 	DoEffect();
 
@@ -90,7 +96,7 @@ void UOverTimeEffect::DoEffect()
 		return;
 	}
 
-	m_Target->AdjustStat(m_EffectData->AffectedStat, m_EffectData->Potency);
+	m_Target->AdjustStat(m_EffectData->AffectedStat, m_Potency);
 
 	if (m_Timer <= 0.0f)
 	{

@@ -32,15 +32,14 @@ public:
 	virtual bool Init(UEffectData* effectData) override;
 
 	virtual void StartEffect(ISusceptible* target, FVector location = FVector::Zero()) override;
+	virtual void EndEffect() override;
 
 	virtual UEffectData* GetEffectData() override;
 
-	virtual void Root() override;
-	virtual void UnRoot() override;
 	virtual void BeginDestroy() override;
 
-private:
-	void ProcessNextBounce();
+protected:
+	virtual void DoEffect() override;
 
 private:
 	TWeakObjectPtr<UChainDeliveryEffectData> m_EffectData = nullptr;

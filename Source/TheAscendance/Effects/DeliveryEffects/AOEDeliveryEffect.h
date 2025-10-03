@@ -17,11 +17,10 @@ public:
 	virtual bool Init(UEffectData* effectData) override;
 
 	virtual void StartEffect(ISusceptible* target, FVector location) override;
+	virtual void EndEffect() override;
 
 	virtual UEffectData* GetEffectData() override;
 
-	virtual void Root() override;
-	virtual void UnRoot() override;
 	virtual void BeginDestroy() override;
 
 protected: 

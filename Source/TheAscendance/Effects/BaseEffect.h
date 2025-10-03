@@ -36,5 +36,6 @@ protected:
 	UPROPERTY()
 	TScriptInterface<ISusceptible> m_Target = nullptr;
 
+	float m_Potency = 0.0f;
 	bool m_HasEnded = false;
 };
