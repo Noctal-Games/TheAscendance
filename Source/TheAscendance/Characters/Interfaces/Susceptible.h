@@ -46,4 +46,6 @@ public:
 	virtual void AddResistance(const FGameplayTag& resistance) {};
 	virtual bool HasImmunity(const FGameplayTag& immunity) const { return false; };
 	virtual bool HasResistance(const FGameplayTag& resistance) const { return false; };
+
+	virtual AActor* GetSusceptibleActor() { return nullptr; };
 };

@@ -8,6 +8,9 @@
 #include "TheAscendance/Effects/CoreEffect.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
 
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+
 // Sets default values for this component's properties
 UEffectHandlerComponent::UEffectHandlerComponent()
 {
@@ -60,6 +63,33 @@ void UEffectHandlerComponent::AddEffect(UCoreEffect* effect)
 	if (m_Effects.Contains(*tag) == false)
 	{
 		m_Effects.Add(effectData->EffectTag, FEffectList());
+
+		if (effectData->EffectNiagara.IsNull() == false)
+		{
+			m_NiagaraSystems.Add(effectData->EffectTag, effectData->EffectNiagara);
+			m_NiagaraComponents.Add(effectData->EffectTag, nullptr);
+
+			UCoreFunctionLibrary::RequestAsyncLoad(m_NiagaraSystems[effectData->EffectTag].ToSoftObjectPath(), [this, effectData]()
+				{
+
+					if (m_NiagaraSystems[effectData->EffectTag].IsValid())
+					{
+						m_NiagaraComponents[effectData->EffectTag] = UNiagaraFunctionLibrary::SpawnSystemAttached(
+							m_NiagaraSystems[effectData->EffectTag].Get(),
+							m_Owner->GetSusceptibleActor()->GetRootComponent(),
+							"",
+							m_Owner->GetSusceptibleActor()->GetActorLocation(),
+							FRotator::ZeroRotator,
+							EAttachLocation::KeepWorldPosition, true, true, ENCPoolMethod::AutoRelease, true);
+
+						if (m_NiagaraComponents[effectData->EffectTag] != nullptr)
+						{
+							m_NiagaraComponents[effectData->EffectTag]->Activate();
+						}
+					}
+				});
+		}
+
 		//Add Niagara
 	}
 
@@ -126,6 +156,21 @@ void UEffectHandlerComponent::RemoveEffect(UCoreEffect* effect)
 		if (m_Effects[data->EffectTag].Effects.IsEmpty())
 		{
 			m_Effects.Remove(data->EffectTag);
+
+			if (m_NiagaraSystems.Contains(data->EffectTag))
+			{
+				m_NiagaraSystems.Remove(data->EffectTag);
+			}
+
+			if (m_NiagaraComponents.Contains(data->EffectTag))
+			{
+				if (m_NiagaraComponents[data->EffectTag] != nullptr)
+				{
+					m_NiagaraComponents[data->EffectTag]->Deactivate();
+				}
+
+				m_NiagaraComponents.Remove(data->EffectTag);
+			}
 		}
 	}
 }

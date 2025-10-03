@@ -33,6 +33,7 @@ public:
 	virtual void AddEffect(UCoreEffect* effect) override;
 	virtual void AdjustStat(ECharacterStat stat, int amount) override;
 	virtual void AdjustMaxStat(ECharacterStat stat, int amount) override;
+	virtual AActor* GetSusceptibleActor() override;
 
 	virtual void AddImmunity(const FGameplayTag& immunity) override;
 	virtual void AddResistance(const FGameplayTag& resistance) override;
@@ -81,6 +82,9 @@ public:
 	virtual bool HasAllMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const override;
 	virtual bool HasAnyMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const override;
 
+	UFUNCTION(BlueprintPure)
+	virtual bool IsSprinting();
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
@@ -109,6 +113,10 @@ protected:
 
 	bool m_TestEquipToggle = false;
 	bool m_AnimTest = false;
+
+	bool m_IsSprinting = false;
+	bool m_IsCrouching = false;
+	bool m_IsJumping = false;
 
 private:
 	bool m_IsMainHandAttacking = false;

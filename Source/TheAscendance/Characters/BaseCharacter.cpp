@@ -132,6 +132,11 @@ void ABaseCharacter::AdjustMaxStat(ECharacterStat stat, int amount)
 	m_CharacterStatsComponent->AdjustMaxStatByValue(stat, amount);
 }
 
+AActor* ABaseCharacter::GetSusceptibleActor()
+{
+	return this;
+}
+
 void ABaseCharacter::AddImmunity(const FGameplayTag& immunity)
 {
 	m_EffectImmunities.AddTag(immunity);
@@ -325,6 +330,11 @@ bool ABaseCharacter::HasAllMatchingGameplayTags(const FGameplayTagContainer& tag
 bool ABaseCharacter::HasAnyMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const
 {
 	return OwnedTags.HasAny(tagContainer);
+}
+
+bool ABaseCharacter::IsSprinting()
+{
+	return m_IsSprinting;
 }
 
 // Called every frame

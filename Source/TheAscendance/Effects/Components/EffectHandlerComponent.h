@@ -9,6 +9,8 @@
 
 class UCoreEffect;
 class UCoreEffectData;
+class UNiagaraComponent;
+class UNiagaraSystem;
 class ISusceptible;
 
 USTRUCT()
@@ -47,4 +49,9 @@ private:
 
 	UPROPERTY()
 	TMap<FGameplayTag, FEffectList> m_Effects;
+
+	UPROPERTY()
+	TMap<FGameplayTag, TSoftObjectPtr<UNiagaraSystem>> m_NiagaraSystems;
+	UPROPERTY()
+	TMap<FGameplayTag, TObjectPtr<UNiagaraComponent>> m_NiagaraComponents;
 };

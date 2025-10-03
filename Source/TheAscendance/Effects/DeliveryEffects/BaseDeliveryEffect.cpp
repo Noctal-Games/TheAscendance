@@ -19,7 +19,7 @@ void UBaseDeliveryEffect::ApplyEffect(ISusceptible* target)
 		return;
 	}
 
-	if (target->HasImmunity(m_EffectToApply->EffectTag) == true)
+	if (target->IsDead() == true || target->HasImmunity(m_EffectToApply->EffectTag) == true)
 	{
 		return;
 	}
