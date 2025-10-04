@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Effects/Enums/EffectType.h"
+#include "TheAscendance/Effects/Enums/AffectableStats.h"
 #include "TheAscendance/Characters/Enums/CharacterStat.h"
 #include "InstancedStruct.h"
 #include "GameplayTagContainer.h"
@@ -31,8 +32,6 @@ class THEASCENDANCE_API UCoreEffectData : public UEffectData
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	ECharacterStat AffectedStat = ECharacterStat::NONE;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int Potency = 0;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -57,6 +56,9 @@ public:
 	{
 		EffectType = EEffectType::INSTANT;
 	}
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EInstantAffectableStat AffectedStat = EInstantAffectableStat::MAX;
 };
 
 UCLASS(BlueprintType)
@@ -70,6 +72,8 @@ public:
 		EffectType = EEffectType::OVERTIME;
 	}
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EOverTimeAffectableStat AffectedStat = EOverTimeAffectableStat::MAX;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Duration = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -87,6 +91,8 @@ public:
 		EffectType = EEffectType::DURATION;
 	}
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	EDurationAffectableStat AffectedStat = EDurationAffectableStat::MAX;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Duration = 0.0f;
 };
@@ -117,6 +123,29 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 0.1f))
 	float BounceDelay = 0.1f;
+};
+
+UCLASS(BlueprintType)
+class THEASCENDANCE_API UAreaOfEffectDeliveryEffectData : public UDeliveryEffectData
+{
+	GENERATED_BODY()
+
+public:
+	UAreaOfEffectDeliveryEffectData()
+	{
+		EffectType = EEffectType::AOE;
+	}
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Duration = 0.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = 0.1f))
+	float EffectInterval = 0.1f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool ApplyPhysics = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "ApplyPhysics == true", EditConditionHides, ToolTip = "True for Push physics, False for Pull physics"))
+	bool PushOrPull = true;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "ApplyPhysics == true", EditConditionHides))
+	float Strength = 0.0f;
 };
 
 USTRUCT(BlueprintType)

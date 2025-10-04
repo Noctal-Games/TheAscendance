@@ -9,6 +9,8 @@
 
 class UCoreEffect;
 class UCoreEffectData;
+class UNiagaraComponent;
+class UNiagaraSystem;
 class ISusceptible;
 
 USTRUCT()
@@ -34,16 +36,12 @@ public:
 	void AddEffect(UCoreEffect* effect);
 	void ClearEffects();
 
-	// Called every frame
-	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
-
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 private:
-	void QueueRemoval(UCoreEffect* effect);
-	void RemoveEffects();
+	void RemoveEffect(UCoreEffect* effect);
 
 private:
 	UPROPERTY()
@@ -51,6 +49,9 @@ private:
 
 	UPROPERTY()
 	TMap<FGameplayTag, FEffectList> m_Effects;
+
 	UPROPERTY()
-	TMap<FGameplayTag, FEffectList> m_EffectsToRemove;
+	TMap<FGameplayTag, TSoftObjectPtr<UNiagaraSystem>> m_NiagaraSystems;
+	UPROPERTY()
+	TMap<FGameplayTag, TObjectPtr<UNiagaraComponent>> m_NiagaraComponents;
 };

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameplayTagAssetInterface.h"
+#include "GameplayTagContainer.h"
 #include "Interfaces/Susceptible.h"
 #include "Enums/CharacterStat.h"
 #include "TheAscendance/Items/Enums/WeaponType.h"
@@ -15,7 +17,7 @@ class UEffectHandlerComponent;
 class AHeldItem;
 
 UCLASS()
-class THEASCENDANCE_API ABaseCharacter : public ACharacter, public ISusceptible, public ISpellCaster
+class THEASCENDANCE_API ABaseCharacter : public ACharacter, public ISusceptible, public ISpellCaster, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 
@@ -30,6 +32,13 @@ public:
 	virtual bool IsDead() override;
 	virtual void AddEffect(UCoreEffect* effect) override;
 	virtual void AdjustStat(ECharacterStat stat, int amount) override;
+	virtual void AdjustMaxStat(ECharacterStat stat, int amount) override;
+	virtual AActor* GetSusceptibleActor() override;
+
+	virtual void AddImmunity(const FGameplayTag& immunity) override;
+	virtual void AddResistance(const FGameplayTag& resistance) override;
+	virtual bool HasImmunity(const FGameplayTag& immunity) const override;
+	virtual bool HasResistance(const FGameplayTag& resistance) const override;
 
 	bool MainHandPrimaryAttack();
 	bool MainHandSecondaryAttack();
@@ -68,11 +77,23 @@ public:
 	const virtual FVector GetCastStartLocation() override;
 	const virtual FVector GetCastStartForward() override;
 
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const override;
+	virtual bool HasMatchingGameplayTag(FGameplayTag tagToCheck) const override;
+	virtual bool HasAllMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const override;
+	virtual bool HasAnyMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const override;
+
+	UFUNCTION(BlueprintPure)
+	virtual bool IsSprinting();
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
+	FGameplayTagContainer OwnedTags;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Character Stats Component"))
@@ -85,8 +106,17 @@ protected:
 	UPROPERTY()
 	TObjectPtr<AHeldItem> m_OffHandItem = nullptr;
 
+	UPROPERTY()
+	FGameplayTagContainer m_EffectImmunities;
+	UPROPERTY()
+	FGameplayTagContainer m_EffectResistances;
+
 	bool m_TestEquipToggle = false;
 	bool m_AnimTest = false;
+
+	bool m_IsSprinting = false;
+	bool m_IsCrouching = false;
+	bool m_IsJumping = false;
 
 private:
 	bool m_IsMainHandAttacking = false;

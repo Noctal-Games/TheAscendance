@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "GameplayTags.h"
 #include "Susceptible.generated.h"
 
 // This class does not need to be modified.
@@ -30,7 +31,7 @@ public:
 	virtual void ReduceStamina(int amount) {};
 	UFUNCTION(BlueprintCallable, Category = "Susceptible Interface")
 	virtual int GetStat(ECharacterStat stat) { return 0; }
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Susceptible Interface")
 	virtual bool IsDead() { return true; };
 
@@ -38,4 +39,13 @@ public:
 	virtual void AddEffect(UCoreEffect* effect) {};
 
 	virtual void AdjustStat(ECharacterStat stat, int amount) {};
+	virtual void AdjustMaxStat(ECharacterStat stat, int amount) {};
+	virtual bool HasMatchingGameplayTag(FGameplayTag tagToCheck) const { return false; };
+
+	virtual void AddImmunity(const FGameplayTag& immunity) {};
+	virtual void AddResistance(const FGameplayTag& resistance) {};
+	virtual bool HasImmunity(const FGameplayTag& immunity) const { return false; };
+	virtual bool HasResistance(const FGameplayTag& resistance) const { return false; };
+
+	virtual AActor* GetSusceptibleActor() { return nullptr; };
 };

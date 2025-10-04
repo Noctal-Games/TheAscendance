@@ -5,7 +5,10 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Effects/Structs/EffectData.h"
 #include "TheAscendance/Effects/OverTimeEffect.h"
+#include "TheAscendance/Effects/DurationEffect.h"
+#include "TheAscendance/Effects/InstantEffect.h"
 #include "TheAscendance/Effects/DeliveryEffects/ChainDeliveryEffect.h"
+#include "TheAscendance/Effects/DeliveryEffects/AOEDeliveryEffect.h"
 
 UBaseEffect* EffectFactory::CreateEffect(UEffectData* effectData)
 {
@@ -24,9 +27,24 @@ UBaseEffect* EffectFactory::CreateEffect(UEffectData* effectData)
 			effect = NewObject<UOverTimeEffect>();
 			break;
 		}
+		case EEffectType::DURATION:
+		{
+			effect = NewObject<UDurationEffect>();
+			break;
+		}
+		case EEffectType::INSTANT:
+		{
+			effect = NewObject<UInstantEffect>();
+			break;
+		}
 		case EEffectType::CHAIN:
 		{
 			effect = NewObject<UChainDeliveryEffect>();
+			break;
+		}
+		case EEffectType::AOE:
+		{
+			effect = NewObject<UAOEDeliveryEffect>();
 			break;
 		}
 	}

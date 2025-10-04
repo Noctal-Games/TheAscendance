@@ -10,7 +10,7 @@ bool UBaseEffect::Init(UEffectData* effectData)
 	return false;
 }
 
-void UBaseEffect::StartEffect(ISusceptible* target)
+void UBaseEffect::StartEffect(ISusceptible* target, FVector location)
 {
 	m_HasEnded = false;
 
@@ -29,10 +29,6 @@ void UBaseEffect::StartEffect(ISusceptible* target)
 	m_Target = target->_getUObject();
 }
 
-void UBaseEffect::Update(float deltaTime)
-{
-}
-
 void UBaseEffect::EndEffect()
 {
 	m_HasEnded = true;
@@ -43,7 +39,16 @@ void UBaseEffect::EndEffect()
 	}
 }
 
+void UBaseEffect::ResetEffect()
+{
+}
+
 UEffectData* UBaseEffect::GetEffectData()
 {
 	return nullptr;
+}
+
+void UBaseEffect::DoEffect()
+{
+
 }

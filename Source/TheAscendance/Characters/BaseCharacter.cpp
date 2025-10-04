@@ -108,7 +108,7 @@ void ABaseCharacter::AdjustStat(ECharacterStat stat, int amount)
 			m_CharacterStatsComponent->AdjustStatByPercentage(stat, amount);
 			break;
 		}
-		case ECharacterStat::CROUCH_SPEED_PENALITY:
+		case ECharacterStat::CROUCH_SPEED_PENALTY:
 		{
 			m_CharacterStatsComponent->AdjustStatByPercentage(stat, amount);
 			break;
@@ -119,6 +119,42 @@ void ABaseCharacter::AdjustStat(ECharacterStat stat, int amount)
 			m_CharacterStatsComponent->AdjustStatByValue(stat, amount);
 		}
 	}
+}
+
+void ABaseCharacter::AdjustMaxStat(ECharacterStat stat, int amount)
+{
+	if (m_CharacterStatsComponent == nullptr)
+	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
+		return;
+	}
+
+	m_CharacterStatsComponent->AdjustMaxStatByValue(stat, amount);
+}
+
+AActor* ABaseCharacter::GetSusceptibleActor()
+{
+	return this;
+}
+
+void ABaseCharacter::AddImmunity(const FGameplayTag& immunity)
+{
+	m_EffectImmunities.AddTag(immunity);
+}
+
+void ABaseCharacter::AddResistance(const FGameplayTag& resistance)
+{
+	m_EffectResistances.AddTag(resistance);
+}
+
+bool ABaseCharacter::HasImmunity(const FGameplayTag& immunity) const
+{
+	return m_EffectImmunities.HasTag(immunity);
+}
+
+bool ABaseCharacter::HasResistance(const FGameplayTag& resistance) const
+{
+	return m_EffectResistances.HasTag(resistance);
 }
 
 bool ABaseCharacter::MainHandPrimaryAttack()
@@ -274,6 +310,31 @@ const FVector ABaseCharacter::GetCastStartLocation()
 const FVector ABaseCharacter::GetCastStartForward()
 {
 	return GetActorForwardVector();
+}
+
+void ABaseCharacter::GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const
+{
+	tagContainer.AppendTags(OwnedTags);
+}
+
+bool ABaseCharacter::HasMatchingGameplayTag(FGameplayTag tagToCheck) const
+{
+	return OwnedTags.HasTag(tagToCheck);
+}
+
+bool ABaseCharacter::HasAllMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const
+{
+	return OwnedTags.HasAll(tagContainer);
+}
+
+bool ABaseCharacter::HasAnyMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const
+{
+	return OwnedTags.HasAny(tagContainer);
+}
+
+bool ABaseCharacter::IsSprinting()
+{
+	return m_IsSprinting;
 }
 
 // Called every frame

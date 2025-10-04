@@ -19,11 +19,15 @@ class THEASCENDANCE_API UBaseEffect : public UObject
 public:
 	virtual bool Init(UEffectData* effectData);
 
-	virtual void StartEffect(ISusceptible* target);
-	virtual void Update(float deltaTime);
+	virtual void StartEffect(ISusceptible* target, FVector location = FVector::Zero());
 	virtual void EndEffect();
 
+	virtual void ResetEffect();
+
 	virtual UEffectData* GetEffectData();
+
+protected:
+	virtual void DoEffect();
 
 public:
 	FOnEffectEnd OnEffectEnd;
@@ -32,5 +36,6 @@ protected:
 	UPROPERTY()
 	TScriptInterface<ISusceptible> m_Target = nullptr;
 
+	float m_Potency = 0.0f;
 	bool m_HasEnded = false;
 };

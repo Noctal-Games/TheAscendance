@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "CoreEffect.h"
-#include "OverTimeEffect.generated.h"
+#include "DurationEffect.generated.h"
 
-class UOverTimeEffectData;
+class UDurationEffectData;
 
 UCLASS()
-class THEASCENDANCE_API UOverTimeEffect : public UCoreEffect
+class THEASCENDANCE_API UDurationEffect : public UCoreEffect
 {
 	GENERATED_BODY()
-	
+
 public:
 	virtual bool Init(UEffectData* effectData) override;
 
@@ -28,10 +28,8 @@ protected:
 	virtual void ProcessAffectedStat() override;
 
 private:
-	TWeakObjectPtr<UOverTimeEffectData> m_EffectData = nullptr;
-
-	float m_Timer = 0.0f;
-	float m_Interval = 0.0f;
-
+	TWeakObjectPtr<UDurationEffectData> m_EffectData = nullptr;
 	FTimerHandle m_TimerHandle;
+
+	bool m_IsActive = false;
 };

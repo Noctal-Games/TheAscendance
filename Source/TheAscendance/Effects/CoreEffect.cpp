@@ -5,7 +5,7 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
 
-void UCoreEffect::StartEffect(ISusceptible* target)
+void UCoreEffect::StartEffect(ISusceptible* target, FVector location)
 {
 	m_HasEnded = false;
 
@@ -32,4 +32,8 @@ void UCoreEffect::EndEffect()
 	{
 		OnEffectEnd.Execute(this);
 	}
+}
+
+void UCoreEffect::ProcessAffectedStat()
+{
 }

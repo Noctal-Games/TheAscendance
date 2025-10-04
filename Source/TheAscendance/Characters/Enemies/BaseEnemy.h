@@ -22,6 +22,10 @@ public:
 
 	void SetSkeletalMesh();
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 private:
 	UPROPERTY()
 	TSoftObjectPtr<USkeletalMesh> m_SkeletalMesh;

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Characters/Structs/LoadoutSlotData.h"
+#include "GameplayTags.h"
 #include "EnemyData.generated.h"
 
 USTRUCT(BlueprintType)
@@ -42,6 +43,11 @@ struct FEnemyStats
 	float SightStrength = 1.0f;
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Higher value for stronger hearing", ClampMin = 0.0f, ClampMax = 1.0f))
 	float HearingStrength = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FGameplayTag> EffectImmunities;
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FGameplayTag> EffectResistances;
 };
 
 USTRUCT(BlueprintType)

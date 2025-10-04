@@ -8,12 +8,15 @@
 #include "TheAscendance/Effects/CoreEffect.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
 
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+
 // Sets default values for this component's properties
 UEffectHandlerComponent::UEffectHandlerComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
 }
@@ -52,9 +55,41 @@ void UEffectHandlerComponent::AddEffect(UCoreEffect* effect)
 
 	FGameplayTag* tag = &effectData->EffectTag;
 
+	if (m_Owner->HasImmunity(*tag) == true)
+	{
+		return;
+	}
+
 	if (m_Effects.Contains(*tag) == false)
 	{
 		m_Effects.Add(effectData->EffectTag, FEffectList());
+
+		if (effectData->EffectNiagara.IsNull() == false)
+		{
+			m_NiagaraSystems.Add(effectData->EffectTag, effectData->EffectNiagara);
+			m_NiagaraComponents.Add(effectData->EffectTag, nullptr);
+
+			UCoreFunctionLibrary::RequestAsyncLoad(m_NiagaraSystems[effectData->EffectTag].ToSoftObjectPath(), [this, effectData]()
+				{
+
+					if (m_NiagaraSystems[effectData->EffectTag].IsValid())
+					{
+						m_NiagaraComponents[effectData->EffectTag] = UNiagaraFunctionLibrary::SpawnSystemAttached(
+							m_NiagaraSystems[effectData->EffectTag].Get(),
+							m_Owner->GetSusceptibleActor()->GetRootComponent(),
+							"",
+							m_Owner->GetSusceptibleActor()->GetActorLocation(),
+							FRotator::ZeroRotator,
+							EAttachLocation::KeepWorldPosition, true, true, ENCPoolMethod::AutoRelease, true);
+
+						if (m_NiagaraComponents[effectData->EffectTag] != nullptr)
+						{
+							m_NiagaraComponents[effectData->EffectTag]->Activate();
+						}
+					}
+				});
+		}
+
 		//Add Niagara
 	}
 
@@ -64,7 +99,15 @@ void UEffectHandlerComponent::AddEffect(UCoreEffect* effect)
 		{
 			if (UCoreEffect* oldEffect = m_Effects[*tag].Effects[0])
 			{
-				oldEffect->EndEffect();
+				oldEffect->ResetEffect();
+
+				if (m_Effects[*tag].Effects.Num() > 1)
+				{
+					m_Effects[*tag].Effects.RemoveAt(0);
+					m_Effects[*tag].Effects.Add(oldEffect);
+				}
+
+				return;
 			}
 		}
 	}
@@ -74,7 +117,8 @@ void UEffectHandlerComponent::AddEffect(UCoreEffect* effect)
 		{
 			if (UCoreEffect* oldEffect = m_Effects[*tag].Effects[0])
 			{
-				oldEffect->EndEffect();
+				oldEffect->ResetEffect();
+				return;
 			}
 		}
 	}
@@ -84,18 +128,18 @@ void UEffectHandlerComponent::AddEffect(UCoreEffect* effect)
 
 		if (UCoreEffect* Core = Cast<UCoreEffect>(toRemove))
 		{
-			QueueRemoval(Core);
+			RemoveEffect(Core);
 		};
 	});
 
 	effect->StartEffect(m_Owner.GetInterface());
 }
 
-void UEffectHandlerComponent::QueueRemoval(UCoreEffect* effect)
+void UEffectHandlerComponent::RemoveEffect(UCoreEffect* effect)
 {
 	if (effect == nullptr)
 	{
-		LOG_ERROR("Tried to QueueRemoval for invalid Effect");
+		LOG_ERROR("Tried to Remove invalid Effect");
 		return;
 	}
 
@@ -103,53 +147,32 @@ void UEffectHandlerComponent::QueueRemoval(UCoreEffect* effect)
 	{
 		if (m_Effects.Contains(data->EffectTag) == false || m_Effects[data->EffectTag].Effects.Contains(effect) == false)
 		{
-			LOG_ERROR("Tried to QueueRemoval for Effect that isn't stored by the EffectComponent");
+			LOG_ERROR("Tried to Remove Effect that isn't stored by the EffectComponent");
 			return;
 		}
 
-		if (m_EffectsToRemove.Contains(data->EffectTag) == false)
+		m_Effects[data->EffectTag].Effects.Remove(effect);
+
+		if (m_Effects[data->EffectTag].Effects.IsEmpty())
 		{
-			m_EffectsToRemove.Add(data->EffectTag, FEffectList());
-		}
+			m_Effects.Remove(data->EffectTag);
 
-		if (m_EffectsToRemove[data->EffectTag].Effects.Contains(effect) == false)
-		{
-			m_EffectsToRemove[data->EffectTag].Effects.Add(effect);
-		}
-	}
-}
+			if (m_NiagaraSystems.Contains(data->EffectTag))
+			{
+				m_NiagaraSystems.Remove(data->EffectTag);
+			}
 
-void UEffectHandlerComponent::RemoveEffects()
-{
-	TArray<FGameplayTag> tags;
-	m_EffectsToRemove.GetKeys(tags);
+			if (m_NiagaraComponents.Contains(data->EffectTag))
+			{
+				if (m_NiagaraComponents[data->EffectTag] != nullptr)
+				{
+					m_NiagaraComponents[data->EffectTag]->Deactivate();
+				}
 
-	TArray<FGameplayTag> tagsToClear;
-
-	for (const FGameplayTag& effectTag : tags)
-	{
-		for (UCoreEffect* effect : m_EffectsToRemove[effectTag].Effects)
-		{
-			m_Effects[effectTag].Effects.Remove(effect);
-		}
-
-		if (m_Effects[effectTag].Effects.IsEmpty() == true)
-		{
-			tagsToClear.Add(effectTag);
+				m_NiagaraComponents.Remove(data->EffectTag);
+			}
 		}
 	}
-
-	for (const FGameplayTag& effectTag : tagsToClear)
-	{
-		if (m_Effects.Contains(effectTag) == false)
-		{
-			continue;
-		}
-
-		m_Effects.Remove(effectTag);
-	}
-
-	m_EffectsToRemove.Empty();
 }
 
 void UEffectHandlerComponent::ClearEffects()
@@ -176,43 +199,5 @@ void UEffectHandlerComponent::BeginPlay()
 
 	// ...
 	
-}
-
-
-// Called every frame
-void UEffectHandlerComponent::TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction)
-{
-	Super::TickComponent(deltaTime, tickType, thisTickFunction);
-
-	if (m_Effects.IsEmpty() == true)
-	{
-		return;
-	}
-
-	TArray<FGameplayTag> tags;
-	m_Effects.GetKeys(tags);
-
-	for (const FGameplayTag& effectTag : tags)
-	{
-		if (m_Effects[effectTag].Effects.Num() == 0)
-		{
-			continue;
-		}
-
-		for (UCoreEffect* effect : m_Effects[effectTag].Effects)
-		{
-			if (effect == nullptr)
-			{
-				continue;
-			}
-
-			effect->Update(deltaTime);
-		}
-	}
-
-	if (m_EffectsToRemove.IsEmpty() == false)
-	{
-		RemoveEffects();
-	}
 }
 

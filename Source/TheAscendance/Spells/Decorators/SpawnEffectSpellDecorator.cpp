@@ -1,44 +1,30 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ApplyEffectSpellDecorator.h"
+#include "SpawnEffectSpellDecorator.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
-#include "TheAscendance/Characters/Interfaces/Susceptible.h"
 #include "TheAscendance/Spells/Structs/SpellModifierData.h"
 #include "TheAscendance/Effects/CoreEffect.h"
 #include "TheAscendance/Effects/DeliveryEffects/ChainDeliveryEffect.h"
+#include "TheAscendance/Effects/DeliveryEffects/AOEDeliveryEffect.h"
 #include "TheAscendance/Effects/Structs/EffectData.h"
 
-void UApplyEffectSpellDecorator::ApplyEffects(AActor* hitActor)
+void USpawnEffectSpellDecorator::OnHit(AActor* hitActor, FVector spellHitLocation)
 {
-	m_DecoratedSpell->ApplyEffects(hitActor);
+	m_DecoratedSpell->OnHit(hitActor, spellHitLocation);
 
 	if (m_ModifierData == nullptr)
 	{
-		LOG_ERROR("ApplyEffectSpellDecorator is missing ModifierData");
 		return;
 	}
 
 	FString subType = UGameplayTagHelpers::GetTagSubtype(m_ModifierData->EffectTag);
 
-	if (subType == "AOE")
+	if (subType != "AOE")
 	{
-		LOG_WARNING("Tried to Apply an invalid Effect, use a SpawnEffectSpellModifier instead");
-		return;
-	}
-
-	if (m_ModifierData->HasRNG == true && (FMath::FRandRange(0.0f, 100.0f) > m_ModifierData->ChanceToApply))
-	{
-		return;
-	}
-
-	ISusceptible* target = Cast<ISusceptible>(hitActor);
-
-	if (target == nullptr)
-	{
-		LOG_ERROR("Tried to apply Effect to invalid Target");
+		LOG_WARNING("Tried to Spawn an invalid Effect, use an ApplyEffectSpellModifier or ApplyCasterEffectSpellModifier instead");
 		return;
 	}
 
@@ -61,23 +47,11 @@ void UApplyEffectSpellDecorator::ApplyEffects(AActor* hitActor)
 
 	if (UEffectData* effectData = effect->GetEffectData())
 	{
-		if (subType == "Chain")
+		if (subType == "AOE")
 		{
-			if (UChainDeliveryEffect* chainEffect = Cast<UChainDeliveryEffect>(effect))
+			if (UAOEDeliveryEffect* aoeEffect = Cast<UAOEDeliveryEffect>(effect))
 			{
-				chainEffect->StartEffect(target);
-			}
-		}
-		else
-		{
-			if (UCoreEffect* coreEffect = Cast<UCoreEffect>(effect))
-			{
-
-				target->AddEffect(coreEffect);
-			}
-			else
-			{
-				LOG_ERROR("Tried to apply an Effect with no subtype but failed to Cast to CoreEffect");
+				aoeEffect->StartEffect(nullptr, spellHitLocation);
 			}
 		}
 	}

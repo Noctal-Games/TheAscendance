@@ -9,8 +9,6 @@
 #include "TheAscendance/Effects/Structs/EffectData.h"
 #include "TheAscendance/Effects/CoreEffect.h"
 
-#include "Kismet/KismetSystemLibrary.h"
-#include "Engine/World.h"
 #include "TimerManager.h"
 
 bool UChainDeliveryEffect::Init(UEffectData* effectData)
@@ -53,13 +51,16 @@ bool UChainDeliveryEffect::Init(UEffectData* effectData)
 	}
 }
 
-void UChainDeliveryEffect::StartEffect(ISusceptible* target)
+void UChainDeliveryEffect::StartEffect(ISusceptible* target, FVector location)
 {
+	AddToRoot();
+	LOG_ONSCREEN(-1, 5.0f, FColor::Red, "ChainDeliveryEffect is being added to root");
+
 	m_HasEnded = false;
 
 	if (m_EffectData == nullptr || m_EffectToApply == nullptr || target == nullptr)
 	{
-		UnRoot();
+		EndEffect();
 		return;
 	}
 
@@ -68,28 +69,21 @@ void UChainDeliveryEffect::StartEffect(ISusceptible* target)
 
 	m_BounceQueue.Enqueue(FChainBounce(target, m_EffectData->DeliveryRange, 0));
 
-	ProcessNextBounce();
+	DoEffect();
 }
 
 UEffectData* UChainDeliveryEffect::GetEffectData()
 {
 	if (m_EffectData.IsValid() == false)
 	{
-		LOG_ERROR("Effect has no valid EffectData");
+		LOG_ERROR("ChainDeliveryEffect has no valid EffectData");
 		return nullptr;
 	}
 
 	return m_EffectData.Get();
 }
-void UChainDeliveryEffect::Root()
-{
-	AddToRoot();
 
-	//Debug
-	LOG_ONSCREEN(-1, 5.0f, FColor::Red, "ChainDeliveryEffect is being added to root");
-}
-
-void UChainDeliveryEffect::UnRoot()
+void UChainDeliveryEffect::EndEffect()
 {
 	if (m_HasEnded == true)
 	{
@@ -111,7 +105,7 @@ void UChainDeliveryEffect::UnRoot()
 	
 	//Debug
 	//CollectGarbage(GARBAGE_COLLECTION_KEEPFLAGS); // Forces immediate GC to check if everything is working.
-	LOG_ONSCREEN(-1, 5.0f, FColor::Red, "ChainDeliveryEffect is being remove from root");
+	LOG_ONSCREEN(-1, 5.0f, FColor::Red, "ChainDeliveryEffect is being removed from root");
 }
 
 void UChainDeliveryEffect::BeginDestroy()
@@ -122,7 +116,7 @@ void UChainDeliveryEffect::BeginDestroy()
 	LOG_ONSCREEN(-1, 5.0f, FColor::Red, "ChainDeliveryEffect is being destroyed");
 }
 
-void UChainDeliveryEffect::ProcessNextBounce()
+void UChainDeliveryEffect::DoEffect()
 {
 	if (m_HasEnded == true)
 	{
@@ -134,25 +128,30 @@ void UChainDeliveryEffect::ProcessNextBounce()
 	if (m_BounceQueue.Dequeue(currentBounce) == false)
 	{
 		LOG_ERROR("Chain BounceQueue failed to Dequeue");
-		UnRoot();
+		EndEffect();
 		return;
 	}
 
 	if (currentBounce.Source == nullptr)
 	{
+		EndEffect();
 		return;
 	}
 
 	ISusceptible* current = currentBounce.Source.GetInterface();
 
-	if (current == nullptr || m_AffectedTargets.Contains(current->_getUObject()))
+	if (current == nullptr || m_AffectedTargets.Contains(current->_getUObject()) || current->HasImmunity(m_EffectToApply->EffectTag) == true)
 	{
 		if (m_BounceQueue.IsEmpty() == false)
 		{
 			if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
 			{
-				world->GetTimerManager().SetTimerForNextTick(this, &UChainDeliveryEffect::ProcessNextBounce);
+				world->GetTimerManager().SetTimerForNextTick(this, &UChainDeliveryEffect::DoEffect);
 			}
+		}
+		else
+		{
+			EndEffect();
 		}
 
 		return;
@@ -161,14 +160,17 @@ void UChainDeliveryEffect::ProcessNextBounce()
 	m_AffectedTargets.Add(current->_getUObject());
 	ApplyEffect(current);
 
-	TArray<ISusceptible*> neighbors;
-	FindCharactersInRadius(Cast<AActor>(current->_getUObject())->GetActorLocation(), currentBounce.Radius, neighbors);
+	TArray<AActor*> actors;
+	ScanForTargets(Cast<AActor>(current->_getUObject())->GetActorLocation(), currentBounce.Radius, actors);
 
-	for (ISusceptible* target : neighbors)
+	for (AActor* actor : actors)
 	{
-		if (m_AffectedTargets.Contains(target->_getUObject()) == false)
+		if (ISusceptible* target = Cast<ISusceptible>(actor))
 		{
-			m_BounceQueue.Enqueue(FChainBounce(target, currentBounce.Radius, currentBounce.BounceIndex + 1));
+			if (m_AffectedTargets.Contains(target->_getUObject()) == false)
+			{
+				m_BounceQueue.Enqueue(FChainBounce(target, currentBounce.Radius, currentBounce.BounceIndex + 1));
+			}
 		}
 	}
 
@@ -176,63 +178,11 @@ void UChainDeliveryEffect::ProcessNextBounce()
 	{
 		if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
 		{
-			world->GetTimerManager().SetTimer(m_BounceTimerHandle, this, &UChainDeliveryEffect::ProcessNextBounce, m_EffectData == nullptr ? 0.5f : m_EffectData->BounceDelay, false);
+			world->GetTimerManager().SetTimer(m_BounceTimerHandle, this, &UChainDeliveryEffect::DoEffect, m_EffectData == nullptr ? 0.5f : m_EffectData->BounceDelay, false);
 		}
 	}
 	else
 	{
-		UnRoot();
-	}
-}
-
-void UChainDeliveryEffect::ApplyEffect(ISusceptible* target)
-{
-	if (target == nullptr || m_EffectToApply == nullptr)
-	{
-		return;
-	}
-
-	if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
-	{
-		UBaseEffect* casterEffect = gameMode->CreateEffectFromEffectData(m_EffectToApply.Get());
-
-		if (casterEffect == nullptr)
-		{
-			return;
-		}
-
-		if (UCoreEffect* coreEffect = Cast<UCoreEffect>(casterEffect))
-		{
-			target->AddEffect(coreEffect);
-		}
-	}
-
-}
-
-void UChainDeliveryEffect::FindCharactersInRadius(const FVector& origin, float radius, TArray<ISusceptible*>& targets)
-{
-	TArray<TEnumAsByte<EObjectTypeQuery>> types;
-	types.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-
-	TArray<TObjectPtr<AActor>> ignore;
-	//ignore.Add(owner);
-
-	TArray<AActor*> actors;
-
-	UCoreFunctionLibrary::DrawDebugSphere(origin, radius, 16, FColor::Yellow);
-
-	if (UKismetSystemLibrary::SphereOverlapActors(UCoreFunctionLibrary::GetGameWorld(), origin, radius, types, NULL, ignore, actors))
-	{
-		for (TObjectPtr<AActor> actor : actors)
-		{
-			if (ISusceptible* target = Cast<ISusceptible>(actor))
-			{
-				if (m_AffectedTargets.Contains(target->_getUObject()) == true)
-				{
-					continue;
-				}
-				targets.Add(target);
-			}
-		}
+		EndEffect();
 	}
 }
