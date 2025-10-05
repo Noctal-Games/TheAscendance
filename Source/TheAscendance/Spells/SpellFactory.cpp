@@ -11,6 +11,7 @@
 #include "Decorators/AOESpellDecorator.h"
 #include "Decorators/KnockbackSpellDecorator.h"
 #include "Decorators/PenetrationSpellDecorator.h"
+#include "Decorators/TrailSpellDecorator.h"
 #include "Decorators/ApplyCasterEffectSpellDecorator.h"
 #include "Decorators/ApplyEffectSpellDecorator.h"
 #include "Decorators/SpawnEffectSpellDecorator.h"
@@ -134,7 +135,14 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 
 					case ERangedSpellModifierType::KNOCKBACK:
 					{
-						spell = UKnockbackSpellDecorator::Builder(spell.GetInterface()).Build()->_getUObject();
+						if (modifier.GetScriptStruct() != FKnockbackSpellModifier::StaticStruct())
+						{
+							LOG_ERROR("ARangedSpellModifierType struct with type KNOCKBACK isn't of type KnockbackSpellModifier");
+							continue;
+						}
+
+						const FKnockbackSpellModifier& modifierData = modifier.Get<FKnockbackSpellModifier>();
+						spell = UKnockbackSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
 						break;
 					}
 				}
@@ -160,6 +168,14 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 					{
 						case EProjectileSpellModifierType::TRAIL:
 						{
+							if (modifier.GetScriptStruct() != FTrailSpellModifier::StaticStruct())
+							{
+								LOG_ERROR("A ProjectileSpellModifierType struct with type TRAIL isn't of type TrailSpellModifier");
+								continue;
+							}
+
+							const FTrailSpellModifier& modifierData = modifier.Get<FTrailSpellModifier>();
+							spell = UTrailSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
 							break;
 						}
 

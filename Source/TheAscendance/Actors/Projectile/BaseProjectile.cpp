@@ -137,6 +137,16 @@ ISpell* ABaseProjectile::GetSpell()
 	return m_Spell.GetInterface();
 }
 
+AActor* ABaseProjectile::GetProjectileActor()
+{
+	return this;
+}
+
+FVector ABaseProjectile::GetProjectileLocation()
+{
+	return GetActorLocation();
+}
+
 void ABaseProjectile::OnHit(UPrimitiveComponent* hitComp, AActor* otherActor, UPrimitiveComponent* otherComp, FVector normalImpulse, const FHitResult& hit)
 {
 	if (m_IsActive == false || otherActor == nullptr || otherActor == this || otherActor == m_IgnoredOwner)
@@ -222,6 +232,6 @@ void ABaseProjectile::Tick(float deltaTime)
 		return;
 	}
 
-	HandleOnUpdate(deltaTime);
+	m_DecoratedSelf->HandleOnUpdate(deltaTime);
 }
 

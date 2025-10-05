@@ -30,4 +30,7 @@ public:
 	virtual void ProcessOverlapDamage(int& damage) {};
 
 	virtual ISpell* GetSpell() { return nullptr; };
+
+	virtual AActor* GetProjectileActor() { return nullptr; };
+	virtual FVector GetProjectileLocation() { return FVector::Zero(); };
 };

@@ -4,25 +4,34 @@
 #include "KnockbackSpellDecorator.h"
 #include "TheAscendance/Spells/Interfaces/SpellCaster.h"
 
-bool UKnockbackSpellDecorator::CastSpell()
+#include "Kismet/KismetSystemLibrary.h"
+#include "GameFramework/Character.h"
+
+void UKnockbackSpellDecorator::OnHit(AActor* hitActor, FVector spellHitLocation)
 {
-	if (m_DecoratedSpell == nullptr)
+	if (m_ModifierData == nullptr)
 	{
-		LOG_ERROR("KnoackbackSpellDecorator has no decorated spell");
-		return false;
+		LOG_ERROR("Knockback Spell Decorator modifier data is invalid")
+		return;
 	}
 
-	FVector unitDirection = m_DecoratedSpell->GetSpellOwner()->GetCastStartForward();
-	unitDirection.Normalize();
+	FVector knockbackDirection = hitActor->GetActorLocation() - spellHitLocation;
+	knockbackDirection.Normalize();
+	knockbackDirection.Z = FMath::Max(knockbackDirection.Z, 0.5f);
 
-	Fire(unitDirection);
+	if (ACharacter* character = Cast<ACharacter>(hitActor))
+	{
+		character->LaunchCharacter(knockbackDirection * m_ModifierData->KnockbackStrength, true, true);
+		return;
+	}
 
-	return true;
-}
+	if (UPrimitiveComponent* primitiveComponent = hitActor->FindComponentByClass<UPrimitiveComponent>())
+	{
+		if (primitiveComponent->IsSimulatingPhysics() == false)
+		{
+			return;
+		}
 
-void UKnockbackSpellDecorator::Fire(FVector direction)
-{
-	m_DecoratedSpell->Fire(direction);
-
-	LOG_ONSCREEN(-1, 1.0f, FColor::Cyan, "Knockback Decorator: Fire");
+		primitiveComponent->AddImpulse(knockbackDirection * m_ModifierData->KnockbackStrength, NAME_None, true);
+	}
 }

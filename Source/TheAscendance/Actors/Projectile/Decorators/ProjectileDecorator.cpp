@@ -79,3 +79,25 @@ ISpell* UProjectileDecorator::GetSpell()
 
 	return m_DecoratedProjectile->GetSpell();
 }
+
+AActor* UProjectileDecorator::GetProjectileActor()
+{
+	if (m_DecoratedProjectile == nullptr)
+	{
+		LOG_ERROR("Projectile decorator has invalid DecoratedProjectile pointer");
+		return nullptr;
+	}
+
+	return m_DecoratedProjectile->GetProjectileActor();
+}
+
+FVector UProjectileDecorator::GetProjectileLocation()
+{
+	if (m_DecoratedProjectile == nullptr)
+	{
+		LOG_ERROR("Projectile decorator has invalid DecoratedProjectile pointer");
+		return FVector::Zero();
+	}
+
+	return m_DecoratedProjectile->GetProjectileLocation();
+}

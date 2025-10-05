@@ -14,6 +14,8 @@ class THEASCENDANCE_API UAOEDeliveryEffect : public UBaseDeliveryEffect
 	GENERATED_BODY()
 	
 public:
+	void SetIgnoredActor(AActor* toIgnore);
+
 	virtual bool Init(UEffectData* effectData) override;
 
 	virtual void StartEffect(ISusceptible* target, FVector location) override;
@@ -32,6 +34,8 @@ private:
 	FVector m_Location = FVector::Zero();
 
 	FTimerHandle m_TimerHandle;
+
+	TWeakObjectPtr<AActor> m_ToIgnore = nullptr;
 
 	float m_Timer = 0.0f;
 	float m_Interval = 0.1f;
