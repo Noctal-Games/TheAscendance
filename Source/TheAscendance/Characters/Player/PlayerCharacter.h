@@ -23,6 +23,9 @@ public:
 	void SetPlayerController(ATAPlayerController* PlayerController);
 	ATAPlayerController* GetPlayerController();
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Player Camera"))
+	TObjectPtr<UCameraComponent> m_Camera = nullptr;
+
 	void SetIsSprinting(bool val);
 
 	void SetIsCrouching(bool val);
@@ -55,8 +58,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Player Camera"))
-	TObjectPtr<UCameraComponent> m_Camera = nullptr;
+	
 
 	UPROPERTY()
 	TObjectPtr<UPlayerMovementComponent> m_MovementComponent = nullptr;
