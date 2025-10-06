@@ -13,6 +13,11 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+void UAOEDeliveryEffect::SetIgnoredActor(AActor* toIgnore)
+{
+	m_ToIgnore = toIgnore;
+}
+
 bool UAOEDeliveryEffect::Init(UEffectData* effectData)
 {
 	if (UAreaOfEffectDeliveryEffectData* data = Cast<UAreaOfEffectDeliveryEffectData>(effectData))
@@ -66,16 +71,42 @@ void UAOEDeliveryEffect::StartEffect(ISusceptible* target, FVector location)
 		return;
 	}
 
-	m_Location = location;
-
-	m_Timer = m_EffectData->Duration;
-	m_Interval = m_EffectData->EffectInterval;
-
-	DoEffect();
-
-	if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
+	if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
 	{
-		world->GetTimerManager().SetTimer(m_TimerHandle, this, &UAOEDeliveryEffect::DoEffect, m_Interval, true);
+		FHitResult hit;
+
+		FVector start = location;
+		FVector end = start + ((-FVector::UpVector) * 250);
+
+		FCollisionQueryParams traceParams;
+		traceParams.AddIgnoredActor(m_ToIgnore.Get());
+
+		bool iHit = worldContext->LineTraceSingleByChannel(hit, start, end, ECC_WorldStatic, traceParams);
+		UCoreFunctionLibrary::DrawDebugLine(start, end, iHit ? FColor::Green : FColor::Red);
+
+		if (iHit == false)
+		{
+			EndEffect();
+			return;
+		}
+
+		LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Hit: %s, Distance: %f, ImpactPoint: %s",
+			*hit.GetActor()->GetName(),
+			hit.Distance,
+			*hit.ImpactPoint.ToString());
+
+		m_Location = location;
+
+		m_Timer = m_EffectData->Duration;
+		m_Interval = m_EffectData->EffectInterval;
+
+		DoEffect();
+
+		worldContext->GetTimerManager().SetTimer(m_TimerHandle, this, &UAOEDeliveryEffect::DoEffect, m_Interval, true);
+	}
+	else
+	{
+		EndEffect();
 	}
 }
 

@@ -128,4 +128,16 @@ struct FPenetrationSpellModifier : public FProjectileSpellModifier
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int DamageLossPerHit = 0;
 };
+
+USTRUCT(BlueprintType, meta = (ToolTip = "A modifier that modifies a projectile to spawn a trail of AOE effects behind it."))
+struct FTrailSpellModifier : public FProjectileSpellModifier
+{
+	GENERATED_BODY()
+
+	FTrailSpellModifier() : FProjectileSpellModifier(EProjectileSpellModifierType::TRAIL) {};
+	FTrailSpellModifier(const FTrailSpellModifier& modifierData) = default;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag TrailEffectTag;
+};
 // PROJECTILE SPELL MODIFIERS
