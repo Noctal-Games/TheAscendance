@@ -4,16 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GameplayTagAssetInterface.h"
+#include "GameplayTagContainer.h"
 #include "Interfaces/Susceptible.h"
 #include "Enums/CharacterStat.h"
 #include "TheAscendance/Items/Enums/WeaponType.h"
+#include "TheAscendance/Spells/Interfaces/SpellCaster.h"
 #include "BaseCharacter.generated.h"
 
 class UCharacterStatsComponent;
+class UEffectHandlerComponent;
 class AHeldItem;
 
 UCLASS()
-class THEASCENDANCE_API ABaseCharacter : public ACharacter, public ISusceptible
+class THEASCENDANCE_API ABaseCharacter : public ACharacter, public ISusceptible, public ISpellCaster, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 
@@ -25,6 +29,16 @@ public:
 	virtual void Damage(int amount) override;
 	virtual void ReduceStamina(int amount) override;
 	virtual int GetStat(ECharacterStat stat) override;
+	virtual bool IsDead() override;
+	virtual void AddEffect(UCoreEffect* effect) override;
+	virtual void AdjustStat(ECharacterStat stat, int amount) override;
+	virtual void AdjustMaxStat(ECharacterStat stat, int amount) override;
+	virtual AActor* GetSusceptibleActor() override;
+
+	virtual void AddImmunity(const FGameplayTag& immunity) override;
+	virtual void AddResistance(const FGameplayTag& resistance) override;
+	virtual bool HasImmunity(const FGameplayTag& immunity) const override;
+	virtual bool HasResistance(const FGameplayTag& resistance) const override;
 
 	bool MainHandPrimaryAttack();
 	bool MainHandSecondaryAttack();
@@ -57,9 +71,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EndOffHandAttack();
 
-	void TestFunction1();
-	void TestFunction2();
-	void TestFunction3();
+	virtual AActor* GetActor() override;
+	const virtual FVector GetSpellOwnerLocation() override;
+	const virtual FVector GetSpellOwnerForward() override;
+	const virtual FVector GetCastStartLocation() override;
+	const virtual FVector GetCastStartForward() override;
+
+	virtual void GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const override;
+	virtual bool HasMatchingGameplayTag(FGameplayTag tagToCheck) const override;
+	virtual bool HasAllMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const override;
+	virtual bool HasAnyMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const override;
+
+	UFUNCTION(BlueprintPure)
+	virtual bool IsSprinting();
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -67,20 +91,35 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
+	FGameplayTagContainer OwnedTags;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Character Stats Component"))
 	TObjectPtr<UCharacterStatsComponent> m_CharacterStatsComponent = nullptr;
+	UPROPERTY(meta = (DisplayName = "Effect Handler Component"))
+	TObjectPtr<UEffectHandlerComponent> m_EffectHandlerComponent = nullptr;
 
-private:
 	UPROPERTY()
 	TObjectPtr<AHeldItem> m_MainHandItem = nullptr;
 	UPROPERTY()
 	TObjectPtr<AHeldItem> m_OffHandItem = nullptr;
 
-	bool m_IsMainHandAttacking = false;
-	bool m_IsOffHandAttacking = false;
-	float m_AttackTimer = 0.0f;
+	UPROPERTY()
+	FGameplayTagContainer m_EffectImmunities;
+	UPROPERTY()
+	FGameplayTagContainer m_EffectResistances;
 
 	bool m_TestEquipToggle = false;
 	bool m_AnimTest = false;
+
+	bool m_IsSprinting = false;
+	bool m_IsCrouching = false;
+	bool m_IsJumping = false;
+
+private:
+	bool m_IsMainHandAttacking = false;
+	bool m_IsOffHandAttacking = false;
+	float m_AttackTimer = 0.0f;
 };

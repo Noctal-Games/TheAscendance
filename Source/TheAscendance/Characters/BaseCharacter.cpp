@@ -2,13 +2,14 @@
 
 
 #include "BaseCharacter.h"
+#include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "Components/CharacterStatsComponent.h"
+#include "TheAscendance/Effects/Components/EffectHandlerComponent.h"
 #include "TheAscendance/Items/HeldItem.h"
-#include "TheAscendance/Game/GameModes/PlayableGameMode.h"
-#include "TheAscendance/Core/CoreMacros.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -18,12 +19,20 @@ ABaseCharacter::ABaseCharacter()
 
 	m_CharacterStatsComponent = CreateDefaultSubobject<UCharacterStatsComponent>(TEXT("Character Stats Component"));
 	checkf(m_CharacterStatsComponent, TEXT("Character Stats Component failed to initialise"));
+	m_EffectHandlerComponent = CreateDefaultSubobject<UEffectHandlerComponent>(TEXT("Effect Handler Component"));
+	checkf(m_EffectHandlerComponent, TEXT("Effect Handler Component failed to initialise"));
+	
+	SetRootComponent(GetCapsuleComponent());
+
+	GetMesh()->SetCollisionProfileName(FName("NoCollision"));
+	GetMesh()->SetupAttachment(GetRootComponent());
 }
 
 void ABaseCharacter::Heal(int amount)
 {
 	if (m_CharacterStatsComponent == nullptr)
 	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
 		return;
 	}
 
@@ -34,6 +43,7 @@ void ABaseCharacter::Damage(int amount)
 {
 	if (m_CharacterStatsComponent == nullptr)
 	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
 		return;
 	}
 
@@ -44,6 +54,7 @@ void ABaseCharacter::ReduceStamina(int amount)
 {
 	if (m_CharacterStatsComponent == nullptr)
 	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
 		return;
 	}
 
@@ -54,10 +65,96 @@ int ABaseCharacter::GetStat(ECharacterStat stat)
 {
 	if (m_CharacterStatsComponent == nullptr)
 	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
 		return 0;
 	}
 
 	return m_CharacterStatsComponent->GetStatAsValue(stat);
+}
+
+bool ABaseCharacter::IsDead()
+{
+	return GetStat(ECharacterStat::HEALTH) <= 0.0f;
+}
+
+void ABaseCharacter::AddEffect(UCoreEffect* effect)
+{
+	if (m_EffectHandlerComponent == nullptr)
+	{
+		LOG_ERROR("BaseCharacter has no EffectHandlerComponent");
+		return;
+	}
+
+	m_EffectHandlerComponent->AddEffect(effect);
+}
+
+void ABaseCharacter::AdjustStat(ECharacterStat stat, int amount)
+{
+	if (m_CharacterStatsComponent == nullptr)
+	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
+		return;
+	}
+
+	switch (stat)
+	{ 
+		case ECharacterStat::WALK_SPEED:
+		{
+			m_CharacterStatsComponent->AdjustStatByPercentage(stat, amount);
+			break;
+		}
+		case ECharacterStat::SPRINT_SPEED_BONUS:
+		{
+			m_CharacterStatsComponent->AdjustStatByPercentage(stat, amount);
+			break;
+		}
+		case ECharacterStat::CROUCH_SPEED_PENALTY:
+		{
+			m_CharacterStatsComponent->AdjustStatByPercentage(stat, amount);
+			break;
+		}
+
+		default:
+		{
+			m_CharacterStatsComponent->AdjustStatByValue(stat, amount);
+		}
+	}
+}
+
+void ABaseCharacter::AdjustMaxStat(ECharacterStat stat, int amount)
+{
+	if (m_CharacterStatsComponent == nullptr)
+	{
+		LOG_ERROR("BaseCharacter has no CharacterStatsComponent");
+		return;
+	}
+
+	m_CharacterStatsComponent->AdjustMaxStatByValue(stat, amount);
+}
+
+AActor* ABaseCharacter::GetSusceptibleActor()
+{
+	return this;
+}
+
+void ABaseCharacter::AddImmunity(const FGameplayTag& immunity)
+{
+	m_EffectImmunities.AddTag(immunity);
+}
+
+void ABaseCharacter::AddResistance(const FGameplayTag& resistance)
+{
+	m_EffectResistances.AddTag(resistance);
+}
+
+bool ABaseCharacter::HasImmunity(const FGameplayTag& immunity) const
+{
+	return m_EffectImmunities.HasTag(immunity);
+}
+
+bool ABaseCharacter::HasResistance(const FGameplayTag& resistance) const
+{
+	return m_EffectResistances.HasTag(resistance);
 }
 
 bool ABaseCharacter::MainHandPrimaryAttack()
@@ -190,44 +287,60 @@ void ABaseCharacter::EndOffHandAttack()
 	return m_OffHandItem->EndAttack();
 }
 
-void ABaseCharacter::TestFunction1()
+AActor* ABaseCharacter::GetActor()
 {
-	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 1");
-	m_AnimTest = !m_AnimTest;
+	return this;
 }
 
-void ABaseCharacter::TestFunction2()
+const FVector ABaseCharacter::GetSpellOwnerLocation()
 {
-	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 2");
-	EndMainHandAttack();
-	EndOffHandAttack();
+	return GetActorLocation();
 }
 
-void ABaseCharacter::TestFunction3()
+const FVector ABaseCharacter::GetSpellOwnerForward()
 {
-	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 3");
+	return GetActorForwardVector();
+}
 
-	if (m_TestEquipToggle == false)
-	{
-		if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
-		{
-			m_MainHandItem->Init(gameMode->GetItemData(2));
-		}
-	}
-	else
-	{
-		m_MainHandItem->UnEquip();
-	}
+const FVector ABaseCharacter::GetCastStartLocation()
+{
+	return GetActorLocation();
+}
 
-	m_TestEquipToggle = !m_TestEquipToggle;
+const FVector ABaseCharacter::GetCastStartForward()
+{
+	return GetActorForwardVector();
+}
+
+void ABaseCharacter::GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const
+{
+	tagContainer.AppendTags(OwnedTags);
+}
+
+bool ABaseCharacter::HasMatchingGameplayTag(FGameplayTag tagToCheck) const
+{
+	return OwnedTags.HasTag(tagToCheck);
+}
+
+bool ABaseCharacter::HasAllMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const
+{
+	return OwnedTags.HasAll(tagContainer);
+}
+
+bool ABaseCharacter::HasAnyMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const
+{
+	return OwnedTags.HasAny(tagContainer);
+}
+
+bool ABaseCharacter::IsSprinting()
+{
+	return m_IsSprinting;
 }
 
 // Called every frame
 void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	LOG_ONSCREEN(0, 1, FColor::Yellow, "USING ANIMATIONS: %s", m_AnimTest ? TEXT("TRUE") : TEXT("FALSE"));
 
 	if (m_AnimTest == false && IsAttacking() == true)
 	{
@@ -253,6 +366,8 @@ void ABaseCharacter::Tick(float DeltaTime)
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	m_EffectHandlerComponent->Init(this);
 
 	if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
 	{

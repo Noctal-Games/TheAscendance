@@ -9,6 +9,7 @@
 class UPlayerMovementComponent;
 class UCameraComponent;
 class ATAPlayerController;
+class ISpell;
 
 UCLASS()
 class THEASCENDANCE_API APlayerCharacter : public ABaseCharacter
@@ -22,8 +23,10 @@ public:
 	void SetPlayerController(ATAPlayerController* PlayerController);
 	ATAPlayerController* GetPlayerController();
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Player Camera"))
+	TObjectPtr<UCameraComponent> m_Camera = nullptr;
+
 	void SetIsSprinting(bool val);
-	bool IsSprinting();
 
 	void SetIsCrouching(bool val);
 	bool IsCrouching();
@@ -40,6 +43,14 @@ public:
 
 	UCameraComponent* GetCamera();
 
+	const virtual FVector GetCastStartForward() override;
+
+	void TestFunction1();
+	void TestFunction2();
+	void TestFunction3();
+
+	virtual bool IsSprinting() override;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
@@ -47,8 +58,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Player Camera"))
-	TObjectPtr<UCameraComponent> m_Camera = nullptr;
+	
 
 	UPROPERTY()
 	TObjectPtr<UPlayerMovementComponent> m_MovementComponent = nullptr;
@@ -60,7 +70,9 @@ private:
 	float m_DefaultCapsuleHeight = 0.0f;
 	float m_DefaultCapsuleRadius = 0.0f;
 
-	bool m_IsSprinting = false;
-	bool m_IsCrouching = false;
-	bool m_IsJumping = false;
+
+
+	//Test
+	UPROPERTY()
+	TScriptInterface<ISpell> m_TestSpell = nullptr;
 };
