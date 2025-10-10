@@ -37,6 +37,9 @@ public:
 
 	virtual ISpell* GetSpell() override;
 
+	virtual AActor* GetProjectileActor() override;
+	virtual FVector GetProjectileLocation() override;
+
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* hitComp, AActor* otherActor, UPrimitiveComponent* otherComp, FVector normalImpulse, const FHitResult& hit);
 	UFUNCTION()

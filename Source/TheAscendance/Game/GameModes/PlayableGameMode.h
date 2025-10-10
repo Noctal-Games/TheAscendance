@@ -37,6 +37,7 @@ public:
 
 	ISpell* CreateSpellFromID(int spellID, ISpellCaster* spellOwner);
 
+	UFUNCTION(BlueprintCallable)
 	ABaseEnemy* CreateEnemyFromID(int enemyID);
 
 	virtual void InitGameState() override;

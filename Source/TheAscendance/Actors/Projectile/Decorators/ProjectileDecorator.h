@@ -26,6 +26,10 @@ public:
 	virtual void ProcessOverlapDamage(int& damage) override;
 
 	virtual ISpell* GetSpell() override;
+
+	virtual AActor* GetProjectileActor() override;
+	virtual FVector GetProjectileLocation() override;
+
 protected:
 	UPROPERTY()
 	TScriptInterface<IProjectile> m_DecoratedProjectile = nullptr;

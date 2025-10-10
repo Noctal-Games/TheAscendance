@@ -15,6 +15,7 @@ void UAOESpellDecorator::OnHit(AActor* hitActor, FVector spellHitLocation)
 
 	if (m_ModifierData == nullptr)
 	{
+		LOG_ERROR("AOE Spell Decorator modifier data is invalid")
 		return;
 	}
 

@@ -24,7 +24,7 @@ APlayerCharacter::APlayerCharacter() : ABaseCharacter()
 
 	m_Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera Component"));
 	checkf(m_Camera, TEXT("Player Camera failed to initialise"));
-	m_Camera->SetupAttachment(GetRootComponent());
+	m_Camera->SetupAttachment(GetMesh(), TEXT("head"));
 	m_Camera->bUsePawnControlRotation = true;
 }
 

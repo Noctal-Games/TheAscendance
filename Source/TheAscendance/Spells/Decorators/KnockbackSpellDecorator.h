@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "SpellDecorator.h"
+#include "TheAscendance/Spells/Structs/SpellModifierData.h"
 #include "KnockbackSpellDecorator.generated.h"
 
-/**
- * 
- */
+struct FKnockbackSpellModifier;
+
 UCLASS()
 class THEASCENDANCE_API UKnockbackSpellDecorator : public USpellDecorator
 {
@@ -20,10 +20,11 @@ public:
 		TWeakObjectPtr<UKnockbackSpellDecorator> m_Decorator = nullptr;
 
 	public:
-		Builder(ISpell* decorator)
+		Builder(ISpell* decorator, const FKnockbackSpellModifier& modifierData)
 		{
 			m_Decorator = NewObject<UKnockbackSpellDecorator>();
 			m_Decorator->Decorate(decorator);
+			m_Decorator->m_ModifierData = MakeShared<FKnockbackSpellModifier>(modifierData);
 		}
 		ISpell* Build()
 		{
@@ -37,8 +38,8 @@ public:
 		}
 	};
 
-	virtual bool CastSpell() override;
+	virtual void OnHit(AActor* hitActor, FVector spellHitLocation) override;
 
-	//Test
-	virtual void Fire(FVector direction) override;
+private:
+	TSharedPtr<FKnockbackSpellModifier> m_ModifierData = nullptr;
 };
