@@ -1,0 +1,112 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "HSMAgentComponent.h"
+#include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Characters/AI/States/IdleState.h"
+#include "TheAscendance/Characters/Enemies/BaseEnemy.h"
+
+// Sets default values for this component's properties
+UHSMAgentComponent::UHSMAgentComponent()
+{
+	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
+	// off to improve performance if you don't need them.
+	PrimaryComponentTick.bCanEverTick = true;
+
+	// ...
+}
+
+void UHSMAgentComponent::Init(ABaseEnemy* owner)
+{
+	if (owner == nullptr)
+	{
+		LOG_ERROR("Tried to Init HSMAgentComponent with invalid owner");
+		return;
+	}
+
+	m_Owner = owner;
+
+	m_CurrentState = EState::MAX;
+	m_States.Add(EState::IDLE, NewObject<UIdleState>());
+
+	if (m_States.Num() != (int32)EState::MAX)
+	{
+		LOG_ERROR("States count does not match EState length");
+	}
+
+	SetState(EState::IDLE);
+}
+
+void UHSMAgentComponent::SetState(EState newState)
+{
+	if (m_CurrentState == newState)
+	{
+		return;
+	}
+	else if (m_States.Contains(newState) == false || m_States[newState] == nullptr)
+	{
+		LOG_ERROR("Tried to set state to an invalid state");
+		return;
+	}
+
+	if(m_States.Contains(m_CurrentState) && m_States[m_CurrentState] != nullptr)
+	{
+		m_States[m_CurrentState]->EndState();
+	}
+
+	m_CurrentState = newState;
+	m_States[m_CurrentState]->StartState(this);
+}
+
+void UHSMAgentComponent::SetDestination(const FVector& destination)
+{
+	if(m_Owner.IsValid() == false)
+	{
+		LOG_ERROR("Tried to set destination with invalid owner");
+		return;
+	}
+
+	m_Owner->SetDestination(destination);
+}
+
+const ABaseEnemy* UHSMAgentComponent::GetAgentOwner() const
+{
+	if(m_Owner.IsValid() == false)
+	{
+		LOG_ERROR("Tried to get owner enemy with invalid owner");
+		return nullptr;
+	}
+
+	return m_Owner.Get();
+}
+
+bool UHSMAgentComponent::HasPath() const
+{
+	if (m_Owner.IsValid() == false)
+	{
+		LOG_ERROR("Tried to get owner HasPath with invalid owner");
+		return true;
+	}
+
+	return m_Owner->HasPath();
+}
+
+// Called when the game starts
+void UHSMAgentComponent::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+// Called every frame
+void UHSMAgentComponent::TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction)
+{
+	Super::TickComponent(deltaTime, tickType, thisTickFunction);
+
+	if (m_States.Num() == 0 || m_States[m_CurrentState] == nullptr)
+	{
+		return;
+	}
+
+	m_States[m_CurrentState]->Update(deltaTime);
+}
+

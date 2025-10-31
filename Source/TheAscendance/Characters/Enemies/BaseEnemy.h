@@ -6,6 +6,8 @@
 #include "TheAscendance/Characters/BaseCharacter.h"
 #include "BaseEnemy.generated.h"
 
+class ATAAIController;
+class UHSMAgentComponent;
 class USkeletalMesh;
 class UAnimBlueprintGeneratedClass;
 struct FEnemyTableData;
@@ -19,8 +21,10 @@ public:
 	ABaseEnemy();
 
 	void Init(FEnemyTableData* data);
-
 	void SetSkeletalMesh();
+
+	void SetDestination(const FVector& destination);
+	bool HasPath() const;
 
 protected:
 	// Called when the game starts or when spawned
@@ -31,4 +35,9 @@ private:
 	TSoftObjectPtr<USkeletalMesh> m_SkeletalMesh;
 	UPROPERTY()
 	TSoftClassPtr<UAnimBlueprintGeneratedClass> m_AnimationBP;
+
+	TWeakObjectPtr<ATAAIController> m_Controller = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UHSMAgentComponent> m_Agent = nullptr;
 };
