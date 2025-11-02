@@ -6,6 +6,8 @@
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Characters/Components/CharacterStatsComponent.h"
 #include "TheAscendance/Characters/CharacterGameplayTags.h"
+#include "TheAscendance/Characters/AI/TAAIController.h"
+#include "TheAscendance/Characters/AI/Components/HSMAgentComponent.h"
 #include "Structs/EnemyData.h"
 
 #include "Components/CapsuleComponent.h"
@@ -84,10 +86,22 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 
 	if (equipment.LoadoutData.Num() == 0)
 	{                               
-		return;
+		
 	}
-	
-	//Equip items
+	else
+	{
+		//Equip items
+	}
+
+	if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))
+	{
+		m_Agent->RegisterComponent();
+		m_Agent->Init(this);
+	}
+	else
+	{
+		LOG_ERROR("Failed to initalise HSM_Agent");
+	}
 }
 
 void ABaseEnemy::SetSkeletalMesh()
@@ -120,9 +134,33 @@ void ABaseEnemy::SetSkeletalMesh()
 	}
 }
 
+void ABaseEnemy::SetDestination(const FVector& destination)
+{
+	if (m_Controller.IsValid() == false)
+	{
+		LOG_ERROR("Tried to set destination with invalid controller");
+		return;
+	}
+
+	m_Controller->SetDestination(destination);
+}
+
+bool ABaseEnemy::HasPath() const
+{
+	if (m_Controller.IsValid() == false)
+	{
+		LOG_ERROR("Tried to get HasPath with invalid Controller");
+		return true;
+	}
+
+	return m_Controller->HasPath();
+}
+
 void ABaseEnemy::BeginPlay()
 {
 	ABaseCharacter::BeginPlay();
 
 	OwnedTags.AddTag(CHARACTER_ENEMY);
+
+	m_Controller = Cast<ATAAIController>(GetController());
 }

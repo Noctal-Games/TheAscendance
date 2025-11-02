@@ -82,7 +82,7 @@ void UAOEDeliveryEffect::StartEffect(ISusceptible* target, FVector location)
 		traceParams.AddIgnoredActor(m_ToIgnore.Get());
 
 		bool iHit = worldContext->LineTraceSingleByChannel(hit, start, end, ECC_WorldStatic, traceParams);
-		UCoreFunctionLibrary::DrawDebugLine(start, end, iHit ? FColor::Green : FColor::Red);+
+		UCoreFunctionLibrary::DrawDebugLine(start, end, iHit ? FColor::Green : FColor::Red);
 
 		if (iHit == false)
 		{
