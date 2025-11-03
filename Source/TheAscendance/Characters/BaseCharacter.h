@@ -85,11 +85,16 @@ public:
 	UFUNCTION(BlueprintPure)
 	virtual bool IsSprinting();
 
+	virtual void SetDestination(const FVector& destination);
+	void TurnTowards(const FRotator& targetRotation);
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+private:
+	void UpdateTurnTowards();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
@@ -122,4 +127,9 @@ private:
 	bool m_IsMainHandAttacking = false;
 	bool m_IsOffHandAttacking = false;
 	float m_AttackTimer = 0.0f;
+
+	FTimerHandle m_TurnTimerHandle;
+	FRotator m_TurnTargetRotation = FRotator::ZeroRotator;
+	float m_TurnInterpSpeed = 5.0f;
+	bool m_IsTurning = false;
 };

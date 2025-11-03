@@ -69,7 +69,7 @@ void UHSMAgentComponent::SetDestination(const FVector& destination)
 	m_Owner->SetDestination(destination);
 }
 
-const ABaseEnemy* UHSMAgentComponent::GetAgentOwner() const
+ABaseEnemy* UHSMAgentComponent::GetAgentOwner() const
 {
 	if(m_Owner.IsValid() == false)
 	{
@@ -89,6 +89,32 @@ bool UHSMAgentComponent::HasPath() const
 	}
 
 	return m_Owner->HasPath();
+}
+
+void UHSMAgentComponent::SetWaypointRoute(AWaypointRoute* route)
+{
+	m_WaypointRoute = route;
+
+	if (m_CurrentState != EState::IDLE || m_WaypointRoute.IsValid() == false)
+	{
+		return;
+	}
+
+	if (m_States.Contains(m_CurrentState) && m_States[m_CurrentState] != nullptr)
+	{
+		m_States[m_CurrentState]->EndState();
+		m_States[m_CurrentState]->StartState(this);
+	}
+}
+
+AWaypointRoute* UHSMAgentComponent::GetWaypointRoute() const
+{
+	if(m_WaypointRoute.IsValid() == false)
+	{
+		return nullptr;
+	}
+
+	return m_WaypointRoute.Get();
 }
 
 // Called when the game starts

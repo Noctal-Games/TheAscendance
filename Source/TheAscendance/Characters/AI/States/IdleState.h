@@ -21,4 +21,6 @@ public:
 
 private:
 	TWeakObjectPtr<UNavigationSystemV1> m_NavigationSystem = nullptr;
+
+	bool m_UsingWaypointRoute = false;
 };
