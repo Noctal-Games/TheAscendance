@@ -1,9 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "IdleState.h"
+#include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Characters/AI/Navigation/WaypointRoute.h"
 #include "TheAscendance/Characters/AI/Components/HSMAgentComponent.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
+#include "TheAscendance/Characters/BaseCharacter.h"
 #include "NavigationSystem.h"
 
 void UIdleState::StartState(UHSMAgentComponent* agent)
@@ -15,6 +18,13 @@ void UIdleState::StartState(UHSMAgentComponent* agent)
 		return;
 	}
 
+	if(AWaypointRoute* waypointRoute = m_Agent->GetWaypointRoute())
+	{
+		m_UsingWaypointRoute = true;
+		waypointRoute->AddCharacterToRoute(m_Agent->GetAgentOwner());
+		return;
+	}
+
 	if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
 	{
 		m_NavigationSystem = UNavigationSystemV1::GetCurrent(worldContext);
@@ -23,7 +33,7 @@ void UIdleState::StartState(UHSMAgentComponent* agent)
 
 void UIdleState::Update(float deltaTime)
 {
-	if (m_Agent->HasPath() == true)
+	if (m_Agent->HasPath() == true || m_UsingWaypointRoute == true)
 	{
 		return;
 	}
@@ -44,5 +54,11 @@ void UIdleState::EndState()
 		return;
 	}
 
+	if (AWaypointRoute* waypointRoute = m_Agent->GetWaypointRoute())
+	{
+		waypointRoute->RemoveCharacterFromRoute(m_Agent->GetAgentOwner());
+	}
+
+	m_UsingWaypointRoute = false;
 	UAbstractState::EndState();
 }

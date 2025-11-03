@@ -156,6 +156,16 @@ bool ABaseEnemy::HasPath() const
 	return m_Controller->HasPath();
 }
 
+void ABaseEnemy::SetWaypointRoute(AWaypointRoute* route)
+{
+	if (route == nullptr || m_Agent == nullptr)
+	{
+		return;
+	}
+
+	m_Agent->SetWaypointRoute(route);
+}
+
 void ABaseEnemy::BeginPlay()
 {
 	ABaseCharacter::BeginPlay();

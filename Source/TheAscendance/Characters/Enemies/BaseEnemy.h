@@ -10,6 +10,7 @@ class ATAAIController;
 class UHSMAgentComponent;
 class USkeletalMesh;
 class UAnimBlueprintGeneratedClass;
+class AWaypointRoute;
 struct FEnemyTableData;
 
 UCLASS()
@@ -23,8 +24,11 @@ public:
 	void Init(FEnemyTableData* data);
 	void SetSkeletalMesh();
 
-	void SetDestination(const FVector& destination);
+	virtual void SetDestination(const FVector& destination) override;
 	bool HasPath() const;
+
+	//Temp until better setup
+	void SetWaypointRoute(AWaypointRoute* route);
 
 protected:
 	// Called when the game starts or when spawned

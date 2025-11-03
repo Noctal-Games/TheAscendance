@@ -10,6 +10,7 @@
 class ABaseEnemy;
 class APlayerCharacter;
 class UAbstractState;
+class AWaypointRoute;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API UHSMAgentComponent : public UActorComponent
@@ -24,9 +25,13 @@ public:
 	void SetState(EState newState);
 
 	void SetDestination(const FVector& destination);
-	const ABaseEnemy* GetAgentOwner() const;
+	ABaseEnemy* GetAgentOwner() const;
 
 	bool HasPath() const;
+
+	//Temp until better setup
+	void SetWaypointRoute(AWaypointRoute* route);
+	AWaypointRoute* GetWaypointRoute() const;
 
 	// Called every frame
 	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
@@ -38,6 +43,9 @@ protected:
 private:
 	TWeakObjectPtr<ABaseEnemy> m_Owner = nullptr;
 	TWeakObjectPtr<APlayerCharacter> m_Player = nullptr;
+
+	//Temp until better setup
+	TWeakObjectPtr<AWaypointRoute> m_WaypointRoute = nullptr;
 
 	UPROPERTY()
 	TMap<EState, TObjectPtr<UAbstractState>> m_States;
