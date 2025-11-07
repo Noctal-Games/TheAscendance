@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "InstancedEnemySpawner.generated.h"
 
+class AWaypointRoute;
+
 UCLASS()
 class THEASCENDANCE_API AInstancedEnemySpawner : public AActor
 {
@@ -22,4 +24,6 @@ protected:
 public:
 	UPROPERTY(EditInstanceOnly)
 	int EnemyID = 0;
+	UPROPERTY(EditInstanceOnly)
+	TObjectPtr<AWaypointRoute> PatrolRoute = nullptr;
 };

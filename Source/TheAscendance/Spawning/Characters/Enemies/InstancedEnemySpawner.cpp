@@ -38,6 +38,11 @@ void AInstancedEnemySpawner::BeginPlay()
 		enemy->SetActorLocation(GetActorLocation());
 		enemy->SetActorRotation(GetActorRotation());
 
+		if(PatrolRoute != nullptr)
+		{
+			enemy->SetWaypointRoute(PatrolRoute);
+		}
+
 		LOG_INFO("InstancedEnemySpawner successfully loaded enemy with ID: %i", EnemyID);
 	}
 }
