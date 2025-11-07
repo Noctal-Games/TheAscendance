@@ -15,3 +15,14 @@ enum class EState : uint8
 
 	MAX UMETA(Hidden)
 };
+
+UENUM(BlueprintType)
+enum class ECombatState : uint8
+{
+	CHASE UMETA(DisplayName = "Chase"),
+	POSITION UMETA(DisplayName = "Position"),
+	ATTACK UMETA(DisplayName = "Attack"),
+	FLEE UMETA(DisplayName = "Flee"),
+
+	MAX
+};
