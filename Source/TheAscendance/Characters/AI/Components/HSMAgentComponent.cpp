@@ -4,6 +4,8 @@
 #include "HSMAgentComponent.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Characters/AI/States/IdleState.h"
+#include "TheAscendance/Characters/AI/States/InvestigateState.h"
+#include "TheAscendance/Characters/AI/States/CombatState.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
 
 // Sets default values for this component's properties
@@ -28,6 +30,8 @@ void UHSMAgentComponent::Init(ABaseEnemy* owner)
 
 	m_CurrentState = EState::MAX;
 	m_States.Add(EState::IDLE, NewObject<UIdleState>());
+	m_States.Add(EState::INVESTIGATE, NewObject<UInvestigateState>());
+	m_States.Add(EState::COMBAT, NewObject<UCombatState>());
 
 	if (m_States.Num() != (int32)EState::MAX)
 	{
