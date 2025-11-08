@@ -14,12 +14,15 @@
 
 UWorld* UCoreFunctionLibrary::GetGameWorld()
 {
-	if (UGameViewportClient* viewport = GEngine->GameViewport)
+	for (const FWorldContext& context : GEngine->GetWorldContexts())
 	{
-		return viewport->GetWorld();
+		if (context.WorldType == EWorldType::Game || context.WorldType == EWorldType::PIE)
+		{
+			return context.World();
+		}
 	}
 
-	LOG_ERROR("GameViewport was invalid");
+	LOG_ERROR("Unable to find a valid Game World Context");
 	return nullptr;
 }
 

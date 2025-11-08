@@ -2,14 +2,15 @@
 
 
 #include "TAAIController.h"
+#include "TheAscendance/Core/CoreMacros.h"
 #include "Navigation/PathFollowingComponent.h"
 
-void ATAAIController::SetDestination(const FVector& destination)
+void ATAAIController::SetDestination(const FVector& destination, float acceptanceRadius)
 {
 	m_CurrentDestination = destination;
 
 	FAIMoveRequest moveTo;
-	moveTo.SetAcceptanceRadius(50);
+	moveTo.SetAcceptanceRadius(acceptanceRadius < 15.0f ? 15.0f : acceptanceRadius);
 	moveTo.SetGoalLocation(m_CurrentDestination);
 
 	MoveTo(moveTo);

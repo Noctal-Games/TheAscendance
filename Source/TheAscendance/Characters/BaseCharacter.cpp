@@ -337,14 +337,38 @@ bool ABaseCharacter::IsSprinting()
 	return m_IsSprinting;
 }
 
-// Called every frame
-void ABaseCharacter::Tick(float DeltaTime)
+void ABaseCharacter::SetDestination(const FVector& destination)
 {
-	Super::Tick(DeltaTime);
+}
+
+void ABaseCharacter::TurnTowards(const FRotator& targetRotation)
+{
+	m_TurnTargetRotation = targetRotation;
+	m_IsTurning = true;
+}
+
+FVector ABaseCharacter::GetSocketLocation(FName socketName)
+{
+	if (GetMesh()->DoesSocketExist(socketName) == false)
+	{
+		return FVector::Zero();
+	}
+
+	return GetMesh()->GetSocketLocation(socketName);
+}
+
+void ABaseCharacter::UpdateTurnTowards()
+{
+}
+
+// Called every frame
+void ABaseCharacter::Tick(float deltaTime)
+{
+	Super::Tick(deltaTime);
 
 	if (m_AnimTest == false && IsAttacking() == true)
 	{
-		m_AttackTimer -= DeltaTime;
+		m_AttackTimer -= deltaTime;
 
 		if (m_AttackTimer > 0)
 		{
@@ -358,6 +382,24 @@ void ABaseCharacter::Tick(float DeltaTime)
 		else
 		{
 			EndOffHandAttack();
+		}
+	}
+
+	if (m_IsTurning == true)
+	{
+		FRotator rotation = GetActorRotation();
+
+		float deltaYaw = FMath::FindDeltaAngleDegrees(rotation.Yaw, m_TurnTargetRotation.Yaw);
+		float maxYawThisFrame = 180.f * deltaTime;
+
+		rotation.Yaw += FMath::Clamp(deltaYaw, -maxYawThisFrame, maxYawThisFrame);
+		SetActorRotation(rotation);
+
+		if (FMath::IsNearlyZero(deltaYaw, 0.5f))
+		{
+			rotation.Yaw = m_TurnTargetRotation.Yaw;
+			SetActorRotation(rotation);
+			m_IsTurning = false;
 		}
 	}
 }
@@ -396,6 +438,3 @@ void ABaseCharacter::BeginPlay()
 	//Test
 	m_TestEquipToggle = false;
 }
-
-
-

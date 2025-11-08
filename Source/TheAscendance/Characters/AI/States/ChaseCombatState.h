@@ -4,23 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "AbstractState.h"
-#include "IdleState.generated.h"
+#include "ChaseCombatState.generated.h"
 
 class UHSMAgentComponent;
-class UNavigationSystemV1;
 
 UCLASS()
-class THEASCENDANCE_API UIdleState : public UAbstractState
+class THEASCENDANCE_API UChaseCombatState : public UAbstractState
 {
 	GENERATED_BODY()
-	
+
 public:
-	virtual void StartState(UHSMAgentComponent* agent) override;
+	virtual void StartState(UHSMAgentComponent* owningAgent) override;
 	virtual void Update(float deltaTime) override;
 	virtual void EndState() override;
 
 private:
-	TWeakObjectPtr<UNavigationSystemV1> m_NavigationSystem = nullptr;
+	FVector m_PlayerLastKnownPos = FVector::ZeroVector;
 
-	bool m_UsingWaypointRoute = false;
+	float m_ChaseTimer = 0.0f;
+	float m_EndChaseCooldown = 0.0f;
 };

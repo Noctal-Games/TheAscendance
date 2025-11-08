@@ -4,23 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "AbstractState.h"
-#include "IdleState.generated.h"
+#include "InvestigateState.generated.h"
 
 class UHSMAgentComponent;
 class UNavigationSystemV1;
 
 UCLASS()
-class THEASCENDANCE_API UIdleState : public UAbstractState
+class THEASCENDANCE_API UInvestigateState : public UAbstractState
 {
 	GENERATED_BODY()
 	
 public:
-	virtual void StartState(UHSMAgentComponent* agent) override;
+	virtual void StartState(UHSMAgentComponent* owningAgent) override;
 	virtual void Update(float deltaTime) override;
 	virtual void EndState() override;
 
 private:
-	TWeakObjectPtr<UNavigationSystemV1> m_NavigationSystem = nullptr;
+	TWeakObjectPtr<UNavigationSystemV1> m_NavSystem = nullptr;
+	float m_Timer = 0.0f;
+	float m_DelayBetweenPathing = 0.0f;
 
-	bool m_UsingWaypointRoute = false;
+	float m_InvestigationTimer = 0.0f;
 };
