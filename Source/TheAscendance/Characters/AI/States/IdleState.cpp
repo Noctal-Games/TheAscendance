@@ -33,6 +33,12 @@ void UIdleState::StartState(UHSMAgentComponent* agent)
 
 void UIdleState::Update(float deltaTime)
 {
+	if (m_Agent->HasLineOfSight() == true)
+	{
+		m_Agent->SetState(EState::COMBAT);
+		return;
+	}
+
 	if (m_Agent->HasPath() == true || m_UsingWaypointRoute == true)
 	{
 		return;

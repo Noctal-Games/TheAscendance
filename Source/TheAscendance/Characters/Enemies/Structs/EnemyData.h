@@ -100,6 +100,7 @@ struct FEnemyTableData : public FTableRowBase
 	FEnemyData EnemyData;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftObjectPtr<class USkeletalMesh> EnemyMesh = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSoftClassPtr<class UAnimBlueprintGeneratedClass> EnemyAnimationBP = nullptr;
+	TSoftClassPtr<class UAnimInstance> EnemyAnimationBP = nullptr;
 };

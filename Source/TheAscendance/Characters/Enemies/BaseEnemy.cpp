@@ -55,7 +55,7 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 	UCoreFunctionLibrary::RequestAsyncLoad(assetPaths, [this]() { SetSkeletalMesh(); });
 
 	const FEnemyStats& stats = data->EnemyData.EnemyStats;
-
+	
 	m_CharacterStatsComponent->SetStat(ECharacterStat::HEALTH, stats.Health);
 	m_CharacterStatsComponent->SetStat(ECharacterStat::WALK_SPEED, stats.WalkSpeed);
 	m_CharacterStatsComponent->SetStat(ECharacterStat::SPRINT_SPEED_BONUS, stats.SprintSpeedBonus);
@@ -96,6 +96,7 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 	if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))
 	{
 		m_Agent->RegisterComponent();
+		m_Agent->SetVisionStrength(stats.SightStrength);
 		m_Agent->Init(this);
 	}
 	else
@@ -125,8 +126,8 @@ void ABaseEnemy::SetSkeletalMesh()
 		float radius = FMath::Max(extent.X, extent.Y);
 		float halfHeight = extent.Z;
 
-		//GetCapsuleComponent()->SetCapsuleSize(radius, halfHeight);
-		//GetCapsuleComponent()->SetRelativeLocation(bounds.Origin);
+		GetCapsuleComponent()->SetCapsuleSize(radius, halfHeight);
+		GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -halfHeight));
 	}
 	else
 	{
@@ -164,6 +165,16 @@ void ABaseEnemy::SetWaypointRoute(AWaypointRoute* route)
 	}
 
 	m_Agent->SetWaypointRoute(route);
+}
+
+void ABaseEnemy::SetFocus(AActor* target)
+{
+	m_Controller->SetFocus(target);
+}
+
+void ABaseEnemy::ClearFocus()
+{
+	m_Controller->ClearFocus(EAIFocusPriority::Gameplay);
 }
 
 void ABaseEnemy::BeginPlay()

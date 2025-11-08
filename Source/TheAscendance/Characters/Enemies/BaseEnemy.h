@@ -9,7 +9,7 @@
 class ATAAIController;
 class UHSMAgentComponent;
 class USkeletalMesh;
-class UAnimBlueprintGeneratedClass;
+class UAnimInstance;
 class AWaypointRoute;
 struct FEnemyTableData;
 
@@ -30,6 +30,9 @@ public:
 	//Temp until better setup
 	void SetWaypointRoute(AWaypointRoute* route);
 
+	void SetFocus(AActor* target);
+	void ClearFocus();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -38,7 +41,7 @@ private:
 	UPROPERTY()
 	TSoftObjectPtr<USkeletalMesh> m_SkeletalMesh;
 	UPROPERTY()
-	TSoftClassPtr<UAnimBlueprintGeneratedClass> m_AnimationBP;
+	TSoftClassPtr<UAnimInstance> m_AnimationBP;
 
 	TWeakObjectPtr<ATAAIController> m_Controller = nullptr;
 
