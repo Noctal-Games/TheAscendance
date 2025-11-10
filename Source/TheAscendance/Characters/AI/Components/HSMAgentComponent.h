@@ -11,6 +11,7 @@ class ABaseEnemy;
 class APlayerCharacter;
 class UAbstractState;
 class AWaypointRoute;
+class USightSensorComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API UHSMAgentComponent : public UActorComponent
@@ -33,6 +34,12 @@ public:
 	void SetWaypointRoute(AWaypointRoute* route);
 	AWaypointRoute* GetWaypointRoute() const;
 
+	void SetVisionStrength(float visionStrength);
+	const float GetVisionStrength();
+
+	bool HasLineOfSight();
+	void SetHasLineOfSight(bool hasLineOfSight);
+
 	// Called every frame
 	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 
@@ -41,6 +48,9 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY()
+	TObjectPtr<USightSensorComponent> m_SightSensor = nullptr;
+
 	TWeakObjectPtr<ABaseEnemy> m_Owner = nullptr;
 	TWeakObjectPtr<APlayerCharacter> m_Player = nullptr;
 
@@ -51,4 +61,8 @@ private:
 	TMap<EState, TObjectPtr<UAbstractState>> m_States;
 
 	EState m_CurrentState = EState::MAX;
+
+	float m_VisionStrength = 0.0f;
+
+	bool m_HasLineOfSight = false;
 };

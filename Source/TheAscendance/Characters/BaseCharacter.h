@@ -87,6 +87,9 @@ public:
 
 	virtual void SetDestination(const FVector& destination);
 	void TurnTowards(const FRotator& targetRotation);
+
+	FVector GetSocketLocation(FName socketName);
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:

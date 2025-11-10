@@ -32,6 +32,12 @@ void UCombatState::StartState(UHSMAgentComponent* owningAgent)
 
 void UCombatState::Update(float deltaTime)
 {
+	if (m_Agent->HasLineOfSight() == false)
+	{
+		m_Agent->SetState(EState::IDLE);
+		return;
+	}
+
 	if (m_CombatStates.Num() == 0 || m_CombatStates[m_CurrentCombatState] == nullptr)
 	{
 		return;
