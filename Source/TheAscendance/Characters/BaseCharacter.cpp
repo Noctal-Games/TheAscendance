@@ -347,6 +347,16 @@ void ABaseCharacter::TurnTowards(const FRotator& targetRotation)
 	m_IsTurning = true;
 }
 
+FVector ABaseCharacter::GetSocketLocation(FName socketName)
+{
+	if (GetMesh()->DoesSocketExist(socketName) == false)
+	{
+		return FVector::Zero();
+	}
+
+	return GetMesh()->GetSocketLocation(socketName);
+}
+
 void ABaseCharacter::UpdateTurnTowards()
 {
 }
