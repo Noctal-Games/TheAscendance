@@ -7,6 +7,8 @@
 #include "TheAscendance/Spells/Structs/SpellModifierData.h"
 #include "AOESpellDecorator.generated.h"
 
+class UNiagaraSystem;
+
 UCLASS()
 class THEASCENDANCE_API UAOESpellDecorator : public USpellDecorator
 {
@@ -37,10 +39,16 @@ public:
 		}
 	};
 
+	virtual void LoadHitNiagara() override;
+
 	virtual void OnHit(AActor* hitActor, FVector spellHitLocation) override;
 	virtual void ProcessHit(FVector spellHitLocation) override;
 	virtual void ProcessHitDamage(int& damage, FVector targetLocation, FVector hitLocation) override;
+	virtual void SpawnHitNiagara(FVector spellHitLocation) override;
 
 private:
 	TSharedPtr<FAreaOfEffectModifier> m_ModifierData = nullptr;
+
+	UPROPERTY()
+	TSoftObjectPtr<UNiagaraSystem> m_AOEHitNiagara = nullptr;
 };

@@ -3,7 +3,10 @@
 
 #include "BaseSpell.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "Interfaces/SpellCaster.h"
+
+#include "NiagaraFunctionLibrary.h"
 
 void UBaseSpell::Init(USpellData* spellData, ISpellCaster* spellOwner)
 {
@@ -27,6 +30,11 @@ void UBaseSpell::SetDecoratedSelf(ISpell* decoratedSelf)
 	m_DecoratedSelf = decoratedSelf->_getUObject();
 }
 
+void UBaseSpell::LoadHitNiagara()
+{
+
+}
+
 bool UBaseSpell::CanCast()
 {
 	if (m_CooldownTimer > 0.0f)
@@ -45,7 +53,7 @@ bool UBaseSpell::CastSpell()
 		LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Check CanCast before calling CastSpell");
 		return false;
 	}
-
+	
 	m_CooldownTimer = m_Cooldown;
 	return true;
 }
@@ -89,8 +97,22 @@ void UBaseSpell::ProcessHit(FVector spellHitLocation)
 		}
 	}
 
-	//Play Sounds/VFX
+	m_DecoratedSelf->SpawnHitNiagara(spellHitLocation);
+
 	m_HitActors.Empty();
+}
+
+void UBaseSpell::SpawnHitNiagara(FVector spellHitLocation)
+{
+	if (m_HitNiagara.IsValid() == false)
+	{
+		return;
+	}
+
+	if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(worldContext, m_HitNiagara.Get(), spellHitLocation);
+	}
 }
 
 void UBaseSpell::Fire(FVector direction)
