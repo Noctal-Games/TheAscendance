@@ -15,6 +15,7 @@
 class UCharacterStatsComponent;
 class UEffectHandlerComponent;
 class AHeldItem;
+class UCharacterTrajectoryComponent;
 
 UCLASS()
 class THEASCENDANCE_API ABaseCharacter : public ACharacter, public ISusceptible, public ISpellCaster, public IGameplayTagAssetInterface
@@ -108,7 +109,9 @@ protected:
 	TObjectPtr<UCharacterStatsComponent> m_CharacterStatsComponent = nullptr;
 	UPROPERTY(meta = (DisplayName = "Effect Handler Component"))
 	TObjectPtr<UEffectHandlerComponent> m_EffectHandlerComponent = nullptr;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "Character Trajectory Component"))
+	TObjectPtr<UCharacterTrajectoryComponent> m_CharacterTrajectoryComponent = nullptr;
+	
 	UPROPERTY()
 	TObjectPtr<AHeldItem> m_MainHandItem = nullptr;
 	UPROPERTY()
