@@ -9,6 +9,8 @@
 
 class UStaticMeshComponent;
 class USphereComponent;
+class UNiagaraComponent;
+class UNiagaraSystem;
 class UProjectileMovementComponent;
 class UProjectileSpellData;
 class ISpell;
@@ -26,6 +28,7 @@ public:
 	void AddIgnoreActor(AActor* toIgnore);
 	void SetIsActive(bool isActive);
 	void ApplyForce(FVector unitDirection);
+	void SetNiagara(UNiagaraSystem* niagaraSystem);
 
 	virtual void SetDecoratedSelf(IProjectile* decoratedSelf) override;
 
@@ -58,6 +61,8 @@ private:
 	TObjectPtr<USphereComponent> m_Collider = nullptr;
 	UPROPERTY()
 	TObjectPtr<UProjectileMovementComponent> m_MovementComponent = nullptr;
+	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> m_NiagaraComponent = nullptr;
 
 	UPROPERTY()
 	TScriptInterface<IProjectile> m_DecoratedSelf = nullptr;

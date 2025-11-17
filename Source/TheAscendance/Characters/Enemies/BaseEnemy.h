@@ -33,6 +33,9 @@ public:
 	void SetFocus(AActor* target);
 	void ClearFocus();
 
+	bool IsSoundHeard(float soundWeight) const;
+	bool IsInCombat() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

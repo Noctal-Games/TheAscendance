@@ -50,6 +50,8 @@ protected:
 	TScriptInterface<ISpell> m_DecoratedSelf = nullptr;
 
 	UPROPERTY()
+	TSoftObjectPtr<UNiagaraSystem> m_SpellNiagara = nullptr;
+	UPROPERTY()
 	TSoftObjectPtr<UNiagaraSystem> m_HitNiagara = nullptr;
 
 private:

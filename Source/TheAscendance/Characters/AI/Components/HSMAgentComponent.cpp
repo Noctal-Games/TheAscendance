@@ -147,6 +147,16 @@ const float UHSMAgentComponent::GetVisionStrength()
 	return m_VisionStrength;
 }
 
+void UHSMAgentComponent::SetHearingStrength(float hearingStrength)
+{
+	m_HearingStrength = hearingStrength;
+}
+
+const float UHSMAgentComponent::GetHearingStrength()
+{
+	return m_HearingStrength;
+}
+
 bool UHSMAgentComponent::HasLineOfSight()
 {
 	return m_HasLineOfSight;
@@ -161,6 +171,21 @@ void UHSMAgentComponent::SetHasLineOfSight(bool hasLineOfSight)
 
 	m_HasLineOfSight = hasLineOfSight;
 	m_HasLineOfSight ? m_Owner->SetFocus(m_Player.Get()) : m_Owner->ClearFocus();
+}
+
+bool UHSMAgentComponent::IsSoundHeard(float soundWeight) const
+{
+	LOG_ONSCREEN(-1, 2.0f, FColor::Yellow, "%f +++++++ %f", soundWeight, (1 - soundWeight));
+
+	FString string = (m_HearingStrength > (1 - soundWeight)) ? "HEARD" : "NOT HEARD";
+	LOG_ONSCREEN(-1, 2.0f, FColor::Yellow, "%s", *string);
+
+	return (m_HearingStrength > (1 - soundWeight));
+}
+
+bool UHSMAgentComponent::IsInCombat() const
+{
+	return m_CurrentState == EState::COMBAT;
 }
 
 // Called when the game starts

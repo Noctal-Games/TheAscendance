@@ -92,8 +92,10 @@ void UProjectileSpell::Fire(FVector direction)
 	projectile->AddIgnoreActor(owner);
 	m_DecoratedSelf->DecorateProjectile(projectile);
 
-	//projectile->InitNiagara(spellData->spellNiagara);
-	//projectile->SetRange(spellData->range);
+	if (m_SpellNiagara.IsValid() == true)
+	{
+		projectile->SetNiagara(m_SpellNiagara.Get());
+	}
 
 	projectile->SetIsActive(true);
 	projectile->ApplyForce(direction);

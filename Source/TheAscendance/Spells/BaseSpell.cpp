@@ -5,6 +5,7 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "Interfaces/SpellCaster.h"
+#include "Structs/SpellData.h"
 
 #include "NiagaraFunctionLibrary.h"
 
@@ -17,6 +18,15 @@ void UBaseSpell::Init(USpellData* spellData, ISpellCaster* spellOwner)
 	}
 
 	m_SpellOwner = spellOwner->_getUObject();
+	m_SpellNiagara = spellData->SpellNiagara;
+
+	if(m_SpellNiagara.IsNull() == true)
+	{
+		LOG_ERROR("Tried to Init spell with invalid SpellNiagara");
+		return;
+	}
+
+	UCoreFunctionLibrary::RequestAsyncLoad(m_SpellNiagara.ToSoftObjectPath());
 }
 
 void UBaseSpell::SetDecoratedSelf(ISpell* decoratedSelf)
