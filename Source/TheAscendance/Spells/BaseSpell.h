@@ -9,6 +9,7 @@
 
 class ISpellCaster;
 class USpellData;
+class UNiagaraSystem;
 
 UCLASS(Abstract)
 class THEASCENDANCE_API UBaseSpell : public UObject, public ISpell
@@ -18,6 +19,7 @@ class THEASCENDANCE_API UBaseSpell : public UObject, public ISpell
 public:
 	virtual void Init(USpellData* spellData, ISpellCaster* spellOwner) override;
 	virtual void SetDecoratedSelf(ISpell* decoratedSelf) override;
+	virtual void LoadHitNiagara() override;
 
 	virtual bool CanCast() override;
 	virtual bool CastSpell() override;
@@ -27,6 +29,8 @@ public:
 	virtual void OnOverlap(AActor* overlapActor, FVector spellOverlapLocation, int damage) override;
 	virtual void OnHit(AActor* hitActor, FVector spellHitLocation) override;
 	virtual void ProcessHit(FVector spellHitLocation) override;
+	virtual void SpawnHitNiagara(FVector spellHitLocation) override;
+
 	virtual TArray<TObjectPtr<AActor>> GetHitActors() override;
 
 	virtual void Fire(FVector direction) override;
@@ -44,6 +48,12 @@ protected:
 
 	UPROPERTY()
 	TScriptInterface<ISpell> m_DecoratedSelf = nullptr;
+
+	UPROPERTY()
+	TSoftObjectPtr<UNiagaraSystem> m_SpellNiagara = nullptr;
+	UPROPERTY()
+	TSoftObjectPtr<UNiagaraSystem> m_HitNiagara = nullptr;
+
 private:
 	float m_Cooldown = 0.0f;
 	float m_CooldownTimer = 0.0f;

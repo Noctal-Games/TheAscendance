@@ -10,6 +10,7 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "CharacterTrajectoryComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -21,7 +22,9 @@ ABaseCharacter::ABaseCharacter()
 	checkf(m_CharacterStatsComponent, TEXT("Character Stats Component failed to initialise"));
 	m_EffectHandlerComponent = CreateDefaultSubobject<UEffectHandlerComponent>(TEXT("Effect Handler Component"));
 	checkf(m_EffectHandlerComponent, TEXT("Effect Handler Component failed to initialise"));
-	
+	m_CharacterTrajectoryComponent = CreateDefaultSubobject<UCharacterTrajectoryComponent>(TEXT("Character Trajectory Component"));
+	checkf(m_CharacterTrajectoryComponent, TEXT("Character Trajectory Component failed to initialise"));
+
 	SetRootComponent(GetCapsuleComponent());
 
 	GetMesh()->SetCollisionProfileName(FName("NoCollision"));

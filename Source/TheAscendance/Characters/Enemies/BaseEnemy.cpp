@@ -97,6 +97,7 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 	{
 		m_Agent->RegisterComponent();
 		m_Agent->SetVisionStrength(stats.SightStrength);
+		m_Agent->SetHearingStrength(stats.HearingStrength);
 		m_Agent->Init(this);
 	}
 	else
@@ -175,6 +176,26 @@ void ABaseEnemy::SetFocus(AActor* target)
 void ABaseEnemy::ClearFocus()
 {
 	m_Controller->ClearFocus(EAIFocusPriority::Gameplay);
+}
+
+bool ABaseEnemy::IsSoundHeard(float soundWeight) const
+{
+	if (m_Agent == nullptr)
+	{
+		return true;
+	}
+
+	return m_Agent->IsSoundHeard(soundWeight);
+}
+
+bool ABaseEnemy::IsInCombat() const
+{
+	if (m_Agent == nullptr)
+	{
+		return true;
+	}
+
+	return m_Agent->IsInCombat();
 }
 
 void ABaseEnemy::BeginPlay()

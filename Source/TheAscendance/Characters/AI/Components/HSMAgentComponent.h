@@ -37,8 +37,14 @@ public:
 	void SetVisionStrength(float visionStrength);
 	const float GetVisionStrength();
 
+	void SetHearingStrength(float hearingStrength);
+	const float GetHearingStrength();
+
 	bool HasLineOfSight();
 	void SetHasLineOfSight(bool hasLineOfSight);
+
+	bool IsSoundHeard(float soundWeight) const;
+	bool IsInCombat() const;
 
 	// Called every frame
 	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
@@ -63,6 +69,7 @@ private:
 	EState m_CurrentState = EState::MAX;
 
 	float m_VisionStrength = 0.0f;
+	float m_HearingStrength = 0.0f;
 
 	bool m_HasLineOfSight = false;
 };

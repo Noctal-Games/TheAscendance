@@ -8,6 +8,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 
 // Sets default values
 ABaseProjectile::ABaseProjectile()
@@ -86,6 +88,17 @@ void ABaseProjectile::ApplyForce(FVector unitDirection)
 	m_MovementComponent->Velocity = unitDirection * speed;
 	m_MovementComponent->InitialSpeed = speed;
 	m_MovementComponent->MaxSpeed = speed;
+}
+
+void ABaseProjectile::SetNiagara(UNiagaraSystem* niagaraSystem)
+{
+	if(niagaraSystem == nullptr)
+	{
+		LOG_ERROR("Tried to set Projectile Niagara with invalid NiagaraComponent or NiagaraSystem");
+		return;
+	}
+
+	m_NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(niagaraSystem, m_Collider, NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true);
 }
 
 void ABaseProjectile::SetDecoratedSelf(IProjectile* decoratedSelf)

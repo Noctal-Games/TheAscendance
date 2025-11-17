@@ -16,7 +16,8 @@ class THEASCENDANCE_API UProjectileSpell : public UBaseSpell
 	
 public:
 	virtual void Init(USpellData* spellData, ISpellCaster* spellOwner) final;
-
+	virtual void LoadHitNiagara() override;
+	
 	virtual bool CastSpell() override;
 	virtual void Fire(FVector direction) override;
 

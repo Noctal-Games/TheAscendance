@@ -76,6 +76,8 @@ struct FAreaOfEffectModifier : public FGenericSpellModifier
 	bool DoesKnockback = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "DoesKnockback == true", EditConditionHides))
 	float KnockbackStrength = 0.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<class UNiagaraSystem> AOEHitNiagara = nullptr;
 };
 // GENERIC MODIFIERS
 

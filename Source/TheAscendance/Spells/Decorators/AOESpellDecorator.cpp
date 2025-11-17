@@ -8,6 +8,29 @@
 
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/Character.h"
+#include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
+
+void UAOESpellDecorator::LoadHitNiagara()
+{
+	m_DecoratedSpell->LoadHitNiagara();
+
+	if (m_ModifierData == nullptr)
+	{
+		LOG_ERROR("AOE Spell Decorator modifier data is invalid");
+		return;
+	}
+
+	m_AOEHitNiagara = m_ModifierData->AOEHitNiagara;
+
+	if (m_AOEHitNiagara.IsNull() == true)
+	{
+		LOG_ERROR("Tried to Load AOEHitNiagara for AOESpellDecorated with invalid AOEHitNiagara");
+		return;
+	}
+
+	UCoreFunctionLibrary::RequestAsyncLoad(m_AOEHitNiagara.ToSoftObjectPath());
+}
 
 void UAOESpellDecorator::OnHit(AActor* hitActor, FVector spellHitLocation)
 {
@@ -101,4 +124,20 @@ void UAOESpellDecorator::ProcessHitDamage(int& damage, FVector targetLocation, F
 	damageWithFalloff = FMath::Clamp(damageWithFalloff, m_ModifierData->DamageMinimum, m_ModifierData->Damage);
 
 	damage += damageWithFalloff;
+}
+
+void UAOESpellDecorator::SpawnHitNiagara(FVector spellHitLocation)
+{
+	m_DecoratedSpell->SpawnHitNiagara(spellHitLocation);
+
+	if (m_AOEHitNiagara.IsValid() == false)
+	{
+		return;
+	}
+
+	if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
+	{
+		UNiagaraComponent* vfx = UNiagaraFunctionLibrary::SpawnSystemAtLocation(worldContext, m_AOEHitNiagara.Get(), spellHitLocation);
+		vfx->SetVariableFloat(FName("VFX_ShapeScale"), m_ModifierData->Range);
+	}
 }
