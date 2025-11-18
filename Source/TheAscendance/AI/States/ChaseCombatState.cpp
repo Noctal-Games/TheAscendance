@@ -2,7 +2,7 @@
 
 
 #include "ChaseCombatState.h"
-#include "TheAscendance/Characters/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/AI/Components/HSMAgentComponent.h"
 
 void UChaseCombatState::StartState(UHSMAgentComponent* owningAgent)
 {

@@ -4,11 +4,11 @@
 #include "HSMAgentComponent.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
-#include "TheAscendance/Characters/AI/States/IdleState.h"
-#include "TheAscendance/Characters/AI/States/InvestigateState.h"
-#include "TheAscendance/Characters/AI/States/CombatState.h"
+#include "TheAscendance/AI/States/IdleState.h"
+#include "TheAscendance/AI/States/InvestigateState.h"
+#include "TheAscendance/AI/States/CombatState.h"
+#include "TheAscendance/AI/Components/SightSensorComponent.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
-#include "TheAscendance/Characters/AI/Components/SightSensorComponent.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 
 // Sets default values for this component's properties

@@ -3,7 +3,7 @@
 
 #include "CombatState.h"
 #include "TheAscendance/Core/CoreMacros.h"
-#include "TheAscendance/Characters/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/AI/Components/HSMAgentComponent.h"
 #include "ChaseCombatState.h"
 #include "PositionCombatState.h"
 #include "AttackCombatState.h"

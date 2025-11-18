@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbstractState.h"
-#include "TheAscendance/Characters/AI/Enums/State.h"
+#include "TheAscendance/AI/Enums/State.h"
 #include "CombatState.generated.h"
 
 class UHSMAgentComponent;

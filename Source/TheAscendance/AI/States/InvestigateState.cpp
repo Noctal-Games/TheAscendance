@@ -3,7 +3,7 @@
 
 #include "InvestigateState.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
-#include "TheAscendance/Characters/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/AI/Components/HSMAgentComponent.h"
 #include "NavigationSystem.h"
 
 void UInvestigateState::StartState(UHSMAgentComponent* owningAgent)

@@ -6,8 +6,8 @@
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Characters/Components/CharacterStatsComponent.h"
 #include "TheAscendance/Characters/CharacterGameplayTags.h"
-#include "TheAscendance/Characters/AI/TAAIController.h"
-#include "TheAscendance/Characters/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/AI/TAAIController.h"
+#include "TheAscendance/AI/Components/HSMAgentComponent.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
 #include "Structs/EnemyData.h"
 

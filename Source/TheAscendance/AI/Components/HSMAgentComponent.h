@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "TheAscendance/Characters/AI/Enums/State.h"
+#include "TheAscendance/AI/Enums/State.h"
 #include "HSMAgentComponent.generated.h"
 
 class ABaseEnemy;
