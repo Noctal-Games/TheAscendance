@@ -8,6 +8,7 @@
 #include "TheAscendance/Characters/CharacterGameplayTags.h"
 #include "TheAscendance/Characters/AI/TAAIController.h"
 #include "TheAscendance/Characters/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/Characters/Components/LoadoutComponent.h"
 #include "Structs/EnemyData.h"
 
 #include "Components/CapsuleComponent.h"
@@ -83,14 +84,11 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 	spells.Add(equipment.MainHandSpells.SecondarySpell);
 	spells.Add(equipment.OffHandSpells.PrimarySpell);
 	spells.Add(equipment.OffHandSpells.SecondarySpell);
+	m_LoadoutComponent->SetSpells(spells);
 
-	if (equipment.LoadoutData.Num() == 0)
-	{                               
-		
-	}
-	else
+	for (const FLoadoutSlotData& loadoutData : equipment.LoadoutData)
 	{
-		//Equip items
+		m_LoadoutComponent->EquipItem(loadoutData.EquippedPart, loadoutData.ItemID);
 	}
 
 	if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))

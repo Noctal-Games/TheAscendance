@@ -168,8 +168,6 @@ void UAudioManagerSubsystem::PlaySoundForNPCPerception(const FSoundAttenuationSe
 
 			if (world->LineTraceSingleByChannel(hit, location, enemy->GetActorLocation(), ECC_GameTraceChannel2, params) == false)
 			{
-				LOG_ONSCREEN(-1, 2.0f, FColor::Red, "EMPTY SINGLE");
-
 				if (enemy->IsSoundHeard(soundStrength) == true)
 				{
 					//enemy->SetInvestigationLocation(location);
@@ -185,11 +183,8 @@ void UAudioManagerSubsystem::PlaySoundForNPCPerception(const FSoundAttenuationSe
 
 			if (hits.Num() <= 1)
 			{
-				LOG_ONSCREEN(-1, 2.0f, FColor::Red, "EMPTY MULTI");
-
 				if (enemy->IsSoundHeard(soundStrength) == true)
 				{
-					LOG_ONSCREEN(-1, 2.0f, FColor::Red, "HEARD 1");
 					//enemy->SetInvestigationLocation(location);
 				}
 
@@ -230,6 +225,7 @@ void UAudioManagerSubsystem::PlaySoundForNPCPerception(const FSoundAttenuationSe
 				const float thicknessFactor = FMath::Clamp(FMath::Sqrt(thickness / thicknessDivisor), 0.0f, 1.0f);
 				const float crossSectionFactor = FMath::Clamp(FMath::Sqrt(crossSection / crossSectionDivisor), 0.0f, 1.0f);
 				 
+				//Increase multiplier for greater sound reduction
 				const float obstructionLoss = (thicknessFactor + crossSectionFactor) * 0.2f;
 
 				soundStrength -= obstructionLoss;
