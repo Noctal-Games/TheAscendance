@@ -15,6 +15,7 @@
 class UCharacterStatsComponent;
 class UEffectHandlerComponent;
 class AHeldItem;
+class UCharacterTrajectoryComponent;
 
 UCLASS()
 class THEASCENDANCE_API ABaseCharacter : public ACharacter, public ISusceptible, public ISpellCaster, public IGameplayTagAssetInterface
@@ -85,11 +86,19 @@ public:
 	UFUNCTION(BlueprintPure)
 	virtual bool IsSprinting();
 
+	virtual void SetDestination(const FVector& destination);
+	void TurnTowards(const FRotator& targetRotation);
+
+	FVector GetSocketLocation(FName socketName);
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+private:
+	void UpdateTurnTowards();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
@@ -100,7 +109,9 @@ protected:
 	TObjectPtr<UCharacterStatsComponent> m_CharacterStatsComponent = nullptr;
 	UPROPERTY(meta = (DisplayName = "Effect Handler Component"))
 	TObjectPtr<UEffectHandlerComponent> m_EffectHandlerComponent = nullptr;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "Character Trajectory Component"))
+	TObjectPtr<UCharacterTrajectoryComponent> m_CharacterTrajectoryComponent = nullptr;
+	
 	UPROPERTY()
 	TObjectPtr<AHeldItem> m_MainHandItem = nullptr;
 	UPROPERTY()
@@ -122,4 +133,9 @@ private:
 	bool m_IsMainHandAttacking = false;
 	bool m_IsOffHandAttacking = false;
 	float m_AttackTimer = 0.0f;
+
+	FTimerHandle m_TurnTimerHandle;
+	FRotator m_TurnTargetRotation = FRotator::ZeroRotator;
+	float m_TurnInterpSpeed = 5.0f;
+	bool m_IsTurning = false;
 };

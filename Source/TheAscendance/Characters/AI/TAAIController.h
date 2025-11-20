@@ -16,7 +16,7 @@ class THEASCENDANCE_API ATAAIController : public AAIController
 	
 public:
 	UFUNCTION(BlueprintCallable)
-	void SetDestination(const FVector& destination);
+	void SetDestination(const FVector& destination, float acceptanceRadius = 15.0f);
 	UFUNCTION(BlueprintCallable)
 	void ClearDestination();
 

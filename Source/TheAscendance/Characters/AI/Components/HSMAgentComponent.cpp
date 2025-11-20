@@ -3,8 +3,13 @@
 
 #include "HSMAgentComponent.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Characters/AI/States/IdleState.h"
+#include "TheAscendance/Characters/AI/States/InvestigateState.h"
+#include "TheAscendance/Characters/AI/States/CombatState.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
+#include "TheAscendance/Characters/AI/Components/SightSensorComponent.h"
+#include "TheAscendance/Characters/Player/PlayerCharacter.h"
 
 // Sets default values for this component's properties
 UHSMAgentComponent::UHSMAgentComponent()
@@ -25,9 +30,24 @@ void UHSMAgentComponent::Init(ABaseEnemy* owner)
 	}
 
 	m_Owner = owner;
+	m_Player = UCoreFunctionLibrary::GetPlayerCharacter();
+
+	if(m_Player.IsValid() == false)
+	{
+		LOG_ERROR("Tried to Init HSMAgentComponent with invalid player reference");
+		return;
+	}
 
 	m_CurrentState = EState::MAX;
 	m_States.Add(EState::IDLE, NewObject<UIdleState>());
+	m_States.Add(EState::INVESTIGATE, NewObject<UInvestigateState>());
+	m_States.Add(EState::COMBAT, NewObject<UCombatState>());
+
+	m_SightSensor = NewObject<USightSensorComponent>(m_Owner.Get(), TEXT("SIGHT SENSOR"));
+	m_SightSensor->RegisterComponent();
+	m_SightSensor->Init(this);
+	m_SightSensor->SetTarget(m_Player.Get());
+	m_SightSensor->SetIsActive(true);
 
 	if (m_States.Num() != (int32)EState::MAX)
 	{
@@ -69,7 +89,7 @@ void UHSMAgentComponent::SetDestination(const FVector& destination)
 	m_Owner->SetDestination(destination);
 }
 
-const ABaseEnemy* UHSMAgentComponent::GetAgentOwner() const
+ABaseEnemy* UHSMAgentComponent::GetAgentOwner() const
 {
 	if(m_Owner.IsValid() == false)
 	{
@@ -89,6 +109,58 @@ bool UHSMAgentComponent::HasPath() const
 	}
 
 	return m_Owner->HasPath();
+}
+
+void UHSMAgentComponent::SetWaypointRoute(AWaypointRoute* route)
+{
+	m_WaypointRoute = route;
+
+	if (m_CurrentState != EState::IDLE || m_WaypointRoute.IsValid() == false)
+	{
+		return;
+	}
+
+	if (m_States.Contains(m_CurrentState) && m_States[m_CurrentState] != nullptr)
+	{
+		m_States[m_CurrentState]->EndState();
+		m_States[m_CurrentState]->StartState(this);
+	}
+}
+
+AWaypointRoute* UHSMAgentComponent::GetWaypointRoute() const
+{
+	if(m_WaypointRoute.IsValid() == false)
+	{
+		return nullptr;
+	}
+
+	return m_WaypointRoute.Get();
+}
+
+void UHSMAgentComponent::SetVisionStrength(float visionStrength)
+{
+	m_VisionStrength = visionStrength;
+}
+
+const float UHSMAgentComponent::GetVisionStrength()
+{
+	return m_VisionStrength;
+}
+
+bool UHSMAgentComponent::HasLineOfSight()
+{
+	return m_HasLineOfSight;
+}
+
+void UHSMAgentComponent::SetHasLineOfSight(bool hasLineOfSight)
+{
+	if (m_HasLineOfSight == hasLineOfSight || m_Player.IsValid() == false)
+	{
+		return;
+	}
+
+	m_HasLineOfSight = hasLineOfSight;
+	m_HasLineOfSight ? m_Owner->SetFocus(m_Player.Get()) : m_Owner->ClearFocus();
 }
 
 // Called when the game starts
