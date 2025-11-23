@@ -145,6 +145,16 @@ void ABaseEnemy::SetDestination(const FVector& destination)
 	m_Controller->SetDestination(destination);
 }
 
+void ABaseEnemy::SetLocationToInvestigate(const FVector& location)
+{
+	if (m_Agent == nullptr)
+	{
+		return;
+	}
+
+	return m_Agent->SetLocationToInvestigate(location);
+}
+
 bool ABaseEnemy::HasPath() const
 {
 	if (m_Controller.IsValid() == false)
@@ -168,11 +178,23 @@ void ABaseEnemy::SetWaypointRoute(AWaypointRoute* route)
 
 void ABaseEnemy::SetFocus(AActor* target)
 {
+	if (m_Controller.IsValid() == false)
+	{
+		LOG_ERROR("Tried to set focus with invalid controller");
+		return;
+	}
+
 	m_Controller->SetFocus(target);
 }
 
 void ABaseEnemy::ClearFocus()
 {
+	if (m_Controller.IsValid() == false)
+	{
+		LOG_ERROR("Tried to clear focus with invalid controller");
+		return;
+	}
+
 	m_Controller->ClearFocus(EAIFocusPriority::Gameplay);
 }
 

@@ -19,7 +19,9 @@ public:
 	virtual void EndState() override;
 
 private:
-	FVector m_PlayerLastKnownPos = FVector::ZeroVector;
+	TWeakObjectPtr<AActor> m_Target = nullptr;
+
+	FVector m_TargetLastKnownPos = FVector::ZeroVector;
 
 	float m_ChaseTimer = 0.0f;
 	float m_EndChaseCooldown = 0.0f;

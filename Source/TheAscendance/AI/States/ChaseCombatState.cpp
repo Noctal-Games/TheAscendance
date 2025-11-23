@@ -13,16 +13,51 @@ void UChaseCombatState::StartState(UHSMAgentComponent* owningAgent)
 		return;
 	}
 
+	m_Target = m_Agent->GetTargetPlayer();
 	//m_Agent->SetIsSprinting(true);
 
 	m_EndChaseCooldown = 5.0f;
 	m_ChaseTimer = m_EndChaseCooldown;
-	//m_Agent->SetVisionStrength(0.8f);
 }
 
 void UChaseCombatState::Update(float deltaTime)
 {
-	//Chase Logic
+	if (m_Agent == nullptr || m_Target == nullptr)
+	{
+		return;
+	}
+
+	if (m_Agent->HasLineOfSight() == false)
+	{
+		m_ChaseTimer -= deltaTime;
+
+		if (m_ChaseTimer > 0)
+		{
+			m_TargetLastKnownPos = m_Target->GetActorLocation();
+		}
+		else
+		{
+			m_Agent->SetLocationToInvestigate(m_TargetLastKnownPos);
+			m_Agent->SetState(EState::INVESTIGATE);
+		}
+	}
+	else
+	{
+		m_TargetLastKnownPos = m_Target->GetActorLocation();
+
+		//if (m_Agent->IsTargetInActionableRange(m_TargetLastKnownPos) == true)
+		//{
+		//	m_Agent->SetCombatState(ECombatState::POSITION);
+		//	return;
+		//}
+
+		if (m_ChaseTimer != m_EndChaseCooldown)
+		{
+			m_ChaseTimer = m_EndChaseCooldown;
+		}
+	}
+
+	m_Agent->SetDestination(m_TargetLastKnownPos);
 }
 
 void UChaseCombatState::EndState()

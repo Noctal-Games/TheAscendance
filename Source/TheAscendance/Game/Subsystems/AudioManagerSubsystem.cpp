@@ -170,7 +170,7 @@ void UAudioManagerSubsystem::PlaySoundForNPCPerception(const FSoundAttenuationSe
 			{
 				if (enemy->IsSoundHeard(soundStrength) == true)
 				{
-					//enemy->SetInvestigationLocation(location);
+					enemy->SetLocationToInvestigate(location);
 				}
 
 				continue;
@@ -185,7 +185,7 @@ void UAudioManagerSubsystem::PlaySoundForNPCPerception(const FSoundAttenuationSe
 			{
 				if (enemy->IsSoundHeard(soundStrength) == true)
 				{
-					//enemy->SetInvestigationLocation(location);
+					enemy->SetLocationToInvestigate(location);
 				}
 
 				continue;
@@ -202,7 +202,7 @@ void UAudioManagerSubsystem::PlaySoundForNPCPerception(const FSoundAttenuationSe
 				{
 					if (enemy->IsSoundHeard(soundStrength) == true)
 					{
-						//enemy->SetInvestigationLocation(location);
+						enemy->SetLocationToInvestigate(location);
 					}
 
 					break;
@@ -238,7 +238,7 @@ void UAudioManagerSubsystem::PlaySoundForNPCPerception(const FSoundAttenuationSe
 
 			if (enemy->IsSoundHeard(soundStrength) == true)
 			{
-				//enemy->SetInvestigationLocation(location);
+				enemy->SetLocationToInvestigate(location);
 			}
 		}
 	}

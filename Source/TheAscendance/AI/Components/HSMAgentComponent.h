@@ -24,11 +24,20 @@ public:
 
 	void Init(ABaseEnemy* owner);
 	void SetState(EState newState);
+	void SetCombatState(ECombatState combatState);
 
 	void SetDestination(const FVector& destination);
+
+	void SetLocationToInvestigate(const FVector& location);
+	FVector GetLocationToInvestigate();
+
 	ABaseEnemy* GetAgentOwner() const;
+	APlayerCharacter* GetTargetPlayer() const;
 
 	bool HasPath() const;
+
+	void SetFocus(AActor* target);
+	void ClearFocus();
 
 	//Temp until better setup
 	void SetWaypointRoute(AWaypointRoute* route);
@@ -67,6 +76,8 @@ private:
 	TMap<EState, TObjectPtr<UAbstractState>> m_States;
 
 	EState m_CurrentState = EState::MAX;
+
+	FVector m_LocationToInvestigate = FVector::ZeroVector;
 
 	float m_VisionStrength = 0.0f;
 	float m_HearingStrength = 0.0f;

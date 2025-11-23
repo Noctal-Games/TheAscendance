@@ -78,6 +78,19 @@ void UHSMAgentComponent::SetState(EState newState)
 	m_States[m_CurrentState]->StartState(this);
 }
 
+void UHSMAgentComponent::SetCombatState(ECombatState newState)
+{
+	if (m_States.Contains(EState::COMBAT) == false || m_States[EState::COMBAT] == nullptr)
+	{
+		return;
+	}
+
+	if (UCombatState* cState = Cast<UCombatState>(m_States[EState::COMBAT]))
+	{
+		cState->SetCombatState(newState);
+	}
+}
+
 void UHSMAgentComponent::SetDestination(const FVector& destination)
 {
 	if(m_Owner.IsValid() == false)
@@ -87,6 +100,21 @@ void UHSMAgentComponent::SetDestination(const FVector& destination)
 	}
 
 	m_Owner->SetDestination(destination);
+}
+
+void UHSMAgentComponent::SetLocationToInvestigate(const FVector& location)
+{
+	m_LocationToInvestigate = location;
+
+	if (m_CurrentState == EState::IDLE && m_LocationToInvestigate != FVector::ZeroVector)
+	{
+		SetState(EState::INVESTIGATE);
+	}
+}
+
+FVector UHSMAgentComponent::GetLocationToInvestigate()
+{
+	return m_LocationToInvestigate;
 }
 
 ABaseEnemy* UHSMAgentComponent::GetAgentOwner() const
@@ -100,6 +128,17 @@ ABaseEnemy* UHSMAgentComponent::GetAgentOwner() const
 	return m_Owner.Get();
 }
 
+APlayerCharacter* UHSMAgentComponent::GetTargetPlayer() const
+{
+	if (m_Player.IsValid() == false)
+	{
+		LOG_ERROR("Tried to get player target with invalid player");
+		return nullptr;
+	}
+
+	return m_Player.Get();
+}
+
 bool UHSMAgentComponent::HasPath() const
 {
 	if (m_Owner.IsValid() == false)
@@ -109,6 +148,28 @@ bool UHSMAgentComponent::HasPath() const
 	}
 
 	return m_Owner->HasPath();
+}
+
+void UHSMAgentComponent::SetFocus(AActor* target)
+{
+	if (m_Owner.IsValid() == false)
+	{
+		LOG_ERROR("Tried to set focus with invalid owner");
+		return;
+	}
+
+	m_Owner->SetFocus(target);
+}
+
+void UHSMAgentComponent::ClearFocus()
+{
+	if (m_Owner.IsValid() == false)
+	{
+		LOG_ERROR("Tried to clear focus with invalid owner");
+		return;
+	}
+
+	m_Owner->ClearFocus();
 }
 
 void UHSMAgentComponent::SetWaypointRoute(AWaypointRoute* route)
