@@ -57,6 +57,14 @@ void UHSMAgentComponent::Init(ABaseEnemy* owner)
 	SetState(EState::IDLE);
 }
 
+void UHSMAgentComponent::InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance)
+{
+	m_VisionStrength = visionStrength;
+	m_HearingStrength = hearingStrength;
+	m_PreferredDistanceFromTarget = preferredDistanceFromTarget;
+	m_PreferredDistanceTolerance = preferredDistanceTolerance;
+}
+
 void UHSMAgentComponent::SetState(EState newState)
 {
 	if (m_CurrentState == newState)
@@ -150,6 +158,17 @@ bool UHSMAgentComponent::HasPath() const
 	return m_Owner->HasPath();
 }
 
+bool UHSMAgentComponent::IsTargetInActionableRange(const FVector& target) const
+{
+	return false;
+}
+
+void UHSMAgentComponent::GetPreferredDistanceValues(float& preferredDistanceFromTarget, float& preferredDistanceTolerance) const
+{
+	preferredDistanceFromTarget = m_PreferredDistanceFromTarget;
+	preferredDistanceTolerance = m_PreferredDistanceTolerance;
+}
+
 void UHSMAgentComponent::SetFocus(AActor* target)
 {
 	if (m_Owner.IsValid() == false)
@@ -203,7 +222,7 @@ void UHSMAgentComponent::SetVisionStrength(float visionStrength)
 	m_VisionStrength = visionStrength;
 }
 
-const float UHSMAgentComponent::GetVisionStrength()
+float UHSMAgentComponent::GetVisionStrength() const
 {
 	return m_VisionStrength;
 }
@@ -213,12 +232,17 @@ void UHSMAgentComponent::SetHearingStrength(float hearingStrength)
 	m_HearingStrength = hearingStrength;
 }
 
-const float UHSMAgentComponent::GetHearingStrength()
+float UHSMAgentComponent::GetHearingStrength() const
 {
 	return m_HearingStrength;
 }
 
-bool UHSMAgentComponent::HasLineOfSight()
+float UHSMAgentComponent::GetRandomCombatReactionTime() const
+{
+	return FMath::RandRange(m_CombatReactionTimeMin, m_CombatReactionTimeMax);
+}
+
+bool UHSMAgentComponent::HasLineOfSight() const
 {
 	return m_HasLineOfSight;
 }

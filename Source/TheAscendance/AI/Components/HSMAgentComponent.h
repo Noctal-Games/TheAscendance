@@ -23,6 +23,8 @@ public:
 	UHSMAgentComponent();
 
 	void Init(ABaseEnemy* owner);
+	void InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance);
+
 	void SetState(EState newState);
 	void SetCombatState(ECombatState combatState);
 
@@ -36,6 +38,9 @@ public:
 
 	bool HasPath() const;
 
+	bool IsTargetInActionableRange(const FVector& target) const;
+	void GetPreferredDistanceValues(float& preferredDistanceFromTarget, float& preferredDistanceTolerance) const;
+
 	void SetFocus(AActor* target);
 	void ClearFocus();
 
@@ -44,16 +49,19 @@ public:
 	AWaypointRoute* GetWaypointRoute() const;
 
 	void SetVisionStrength(float visionStrength);
-	const float GetVisionStrength();
+	float GetVisionStrength() const;
 
 	void SetHearingStrength(float hearingStrength);
-	const float GetHearingStrength();
+	float GetHearingStrength() const;
 
-	bool HasLineOfSight();
+	float GetRandomCombatReactionTime() const;
+
+	bool HasLineOfSight() const;
 	void SetHasLineOfSight(bool hasLineOfSight);
 
 	bool IsSoundHeard(float soundWeight) const;
 	bool IsInCombat() const;
+
 
 	// Called every frame
 	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
@@ -81,6 +89,12 @@ private:
 
 	float m_VisionStrength = 0.0f;
 	float m_HearingStrength = 0.0f;
+
+	float m_PreferredDistanceFromTarget = 0.0f;
+	float m_PreferredDistanceTolerance = 0.0f;
+
+	float m_CombatReactionTimeMin = 0.0f;
+	float m_CombatReactionTimeMax = 0.0f;
 
 	bool m_HasLineOfSight = false;
 };

@@ -22,7 +22,7 @@ void UChaseCombatState::StartState(UHSMAgentComponent* owningAgent)
 
 void UChaseCombatState::Update(float deltaTime)
 {
-	if (m_Agent == nullptr || m_Target == nullptr)
+	if (m_Agent == nullptr || m_Target.IsValid() == false)
 	{
 		return;
 	}
@@ -45,11 +45,11 @@ void UChaseCombatState::Update(float deltaTime)
 	{
 		m_TargetLastKnownPos = m_Target->GetActorLocation();
 
-		//if (m_Agent->IsTargetInActionableRange(m_TargetLastKnownPos) == true)
-		//{
-		//	m_Agent->SetCombatState(ECombatState::POSITION);
-		//	return;
-		//}
+		if (m_Agent->IsTargetInActionableRange(m_TargetLastKnownPos) == true)
+		{
+			m_Agent->SetCombatState(ECombatState::POSITION);
+			return;
+		}
 
 		if (m_ChaseTimer != m_EndChaseCooldown)
 		{

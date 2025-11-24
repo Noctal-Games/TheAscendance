@@ -17,4 +17,10 @@ public:
 	virtual void StartState(UHSMAgentComponent* owningAgent) override;
 	virtual void Update(float deltaTime) override;
 	virtual void EndState() override;
+
+private:
+	TWeakObjectPtr<AActor> m_Target = nullptr;
+
+	float m_PreferredDistanceFromTarget = 0.0f;
+	float m_PreferredDistanceTolerance = 0.0f;
 };
