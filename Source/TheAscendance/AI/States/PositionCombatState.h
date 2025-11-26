@@ -4,23 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "AbstractState.h"
-#include "ChaseCombatState.generated.h"
+#include "PositionCombatState.generated.h"
 
 class UHSMAgentComponent;
 
 UCLASS()
-class THEASCENDANCE_API UChaseCombatState : public UAbstractState
+class THEASCENDANCE_API UPositionCombatState : public UAbstractState
 {
 	GENERATED_BODY()
-
+	
 public:
 	virtual void StartState(UHSMAgentComponent* owningAgent) override;
 	virtual void Update(float deltaTime) override;
 	virtual void EndState() override;
 
 private:
-	FVector m_PlayerLastKnownPos = FVector::ZeroVector;
+	TWeakObjectPtr<AActor> m_Target = nullptr;
 
-	float m_ChaseTimer = 0.0f;
-	float m_EndChaseCooldown = 0.0f;
+	float m_PreferredDistanceFromTarget = 0.0f;
+	float m_PreferredDistanceTolerance = 0.0f;
 };

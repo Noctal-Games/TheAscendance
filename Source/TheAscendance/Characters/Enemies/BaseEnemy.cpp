@@ -6,8 +6,9 @@
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Characters/Components/CharacterStatsComponent.h"
 #include "TheAscendance/Characters/CharacterGameplayTags.h"
-#include "TheAscendance/Characters/AI/TAAIController.h"
-#include "TheAscendance/Characters/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/AI/TAAIController.h"
+#include "TheAscendance/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/Characters/Components/LoadoutComponent.h"
 #include "Structs/EnemyData.h"
 
 #include "Components/CapsuleComponent.h"
@@ -83,14 +84,11 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 	spells.Add(equipment.MainHandSpells.SecondarySpell);
 	spells.Add(equipment.OffHandSpells.PrimarySpell);
 	spells.Add(equipment.OffHandSpells.SecondarySpell);
+	m_LoadoutComponent->SetSpells(spells);
 
-	if (equipment.LoadoutData.Num() == 0)
-	{                               
-		
-	}
-	else
+	for (const FLoadoutSlotData& loadoutData : equipment.LoadoutData)
 	{
-		//Equip items
+		m_LoadoutComponent->EquipItem(loadoutData.EquippedPart, loadoutData.ItemID);
 	}
 
 	if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))
@@ -147,6 +145,16 @@ void ABaseEnemy::SetDestination(const FVector& destination)
 	m_Controller->SetDestination(destination);
 }
 
+void ABaseEnemy::SetLocationToInvestigate(const FVector& location)
+{
+	if (m_Agent == nullptr)
+	{
+		return;
+	}
+
+	return m_Agent->SetLocationToInvestigate(location);
+}
+
 bool ABaseEnemy::HasPath() const
 {
 	if (m_Controller.IsValid() == false)
@@ -170,11 +178,23 @@ void ABaseEnemy::SetWaypointRoute(AWaypointRoute* route)
 
 void ABaseEnemy::SetFocus(AActor* target)
 {
+	if (m_Controller.IsValid() == false)
+	{
+		LOG_ERROR("Tried to set focus with invalid controller");
+		return;
+	}
+
 	m_Controller->SetFocus(target);
 }
 
 void ABaseEnemy::ClearFocus()
 {
+	if (m_Controller.IsValid() == false)
+	{
+		LOG_ERROR("Tried to clear focus with invalid controller");
+		return;
+	}
+
 	m_Controller->ClearFocus(EAIFocusPriority::Gameplay);
 }
 

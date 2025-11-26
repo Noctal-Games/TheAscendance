@@ -3,7 +3,8 @@
 
 #include "CombatState.h"
 #include "TheAscendance/Core/CoreMacros.h"
-#include "TheAscendance/Characters/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/Characters/Player/PlayerCharacter.h"
 #include "ChaseCombatState.h"
 #include "PositionCombatState.h"
 #include "AttackCombatState.h"
@@ -16,6 +17,8 @@ void UCombatState::StartState(UHSMAgentComponent* owningAgent)
 	{
 		return;
 	}
+
+	m_Agent->SetFocus(m_Agent->GetTargetPlayer());
 
 	m_CurrentCombatState = ECombatState::MAX;
 	m_CombatStates.Add(ECombatState::CHASE, NewObject<UChaseCombatState>());
@@ -48,6 +51,8 @@ void UCombatState::Update(float deltaTime)
 
 void UCombatState::EndState()
 {
+	m_Agent->ClearFocus();
+
 	TArray<ECombatState> states;
 	m_CombatStates.GetKeys(states);
 

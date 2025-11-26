@@ -3,7 +3,8 @@
 
 #include "InvestigateState.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
-#include "TheAscendance/Characters/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/Characters/Enemies/BaseEnemy.h"
 #include "NavigationSystem.h"
 
 void UInvestigateState::StartState(UHSMAgentComponent* owningAgent)
@@ -15,8 +16,7 @@ void UInvestigateState::StartState(UHSMAgentComponent* owningAgent)
 		return;
 	}
 
-	//m_Agent->SetDestination(m_Agent->GetInvestigationLocation());
-	//m_Agent->SetVisionStrength(0.6f);
+	m_Agent->SetDestination(m_Agent->GetLocationToInvestigate());
 
 	if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
 	{
@@ -28,11 +28,11 @@ void UInvestigateState::StartState(UHSMAgentComponent* owningAgent)
 
 void UInvestigateState::Update(float deltaTime)
 {
-	//if (m_Agent->HasLineOfSight() == true)
-	//{
-	//	m_Agent->SetState(EState::COMBAT);
-	//	return;
-	//}
+	if (m_Agent->HasLineOfSight() == true)
+	{
+		m_Agent->SetState(EState::COMBAT);
+		return;
+	}
 
 	if (m_Agent->HasPath() == true)
 	{
@@ -49,19 +49,24 @@ void UInvestigateState::Update(float deltaTime)
 
 	m_Timer -= deltaTime;
 
-	//if (m_Timer <= 0)
-	//{
-	//	FNavLocation location;
-	//	m_NavSystem->GetRandomPointInNavigableRadius(m_Agent->GetActorLocation(), 1500, location);
+	if (m_Timer > 0)
+	{
+		return;
+	}
 
-	//	m_Agent->SetDestination(location);
-	//	m_Timer = m_DelayBetweenPathing;
-	//}
+	if (const ABaseEnemy* owner = m_Agent->GetAgentOwner())
+	{
+		FNavLocation location;
+		m_NavSystem->GetRandomPointInNavigableRadius(owner->GetActorLocation(), 3000, location);
+
+		m_Agent->SetDestination(location);
+		m_Timer = m_DelayBetweenPathing;
+	}
 }
 
 void UInvestigateState::EndState()
 {
-	//m_Agent->SetLocationToInvestigate(FVector::Zero());
+	m_Agent->SetLocationToInvestigate(FVector::ZeroVector);
 
 	UAbstractState::EndState();
 }
