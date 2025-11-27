@@ -5,7 +5,7 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Characters/BaseCharacter.h"
-#include "TheAscendance/Characters/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/AI/Components/HSMAgentComponent.h"
 #include "TheAscendance/AI/AIHelperSubsystem.h"
 
 // Sets default values for this component's properties

@@ -3,8 +3,8 @@
 #include "IdleState.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
-#include "TheAscendance/Characters/AI/Navigation/WaypointRoute.h"
-#include "TheAscendance/Characters/AI/Components/HSMAgentComponent.h"
+#include "TheAscendance/AI/Navigation/WaypointRoute.h"
+#include "TheAscendance/AI/Components/HSMAgentComponent.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
 #include "TheAscendance/Characters/BaseCharacter.h"
 #include "NavigationSystem.h"
@@ -33,11 +33,11 @@ void UIdleState::StartState(UHSMAgentComponent* agent)
 
 void UIdleState::Update(float deltaTime)
 {
-	//if (m_Agent->HasLineOfSight() == true)
-	//{
-	//	m_Agent->SetState(EState::COMBAT);
-	//	return;
-	//}
+	if (m_Agent->HasLineOfSight() == true)
+	{
+		m_Agent->SetState(EState::COMBAT);
+		return;
+	}
 
 	if (m_Agent->HasPath() == true || m_UsingWaypointRoute == true)
 	{

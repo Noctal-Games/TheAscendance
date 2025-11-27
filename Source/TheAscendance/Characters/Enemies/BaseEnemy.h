@@ -25,6 +25,7 @@ public:
 	void SetSkeletalMesh();
 
 	virtual void SetDestination(const FVector& destination) override;
+	void SetLocationToInvestigate(const FVector& location);
 	bool HasPath() const;
 
 	//Temp until better setup

@@ -11,6 +11,7 @@
 #include "TheAscendance/Spells/Interfaces/Spell.h"
 #include "TheAscendance/Characters/CharacterGameplayTags.h"
 #include "TheAscendance/Game/Subsystems/AudioManagerSubsystem.h"
+#include "TheAscendance/Characters/Components/LoadoutComponent.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -213,14 +214,11 @@ void APlayerCharacter::TestFunction3()
 
 	if (m_TestEquipToggle == false)
 	{
-		if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
-		{
-			m_MainHandItem->Init(gameMode->GetItemData(2));
-		}
+		m_LoadoutComponent->EquipItem(EEquippablePart::RIGHT_HAND, 2);
 	}
 	else
 	{
-		m_MainHandItem->UnEquip();
+		m_LoadoutComponent->UnEquipItem(EEquippablePart::RIGHT_HAND);
 	}
 
 	m_TestEquipToggle = !m_TestEquipToggle;

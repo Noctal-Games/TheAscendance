@@ -4,11 +4,11 @@
 #include "HSMAgentComponent.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
-#include "TheAscendance/Characters/AI/States/IdleState.h"
-#include "TheAscendance/Characters/AI/States/InvestigateState.h"
-#include "TheAscendance/Characters/AI/States/CombatState.h"
+#include "TheAscendance/AI/States/IdleState.h"
+#include "TheAscendance/AI/States/InvestigateState.h"
+#include "TheAscendance/AI/States/CombatState.h"
+#include "TheAscendance/AI/Components/SightSensorComponent.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
-#include "TheAscendance/Characters/AI/Components/SightSensorComponent.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 
 // Sets default values for this component's properties
@@ -57,6 +57,16 @@ void UHSMAgentComponent::Init(ABaseEnemy* owner)
 	SetState(EState::IDLE);
 }
 
+void UHSMAgentComponent::InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance, float minReactionTime, float maxReactionTime)
+{
+	m_VisionStrength = visionStrength;
+	m_HearingStrength = hearingStrength;
+	m_PreferredDistanceFromTarget = preferredDistanceFromTarget;
+	m_PreferredDistanceTolerance = preferredDistanceTolerance;
+	m_CombatReactionTimeMin = minReactionTime;
+	m_CombatReactionTimeMax = maxReactionTime;
+}
+
 void UHSMAgentComponent::SetState(EState newState)
 {
 	if (m_CurrentState == newState)
@@ -78,6 +88,19 @@ void UHSMAgentComponent::SetState(EState newState)
 	m_States[m_CurrentState]->StartState(this);
 }
 
+void UHSMAgentComponent::SetCombatState(ECombatState newState)
+{
+	if (m_States.Contains(EState::COMBAT) == false || m_States[EState::COMBAT] == nullptr)
+	{
+		return;
+	}
+
+	if (UCombatState* cState = Cast<UCombatState>(m_States[EState::COMBAT]))
+	{
+		cState->SetCombatState(newState);
+	}
+}
+
 void UHSMAgentComponent::SetDestination(const FVector& destination)
 {
 	if(m_Owner.IsValid() == false)
@@ -87,6 +110,21 @@ void UHSMAgentComponent::SetDestination(const FVector& destination)
 	}
 
 	m_Owner->SetDestination(destination);
+}
+
+void UHSMAgentComponent::SetLocationToInvestigate(const FVector& location)
+{
+	m_LocationToInvestigate = location;
+
+	if (m_CurrentState == EState::IDLE && m_LocationToInvestigate != FVector::ZeroVector)
+	{
+		SetState(EState::INVESTIGATE);
+	}
+}
+
+FVector UHSMAgentComponent::GetLocationToInvestigate()
+{
+	return m_LocationToInvestigate;
 }
 
 ABaseEnemy* UHSMAgentComponent::GetAgentOwner() const
@@ -100,6 +138,17 @@ ABaseEnemy* UHSMAgentComponent::GetAgentOwner() const
 	return m_Owner.Get();
 }
 
+APlayerCharacter* UHSMAgentComponent::GetTargetPlayer() const
+{
+	if (m_Player.IsValid() == false)
+	{
+		LOG_ERROR("Tried to get player target with invalid player");
+		return nullptr;
+	}
+
+	return m_Player.Get();
+}
+
 bool UHSMAgentComponent::HasPath() const
 {
 	if (m_Owner.IsValid() == false)
@@ -109,6 +158,44 @@ bool UHSMAgentComponent::HasPath() const
 	}
 
 	return m_Owner->HasPath();
+}
+
+bool UHSMAgentComponent::IsTargetInActionableRange(const FVector& target) const
+{
+	if (m_Owner == nullptr)
+	{
+		return false;
+	}
+
+	return ((m_Owner->GetActorLocation() - target).Length() <= m_PreferredDistanceFromTarget + (m_PreferredDistanceTolerance * 2.0f));
+}
+
+void UHSMAgentComponent::GetPreferredDistanceValues(float& preferredDistanceFromTarget, float& preferredDistanceTolerance) const
+{
+	preferredDistanceFromTarget = m_PreferredDistanceFromTarget;
+	preferredDistanceTolerance = m_PreferredDistanceTolerance;
+}
+
+void UHSMAgentComponent::SetFocus(AActor* target)
+{
+	if (m_Owner.IsValid() == false)
+	{
+		LOG_ERROR("Tried to set focus with invalid owner");
+		return;
+	}
+
+	m_Owner->SetFocus(target);
+}
+
+void UHSMAgentComponent::ClearFocus()
+{
+	if (m_Owner.IsValid() == false)
+	{
+		LOG_ERROR("Tried to clear focus with invalid owner");
+		return;
+	}
+
+	m_Owner->ClearFocus();
 }
 
 void UHSMAgentComponent::SetWaypointRoute(AWaypointRoute* route)
@@ -142,7 +229,7 @@ void UHSMAgentComponent::SetVisionStrength(float visionStrength)
 	m_VisionStrength = visionStrength;
 }
 
-const float UHSMAgentComponent::GetVisionStrength()
+float UHSMAgentComponent::GetVisionStrength() const
 {
 	return m_VisionStrength;
 }
@@ -152,12 +239,17 @@ void UHSMAgentComponent::SetHearingStrength(float hearingStrength)
 	m_HearingStrength = hearingStrength;
 }
 
-const float UHSMAgentComponent::GetHearingStrength()
+float UHSMAgentComponent::GetHearingStrength() const
 {
 	return m_HearingStrength;
 }
 
-bool UHSMAgentComponent::HasLineOfSight()
+float UHSMAgentComponent::GetRandomCombatReactionTime() const
+{
+	return FMath::RandRange(m_CombatReactionTimeMin, m_CombatReactionTimeMax);
+}
+
+bool UHSMAgentComponent::HasLineOfSight() const
 {
 	return m_HasLineOfSight;
 }
@@ -186,6 +278,30 @@ bool UHSMAgentComponent::IsSoundHeard(float soundWeight) const
 bool UHSMAgentComponent::IsInCombat() const
 {
 	return m_CurrentState == EState::COMBAT;
+}
+
+bool UHSMAgentComponent::IsTargetTooClose(const FVector& target) const
+{
+	if(m_Owner.IsValid() == false)
+	{
+		LOG_ERROR("Tried to check if target is too close with invalid owner");
+		return false;
+	}
+
+	FVector distance = target - m_Owner->GetActorLocation();
+	return distance.Length() <= (m_PreferredDistanceFromTarget - m_PreferredDistanceTolerance);
+}
+
+bool UHSMAgentComponent::IsTargetTooFar(const FVector& target) const
+{
+	if (m_Owner.IsValid() == false)
+	{
+		LOG_ERROR("Tried to check if target is too fase with invalid owner");
+		return false;
+	}
+
+	FVector distance = target - m_Owner->GetActorLocation();
+	return distance.Length() > (m_PreferredDistanceFromTarget + m_PreferredDistanceTolerance);
 }
 
 // Called when the game starts

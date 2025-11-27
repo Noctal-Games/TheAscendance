@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "TheAscendance/Spells/Enums/SpellModifierType.h"
 #include "GameplayTagContainer.h"
+#include "NiagaraSystem.h"
 #include "SpellModifierData.generated.h"
 
 // GENERIC MODIFIERS
@@ -77,7 +78,7 @@ struct FAreaOfEffectModifier : public FGenericSpellModifier
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "DoesKnockback == true", EditConditionHides))
 	float KnockbackStrength = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSoftObjectPtr<class UNiagaraSystem> AOEHitNiagara = nullptr;
+	TSoftObjectPtr<UNiagaraSystem> AOEHitNiagara = nullptr;
 };
 // GENERIC MODIFIERS
 

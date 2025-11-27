@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "TheAscendance/Characters/AI/Enums/State.h"
+#include "TheAscendance/AI/Enums/State.h"
 #include "HSMAgentComponent.generated.h"
 
 class ABaseEnemy;
@@ -23,28 +23,47 @@ public:
 	UHSMAgentComponent();
 
 	void Init(ABaseEnemy* owner);
+	void InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance, float minReactionTime, float maxReactionTime);
+
 	void SetState(EState newState);
+	void SetCombatState(ECombatState combatState);
 
 	void SetDestination(const FVector& destination);
+
+	void SetLocationToInvestigate(const FVector& location);
+	FVector GetLocationToInvestigate();
+
 	ABaseEnemy* GetAgentOwner() const;
+	APlayerCharacter* GetTargetPlayer() const;
 
 	bool HasPath() const;
+
+	bool IsTargetInActionableRange(const FVector& target) const;
+	void GetPreferredDistanceValues(float& preferredDistanceFromTarget, float& preferredDistanceTolerance) const;
+
+	void SetFocus(AActor* target);
+	void ClearFocus();
 
 	//Temp until better setup
 	void SetWaypointRoute(AWaypointRoute* route);
 	AWaypointRoute* GetWaypointRoute() const;
 
 	void SetVisionStrength(float visionStrength);
-	const float GetVisionStrength();
+	float GetVisionStrength() const;
 
 	void SetHearingStrength(float hearingStrength);
-	const float GetHearingStrength();
+	float GetHearingStrength() const;
 
-	bool HasLineOfSight();
+	float GetRandomCombatReactionTime() const;
+
+	bool HasLineOfSight() const;
 	void SetHasLineOfSight(bool hasLineOfSight);
 
 	bool IsSoundHeard(float soundWeight) const;
 	bool IsInCombat() const;
+
+	bool IsTargetTooClose(const FVector& target) const;
+	bool IsTargetTooFar(const FVector& target) const;
 
 	// Called every frame
 	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
@@ -68,8 +87,16 @@ private:
 
 	EState m_CurrentState = EState::MAX;
 
+	FVector m_LocationToInvestigate = FVector::ZeroVector;
+
 	float m_VisionStrength = 0.0f;
 	float m_HearingStrength = 0.0f;
+
+	float m_PreferredDistanceFromTarget = 0.0f;
+	float m_PreferredDistanceTolerance = 0.0f;
+
+	float m_CombatReactionTimeMin = 0.0f;
+	float m_CombatReactionTimeMax = 0.0f;
 
 	bool m_HasLineOfSight = false;
 };
