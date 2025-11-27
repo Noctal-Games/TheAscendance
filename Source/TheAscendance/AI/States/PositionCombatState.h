@@ -21,6 +21,5 @@ public:
 private:
 	TWeakObjectPtr<AActor> m_Target = nullptr;
 
-	float m_PreferredDistanceFromTarget = 0.0f;
-	float m_PreferredDistanceTolerance = 0.0f;
+	float m_PlayerActionReactionTimer = 0.0f;
 };

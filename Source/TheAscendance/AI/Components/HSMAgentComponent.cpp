@@ -57,12 +57,14 @@ void UHSMAgentComponent::Init(ABaseEnemy* owner)
 	SetState(EState::IDLE);
 }
 
-void UHSMAgentComponent::InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance)
+void UHSMAgentComponent::InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance, float minReactionTime, float maxReactionTime)
 {
 	m_VisionStrength = visionStrength;
 	m_HearingStrength = hearingStrength;
 	m_PreferredDistanceFromTarget = preferredDistanceFromTarget;
 	m_PreferredDistanceTolerance = preferredDistanceTolerance;
+	m_CombatReactionTimeMin = minReactionTime;
+	m_CombatReactionTimeMax = maxReactionTime;
 }
 
 void UHSMAgentComponent::SetState(EState newState)
@@ -160,7 +162,12 @@ bool UHSMAgentComponent::HasPath() const
 
 bool UHSMAgentComponent::IsTargetInActionableRange(const FVector& target) const
 {
-	return false;
+	if (m_Owner == nullptr)
+	{
+		return false;
+	}
+
+	return ((m_Owner->GetActorLocation() - target).Length() <= m_PreferredDistanceFromTarget + (m_PreferredDistanceTolerance * 2.0f));
 }
 
 void UHSMAgentComponent::GetPreferredDistanceValues(float& preferredDistanceFromTarget, float& preferredDistanceTolerance) const
@@ -271,6 +278,30 @@ bool UHSMAgentComponent::IsSoundHeard(float soundWeight) const
 bool UHSMAgentComponent::IsInCombat() const
 {
 	return m_CurrentState == EState::COMBAT;
+}
+
+bool UHSMAgentComponent::IsTargetTooClose(const FVector& target) const
+{
+	if(m_Owner.IsValid() == false)
+	{
+		LOG_ERROR("Tried to check if target is too close with invalid owner");
+		return false;
+	}
+
+	FVector distance = target - m_Owner->GetActorLocation();
+	return distance.Length() <= (m_PreferredDistanceFromTarget - m_PreferredDistanceTolerance);
+}
+
+bool UHSMAgentComponent::IsTargetTooFar(const FVector& target) const
+{
+	if (m_Owner.IsValid() == false)
+	{
+		LOG_ERROR("Tried to check if target is too fase with invalid owner");
+		return false;
+	}
+
+	FVector distance = target - m_Owner->GetActorLocation();
+	return distance.Length() > (m_PreferredDistanceFromTarget + m_PreferredDistanceTolerance);
 }
 
 // Called when the game starts
