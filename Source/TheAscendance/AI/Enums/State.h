@@ -26,3 +26,14 @@ enum class ECombatState : uint8
 
 	MAX
 };
+
+UENUM(BlueprintType)
+enum class EAttackState : uint8
+{
+	ENGAGE UMETA(DisplayName = "Engage"),
+	TELEGRAPH UMETA(DisplayName = "Telegraph"),
+	EXECUTE UMETA(DisplayName = "Execute"),
+	COOLDOWN UMETA(DisplayName = "Cooldown"),
+
+	MAX
+};
