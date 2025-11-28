@@ -94,8 +94,7 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 	if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))
 	{
 		m_Agent->RegisterComponent();
-		m_Agent->SetVisionStrength(stats.SightStrength);
-		m_Agent->SetHearingStrength(stats.HearingStrength);
+		m_Agent->InitStats(stats.SightStrength, stats.HearingStrength, stats.PreferredRange, stats.PreferredRangeTolerance, stats.ReactionTimeMinimum, stats.ReactionTimeMaximum);
 		m_Agent->Init(this);
 	}
 	else

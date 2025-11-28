@@ -34,10 +34,14 @@ struct FEnemyStats
 	//UPROPERTY(EditDefaultsOnly)
 	//float CrouchSpeedPenalty = 0.0f;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "The distance from the target that the enemy prefers to be at"))
 	float PreferredRange = 0.0f;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "The tolerance of the PreferredRange"))
+	float PreferredRangeTolerance = 0.0f;
 	UPROPERTY(EditDefaultsOnly)
-	float RetreatRange = 0.0f;
+	float ReactionTimeMinimum = 0.0f;
+	UPROPERTY(EditDefaultsOnly)
+	float ReactionTimeMaximum = 0.0f;
 
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Higher value for stronger vision", ClampMin = 0.0f, ClampMax = 1.0f))
 	float SightStrength = 1.0f;

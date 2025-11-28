@@ -23,7 +23,7 @@ public:
 	UHSMAgentComponent();
 
 	void Init(ABaseEnemy* owner);
-	void InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance);
+	void InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance, float minReactionTime, float maxReactionTime);
 
 	void SetState(EState newState);
 	void SetCombatState(ECombatState combatState);
@@ -62,6 +62,8 @@ public:
 	bool IsSoundHeard(float soundWeight) const;
 	bool IsInCombat() const;
 
+	bool IsTargetTooClose(const FVector& target) const;
+	bool IsTargetTooFar(const FVector& target) const;
 
 	// Called every frame
 	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
