@@ -39,12 +39,10 @@ void UAudioManagerSubsystem::PlaySoundAtLocation(USoundBase* sound, FVector loca
 
 	if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
 	{
-		LOG_WARNING("PLAYING SOUND");
 		UGameplayStatics::PlaySoundAtLocation(world, sound, location, volume);
 
 		if (isNPCAudible == true && sound->AttenuationSettings != nullptr)
 		{
-			LOG_WARNING("PLAYING SOUND FOR NPCS");
 			PlaySoundForNPCPerception(sound->AttenuationSettings->Attenuation, location, volume);
 		}
 	}
