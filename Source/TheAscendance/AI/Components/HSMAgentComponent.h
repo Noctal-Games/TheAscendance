@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "TheAscendance/AI/Enums/State.h"
+#include "TheAscendance/AI/Actions/Attacks/Enums/AttackType.h"
 #include "HSMAgentComponent.generated.h"
 
 class ABaseEnemy;
@@ -12,6 +13,7 @@ class APlayerCharacter;
 class UAbstractState;
 class AWaypointRoute;
 class USightSensorComponent;
+struct FAttackData;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API UHSMAgentComponent : public UActorComponent
@@ -24,6 +26,9 @@ public:
 
 	void Init(ABaseEnemy* owner);
 	void InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance, float minReactionTime, float maxReactionTime);
+	void InitMeleeAttacks(const TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>>& meleeAttacks);
+
+	FAttackData* GetMeleeAttackData(EMeleeAttackType attackType) const;
 
 	void SetState(EState newState);
 	void SetCombatState(ECombatState combatState);
@@ -99,4 +104,6 @@ private:
 	float m_CombatReactionTimeMax = 0.0f;
 
 	bool m_HasLineOfSight = false;
+
+	TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>> m_MeleeAttacks;
 };

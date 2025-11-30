@@ -67,6 +67,21 @@ void UHSMAgentComponent::InitStats(float visionStrength, float hearingStrength, 
 	m_CombatReactionTimeMax = maxReactionTime;
 }
 
+void UHSMAgentComponent::InitMeleeAttacks(const TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>>& meleeAttacks)
+{
+	m_MeleeAttacks = meleeAttacks;
+}
+
+FAttackData* UHSMAgentComponent::GetMeleeAttackData(EMeleeAttackType attackType) const
+{
+	if(m_MeleeAttacks.Contains(attackType) && m_MeleeAttacks[attackType].IsValid())
+	{
+		return m_MeleeAttacks[attackType].Get();
+	}
+
+	return nullptr;
+}
+
 void UHSMAgentComponent::SetState(EState newState)
 {
 	if (m_CurrentState == newState)
