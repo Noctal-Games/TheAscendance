@@ -82,5 +82,6 @@ void UAttackCombatState::SetAttackState(EAttackState newState)
 
 	m_CurrentAttackState = newState;
 
+	m_AttackStates[m_CurrentAttackState]->SetAttackCombatState(this);
 	m_AttackStates[m_CurrentAttackState]->StartState(m_Agent.Get());
 }

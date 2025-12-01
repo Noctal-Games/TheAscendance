@@ -364,6 +364,24 @@ FVector ABaseCharacter::GetSocketLocation(FName socketName)
 	return GetMesh()->GetSocketLocation(socketName);
 }
 
+float ABaseCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate, FName startSection)
+{
+	if (montageToPlay == nullptr)
+	{
+		LOG_ERROR("Tried to play null animation montage");
+		return 0.0f;
+	}
+
+	float duration = GetMesh()->GetAnimInstance()->Montage_Play(montageToPlay, playRate);
+
+	if (startSection != NAME_None)
+	{
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(startSection, montageToPlay);
+	}
+
+	return duration;
+}
+
 bool ABaseCharacter::EquipItem(EEquippablePart part, int itemID)
 {
 	if(itemID <= 0)

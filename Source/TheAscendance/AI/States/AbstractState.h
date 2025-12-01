@@ -7,6 +7,7 @@
 #include "AbstractState.generated.h"
 
 class UHSMAgentComponent;
+class UAttackCombatState;
 
 UCLASS(Abstract)
 class THEASCENDANCE_API UAbstractState : public UObject
@@ -18,6 +19,9 @@ public:
 	virtual void Update(float deltaTime) PURE_VIRTUAL(UAbstractState::Update, );
 	virtual void EndState();
 
+	void SetAttackCombatState(UAttackCombatState* attackCombatState);
+
 protected:
 	TWeakObjectPtr<UHSMAgentComponent> m_Agent = nullptr;
+	TWeakObjectPtr<UAttackCombatState> m_AttackCombatState = nullptr;
 };
