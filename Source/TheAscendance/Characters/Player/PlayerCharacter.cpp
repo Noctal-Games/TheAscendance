@@ -10,6 +10,8 @@
 #include "TheAscendance/Items/HeldItem.h"
 #include "TheAscendance/Spells/Interfaces/Spell.h"
 #include "TheAscendance/Characters/CharacterGameplayTags.h"
+#include "TheAscendance/Game/Subsystems/AudioManagerSubsystem.h"
+#include "TheAscendance/Characters/Components/LoadoutComponent.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -175,6 +177,17 @@ void APlayerCharacter::TestFunction1()
 {
 	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 1");
 	m_AnimTest = !m_AnimTest;
+
+	if (m_TestSound != nullptr)
+	{
+		if(UWorld* world = UCoreFunctionLibrary::GetGameWorld())
+		{
+			if (UAudioManagerSubsystem* audioManager = world->GetGameInstance()->GetSubsystem<UAudioManagerSubsystem>())
+			{
+				audioManager->PlaySoundAtLocation(m_TestSound, GetActorLocation(), 1.0f, true);
+			}
+		}
+	}
 }
 
 void APlayerCharacter::TestFunction2()
@@ -201,14 +214,11 @@ void APlayerCharacter::TestFunction3()
 
 	if (m_TestEquipToggle == false)
 	{
-		if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
-		{
-			m_MainHandItem->Init(gameMode->GetItemData(2));
-		}
+		m_LoadoutComponent->EquipItem(EEquippablePart::RIGHT_HAND, 2);
 	}
 	else
 	{
-		m_MainHandItem->UnEquip();
+		m_LoadoutComponent->UnEquipItem(EEquippablePart::RIGHT_HAND);
 	}
 
 	m_TestEquipToggle = !m_TestEquipToggle;

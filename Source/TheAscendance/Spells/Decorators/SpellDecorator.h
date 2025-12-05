@@ -18,7 +18,9 @@ class THEASCENDANCE_API USpellDecorator : public UObject, public ISpell
 	
 public:
 	void Decorate(ISpell* decorator);
+
 	virtual void SetDecoratedSelf(ISpell* decoratedSelf) override;
+	virtual void LoadHitNiagara() override;
 
 	virtual bool CanCast() override;
 	virtual bool CastSpell() override;
@@ -28,6 +30,8 @@ public:
 	virtual void OnOverlap(AActor* overlapActor, FVector spellOverlapLocation, int damage) override;
 	virtual void OnHit(AActor* hitActor, FVector spellHitLocation) override;
 	virtual void ProcessHit(FVector spellHitLocation) override;
+	virtual void SpawnHitNiagara(FVector spellHitLocation) override;
+
 	virtual TArray<TObjectPtr<AActor>> GetHitActors() override;
 
 	virtual void Fire(FVector direction) override;

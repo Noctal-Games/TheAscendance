@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "TheAscendance/Spells/Enums/SpellModifierType.h"
 #include "GameplayTagContainer.h"
+#include "NiagaraSystem.h"
 #include "SpellModifierData.generated.h"
 
 // GENERIC MODIFIERS
-USTRUCT(BlueprintType)
+USTRUCT( )
 struct FGenericSpellModifier
 {
 	GENERATED_BODY()
@@ -76,6 +77,8 @@ struct FAreaOfEffectModifier : public FGenericSpellModifier
 	bool DoesKnockback = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "DoesKnockback == true", EditConditionHides))
 	float KnockbackStrength = 0.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UNiagaraSystem> AOEHitNiagara = nullptr;
 };
 // GENERIC MODIFIERS
 

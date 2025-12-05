@@ -25,6 +25,7 @@ public:
 	void SetSkeletalMesh();
 
 	virtual void SetDestination(const FVector& destination) override;
+	void SetLocationToInvestigate(const FVector& location);
 	bool HasPath() const;
 
 	//Temp until better setup
@@ -32,6 +33,9 @@ public:
 
 	void SetFocus(AActor* target);
 	void ClearFocus();
+
+	bool IsSoundHeard(float soundWeight) const;
+	bool IsInCombat() const;
 
 protected:
 	// Called when the game starts or when spawned

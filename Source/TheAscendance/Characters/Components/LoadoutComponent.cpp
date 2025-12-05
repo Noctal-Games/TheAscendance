@@ -2,6 +2,8 @@
 
 
 #include "LoadoutComponent.h"
+#include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Characters/BaseCharacter.h"
 
 // Sets default values for this component's properties
 ULoadoutComponent::ULoadoutComponent()
@@ -15,9 +17,27 @@ ULoadoutComponent::ULoadoutComponent()
 
 void ULoadoutComponent::EquipItem(EEquippablePart part, int itemID)
 {
+	if (m_Owner.IsValid() == false)
+	{
+		m_Owner = Cast<ABaseCharacter>(GetOwner());
+
+		if(m_Owner.IsValid() == false)
+		{
+			LOG_ERROR("LoadoutComponent has invalid owner");
+			return;
+		}
+	}
+
 	UnEquipItem(part);
 
+	if(m_Owner->EquipItem(part, itemID) == false)
+	{
+		LOG_ERROR("%s failed to equip item %i", *m_Owner->GetName(), itemID);
+		return;
+	}
+
 	m_Loadout.Add(MakeShared<FLoadoutSlotData>(itemID, part));
+	LOG_INFO("%s equipped item %i", *m_Owner->GetName(), itemID);
 }
 
 void ULoadoutComponent::UnEquipItem(EEquippablePart part)
@@ -26,7 +46,9 @@ void ULoadoutComponent::UnEquipItem(EEquippablePart part)
 	{
 		if (data->EquippedPart == part)
 		{
-			//Unequip Logic
+			LOG_INFO("%s unequipped item %i", *m_Owner->GetName(), data->ItemID);
+			data->ItemID = 0;
+			m_Owner->UnEquipItem(part);
 			return;
 		}
 	}
@@ -35,12 +57,6 @@ void ULoadoutComponent::UnEquipItem(EEquippablePart part)
 void ULoadoutComponent::SetSpells(const TArray<int>& spells)
 {
 	m_Spells = spells;
-}
-
-// Called when the game starts
-void ULoadoutComponent::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 bool ULoadoutComponent::Contains(EEquippablePart part)
@@ -56,3 +72,8 @@ bool ULoadoutComponent::Contains(EEquippablePart part)
 	return false;
 }
 
+// Called when the game starts
+void ULoadoutComponent::BeginPlay()
+{
+	Super::BeginPlay();
+}

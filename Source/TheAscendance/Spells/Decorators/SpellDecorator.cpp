@@ -25,6 +25,17 @@ void USpellDecorator::SetDecoratedSelf(ISpell* decoratedSelf)
 	return m_DecoratedSpell->SetDecoratedSelf(decoratedSelf);
 }
 
+void USpellDecorator::LoadHitNiagara()
+{
+	if (m_DecoratedSpell == nullptr)
+	{
+		LOG_ERROR("Spell decorator has invalid DecoratedSpell pointer");
+		return;
+	}
+
+	return m_DecoratedSpell->LoadHitNiagara();
+}
+
 bool USpellDecorator::CanCast()
 {
 	if (m_DecoratedSpell == nullptr)
@@ -89,6 +100,17 @@ void USpellDecorator::ProcessHit(FVector spellHitLocation)
 	}
 
 	m_DecoratedSpell->ProcessHit(spellHitLocation);
+}
+
+void USpellDecorator::SpawnHitNiagara(FVector spellHitLocation)
+{
+	if (m_DecoratedSpell == nullptr)
+	{
+		LOG_ERROR("Spell decorator has invalid DecoratedSpell pointer");
+		return;
+	}
+
+	m_DecoratedSpell->SpawnHitNiagara(spellHitLocation);
 }
 
 TArray<TObjectPtr<AActor>> USpellDecorator::GetHitActors()

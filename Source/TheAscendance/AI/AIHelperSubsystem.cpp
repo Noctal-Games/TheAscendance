@@ -44,8 +44,6 @@ FVector UAIHelperSubsystem::GetTargetSocketLocation(ABaseCharacter* target, FNam
 
 		if (socketInfo == nullptr || currentTime - socketInfo->LastQueriedTime > 0.2f)
 		{
-			LOG_ONSCREEN(-1, 1.0f, FColor::Red, "UPDATING SOCKET INFO");
-
 			FTargetSocketInfo& newSocketInfo = m_TargetSocketInfoMap.FindOrAdd(target);
 			newSocketInfo.SocketLocations.Empty();
 
@@ -57,10 +55,6 @@ FVector UAIHelperSubsystem::GetTargetSocketLocation(ABaseCharacter* target, FNam
 
 			newSocketInfo.LastQueriedTime = currentTime;
 			socketInfo = &newSocketInfo;
-		}
-		else
-		{
-			LOG_ONSCREEN(-1, 1.0f, FColor::Green, "USING CACHED SOCKET INFO");
 		}
 
 		if (const FVector* socketLocation = socketInfo->SocketLocations.Find(socketName))

@@ -3,6 +3,7 @@
 
 #include "ProjectileSpell.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "Interfaces/SpellCaster.h"
 #include "Structs/SpellData.h"
 #include "TheAscendance/Actors/Projectile/BaseProjectile.h"
@@ -28,6 +29,25 @@ void UProjectileSpell::Init(USpellData* spellData, ISpellCaster* spellOwner)
 	}
 }
 
+void UProjectileSpell::LoadHitNiagara()
+{
+	if(m_SpellData.IsValid() == false)
+	{
+		LOG_ERROR("Tried to Load HitNiagara for ProjectileSpell with invalid SpellData");
+		return;
+	}
+
+	m_HitNiagara = m_SpellData->SpellHitNiagara;
+
+	if (m_HitNiagara.IsNull() == true)
+	{
+		LOG_WARNING("Tried to Load HitNiagara for ProjectileSpell with invalid SpellHitNiagara");
+		return;
+	}
+
+	UCoreFunctionLibrary::RequestAsyncLoad(m_HitNiagara.ToSoftObjectPath());
+}
+
 bool UProjectileSpell::CastSpell()
 {
 	if (UBaseSpell::CastSpell() == false)
@@ -45,12 +65,15 @@ bool UProjectileSpell::CastSpell()
 
 void UProjectileSpell::Fire(FVector direction)
 {
-	UBaseSpell::Fire(direction);
-
 	if (m_DecoratedSelf == nullptr)
 	{
 		LOG_ERROR("Tried to Fire Projectile with invalid DecoratedSelf");
 		return;
+	}
+
+	if (m_HitNiagara.IsValid() == false)
+	{
+		m_DecoratedSelf->LoadHitNiagara();
 	}
 
 	AActor* owner = m_SpellOwner->GetActor();
@@ -69,8 +92,10 @@ void UProjectileSpell::Fire(FVector direction)
 	projectile->AddIgnoreActor(owner);
 	m_DecoratedSelf->DecorateProjectile(projectile);
 
-	//projectile->InitNiagara(spellData->spellNiagara);
-	//projectile->SetRange(spellData->range);
+	if (m_SpellNiagara.IsValid() == true)
+	{
+		projectile->SetNiagara(m_SpellNiagara.Get());
+	}
 
 	projectile->SetIsActive(true);
 	projectile->ApplyForce(direction);

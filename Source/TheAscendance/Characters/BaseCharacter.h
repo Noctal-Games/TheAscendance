@@ -10,12 +10,14 @@
 #include "Enums/CharacterStat.h"
 #include "TheAscendance/Items/Enums/WeaponType.h"
 #include "TheAscendance/Spells/Interfaces/SpellCaster.h"
+#include "Enums/EquippablePart.h"
 #include "BaseCharacter.generated.h"
 
 class UCharacterStatsComponent;
 class UEffectHandlerComponent;
 class AHeldItem;
 class UCharacterTrajectoryComponent;
+class ULoadoutComponent;
 
 UCLASS()
 class THEASCENDANCE_API ABaseCharacter : public ACharacter, public ISusceptible, public ISpellCaster, public IGameplayTagAssetInterface
@@ -91,9 +93,16 @@ public:
 
 	FVector GetSocketLocation(FName socketName);
 
+	float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None);
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
+	friend class ULoadoutComponent;
+
+	bool EquipItem(EEquippablePart part, int itemID);
+	void UnEquipItem(EEquippablePart part);
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -111,7 +120,9 @@ protected:
 	TObjectPtr<UEffectHandlerComponent> m_EffectHandlerComponent = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (DisplayName = "Character Trajectory Component"))
 	TObjectPtr<UCharacterTrajectoryComponent> m_CharacterTrajectoryComponent = nullptr;
-	
+	UPROPERTY()
+	TObjectPtr<ULoadoutComponent> m_LoadoutComponent = nullptr;
+
 	UPROPERTY()
 	TObjectPtr<AHeldItem> m_MainHandItem = nullptr;
 	UPROPERTY()

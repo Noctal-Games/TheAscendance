@@ -55,6 +55,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
 	TArray<TInstancedStruct<FRangedSpellModifier>> RangedSpellModifiers;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UNiagaraSystem> SpellHitNiagara = nullptr;
 };
 
 UCLASS(BlueprintType)

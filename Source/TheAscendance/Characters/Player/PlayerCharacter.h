@@ -10,6 +10,7 @@ class UPlayerMovementComponent;
 class UCameraComponent;
 class ATAPlayerController;
 class ISpell;
+class USoundBase;
 
 UCLASS()
 class THEASCENDANCE_API APlayerCharacter : public ABaseCharacter
@@ -58,8 +59,6 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	
-
 	UPROPERTY()
 	TObjectPtr<UPlayerMovementComponent> m_MovementComponent = nullptr;
 	UPROPERTY()
@@ -70,9 +69,9 @@ private:
 	float m_DefaultCapsuleHeight = 0.0f;
 	float m_DefaultCapsuleRadius = 0.0f;
 
-
-
 	//Test
 	UPROPERTY()
 	TScriptInterface<ISpell> m_TestSpell = nullptr;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> m_TestSound = nullptr;
 };

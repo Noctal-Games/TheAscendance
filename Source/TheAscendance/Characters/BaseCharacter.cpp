@@ -5,8 +5,10 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "Components/CharacterStatsComponent.h"
+#include "Components/LoadoutComponent.h"
 #include "TheAscendance/Effects/Components/EffectHandlerComponent.h"
 #include "TheAscendance/Items/HeldItem.h"
+#include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -24,6 +26,8 @@ ABaseCharacter::ABaseCharacter()
 	checkf(m_EffectHandlerComponent, TEXT("Effect Handler Component failed to initialise"));
 	m_CharacterTrajectoryComponent = CreateDefaultSubobject<UCharacterTrajectoryComponent>(TEXT("Character Trajectory Component"));
 	checkf(m_CharacterTrajectoryComponent, TEXT("Character Trajectory Component failed to initialise"));
+	m_LoadoutComponent = CreateDefaultSubobject<ULoadoutComponent>(TEXT("Loadout Component"));
+	checkf(m_LoadoutComponent, TEXT("Loadout Component failed to initialise"));
 
 	SetRootComponent(GetCapsuleComponent());
 
@@ -358,6 +362,128 @@ FVector ABaseCharacter::GetSocketLocation(FName socketName)
 	}
 
 	return GetMesh()->GetSocketLocation(socketName);
+}
+
+float ABaseCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate, FName startSection)
+{
+	if (montageToPlay == nullptr)
+	{
+		LOG_ERROR("Tried to play null animation montage");
+		return 0.0f;
+	}
+
+	float duration = GetMesh()->GetAnimInstance()->Montage_Play(montageToPlay, playRate);
+
+	if (startSection != NAME_None)
+	{
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(startSection, montageToPlay);
+	}
+
+	return duration;
+}
+
+bool ABaseCharacter::EquipItem(EEquippablePart part, int itemID)
+{
+	if(itemID <= 0)
+	{
+		UnEquipItem(part);
+		return true;
+	}
+
+	//Remove from inventory logic
+
+	switch (part)
+	{
+		case EEquippablePart::RIGHT_HAND:
+		{
+			if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
+			{
+				if (m_MainHandItem == nullptr)
+				{
+					LOG_ERROR("Main Hand Item is null");
+					return false;
+				}
+
+				FItemData* itemData = gameMode->GetItemData(itemID);
+
+				if (itemData == nullptr)
+				{
+					return false;
+				}
+
+				m_MainHandItem->Init(itemData);
+				return true;
+			}
+			break;
+		}
+
+		case EEquippablePart::LEFT_HAND:
+		{
+			if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
+			{
+				if (m_OffHandItem == nullptr)
+				{
+					LOG_ERROR("OffHand Item is null");
+					return false;
+				}
+
+				FItemData* itemData = gameMode->GetItemData(itemID);
+
+				if (itemData == nullptr)
+				{
+					return false;
+				}
+
+				m_OffHandItem->Init(itemData);
+				return true;
+			}
+			break;
+		}
+
+		default:
+		{
+			LOG_WARNING("EquipItem called with invalid EEquippablePart");
+		}
+	}
+
+	return false;
+}
+
+void ABaseCharacter::UnEquipItem(EEquippablePart part)
+{			
+	//Add to inventory logic
+
+	switch (part)
+	{
+		case EEquippablePart::RIGHT_HAND:
+		{
+			if (m_MainHandItem == nullptr)
+			{
+				LOG_ERROR("Main Hand Item is null");
+				return;
+			}
+
+			m_MainHandItem->UnEquip();
+			break;
+		}
+
+		case EEquippablePart::LEFT_HAND:
+		{
+			if (m_OffHandItem == nullptr)
+			{
+				LOG_ERROR("OffHand Item is null");
+				return;
+			}
+
+			m_OffHandItem->UnEquip();
+			break;
+		}
+
+		default:
+		{
+			LOG_WARNING("UnEquip called on invalid EquippablePart");
+		}
+	}
 }
 
 void ABaseCharacter::UpdateTurnTowards()
