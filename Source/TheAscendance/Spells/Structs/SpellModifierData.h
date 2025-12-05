@@ -9,7 +9,7 @@
 #include "SpellModifierData.generated.h"
 
 // GENERIC MODIFIERS
-USTRUCT(BlueprintType)
+USTRUCT( )
 struct FGenericSpellModifier
 {
 	GENERATED_BODY()

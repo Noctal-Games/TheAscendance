@@ -24,3 +24,8 @@ void UAbstractState::EndState()
 
 	//m_Agent->SetDestination(agent->GetActorLocation());
 }
+
+void UAbstractState::SetAttackCombatState(UAttackCombatState* attackCombatState)
+{
+	m_AttackCombatState = attackCombatState;
+}

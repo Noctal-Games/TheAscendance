@@ -9,6 +9,9 @@
 
 class UHSMAgentComponent;
 class UAbstractAttackState;
+class UEngageAttackState;
+class UTelegraphAttackState;
+class UAnimMontage;
 
 UCLASS()
 class THEASCENDANCE_API UAttackCombatState : public UAbstractState
@@ -22,6 +25,14 @@ public:
 
 	void SetAttackState(EAttackState newState);
 	
+protected:
+	friend class UAbstractAttackState;
+	friend class UEngageAttackState;
+	friend class UTelegraphAttackState;
+
+	UPROPERTY()
+	TSoftObjectPtr<UAnimMontage> m_CurrentTelegraphMontage;
+
 private:
 	UPROPERTY()
 	TMap<EAttackState, TObjectPtr<UAbstractAttackState>> m_AttackStates;
