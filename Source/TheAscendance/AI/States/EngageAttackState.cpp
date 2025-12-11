@@ -17,20 +17,20 @@ void UEngageAttackState::StartState(UHSMAgentComponent* agent)
 		return;
 	}
 
-	if(FQuickAttackData* attackData = Cast<FQuickAttackData>(m_Agent->GetMeleeAttackData(EMeleeAttackType::QUICK_ATTACK)))
-	{
-		m_AttackCombatState->m_CurrentTelegraphMontage = attackData->TelegraphMontage;
+	//if(FQuickAttackData* attackData = Cast<FQuickAttackData>(m_Agent->GetMeleeAttackData(EMeleeAttackType::QUICK_ATTACK)))
+	//{
+	//	m_AttackCombatState->m_CurrentTelegraphMontage = attackData->TelegraphMontage;
 
-		UCoreFunctionLibrary::RequestAsyncLoad(attackData->AttackMontage.ToSoftObjectPath(), [this, attackData]()
-			{
-				m_AttackCombatState->SetAttackState(EAttackState::TELEGRAPH);
-			}
-		);
-	}
-	else
-	{
-		LOG_ERROR("EngageAttackState could not get QuickAttackData from HSMAgentComponent");
-	}
+	//	UCoreFunctionLibrary::RequestAsyncLoad(attackData->AttackMontage.ToSoftObjectPath(), [this, attackData]()
+	//		{
+	//			m_AttackCombatState->SetAttackState(EAttackState::TELEGRAPH);
+	//		}
+	//	);
+	//}
+	//else
+	//{
+	//	LOG_ERROR("EngageAttackState could not get QuickAttackData from HSMAgentComponent");
+	//}
 }
 
 void UEngageAttackState::Update(float deltaTime)
