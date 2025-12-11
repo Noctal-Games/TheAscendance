@@ -17,7 +17,7 @@ void UEngageAttackState::StartState(UHSMAgentComponent* agent)
 		return;
 	}
 
-	if(FQuickAttackData* attackData = Cast<FQuickAttackData>(m_Agent->GetMeleeAttackData(EMeleeAttackType::QUICK_ATTACK)))
+	/*if(FQuickAttackData* attackData = Cast<FQuickAttackData>(m_Agent->GetMeleeAttackData(EMeleeAttackType::QUICK_ATTACK)))
 	{
 		m_AttackCombatState->m_CurrentTelegraphMontage = attackData->TelegraphMontage;
 
@@ -30,7 +30,7 @@ void UEngageAttackState::StartState(UHSMAgentComponent* agent)
 	else
 	{
 		LOG_ERROR("EngageAttackState could not get QuickAttackData from HSMAgentComponent");
-	}
+	}*/
 }
 
 void UEngageAttackState::Update(float deltaTime)
