@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "TheAscendance/AI/Enums/State.h"
 #include "TheAscendance/AI/Actions/Attacks/Enums/AttackType.h"
+#include "TheAscendance/AI/Actions/Attacks/Structs/AttackData.h"
 #include "HSMAgentComponent.generated.h"
 
 class ABaseEnemy;
@@ -26,9 +27,10 @@ public:
 
 	void Init(ABaseEnemy* owner);
 	void InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance, float minReactionTime, float maxReactionTime);
-	void InitMeleeAttacks(const TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>>& meleeAttacks);
+	void InitMeleeAttacks(const FAttackSetData& attackSet /*const TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>>& meleeAttacks*/);
 
-	FAttackData* GetMeleeAttackData(EMeleeAttackType attackType) const;
+	const FAttackSetData* GetAttackSetData() const;
+	//FAttackData* GetMeleeAttackData(EMeleeAttackType attackType) const;
 
 	void SetState(EState newState);
 	void SetCombatState(ECombatState combatState);
@@ -105,5 +107,6 @@ private:
 
 	bool m_HasLineOfSight = false;
 
-	TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>> m_MeleeAttacks;
+	//TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>> m_MeleeAttacks;
+	TSharedPtr<FAttackSetData> m_AttackSet = nullptr;
 };

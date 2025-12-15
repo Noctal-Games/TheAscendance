@@ -95,6 +95,7 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 	{
 		m_Agent->RegisterComponent();
 		m_Agent->InitStats(stats.SightStrength, stats.HearingStrength, stats.PreferredRange, stats.PreferredRangeTolerance, stats.ReactionTimeMinimum, stats.ReactionTimeMaximum);
+		m_Agent->InitMeleeAttacks(data->EnemyData.AttackSet);
 		m_Agent->Init(this);
 	}
 	else

@@ -67,20 +67,32 @@ void UHSMAgentComponent::InitStats(float visionStrength, float hearingStrength, 
 	m_CombatReactionTimeMax = maxReactionTime;
 }
 
-void UHSMAgentComponent::InitMeleeAttacks(const TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>>& meleeAttacks)
+void UHSMAgentComponent::InitMeleeAttacks(const FAttackSetData& attackSet /*const TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>>& meleeAttacks*/)
 {
-	m_MeleeAttacks = meleeAttacks;
+	m_AttackSet = MakeShared<FAttackSetData>(attackSet);
+	//m_MeleeAttacks = meleeAttacks;
 }
 
-FAttackData* UHSMAgentComponent::GetMeleeAttackData(EMeleeAttackType attackType) const
+const FAttackSetData* UHSMAgentComponent::GetAttackSetData() const
 {
-	if(m_MeleeAttacks.Contains(attackType) && m_MeleeAttacks[attackType].IsValid())
+	if(m_AttackSet.IsValid() == false)
 	{
-		return m_MeleeAttacks[attackType].Get();
+		LOG_ERROR("Tried to get attack set data with invalid attack set");
+		return nullptr;
 	}
 
-	return nullptr;
+	return m_AttackSet.Get();
 }
+
+//FAttackData* UHSMAgentComponent::GetMeleeAttackData(EMeleeAttackType attackType) const
+//{
+//	if(m_MeleeAttacks.Contains(attackType) && m_MeleeAttacks[attackType].IsValid())
+//	{
+//		return m_MeleeAttacks[attackType].Get();
+//	}
+//
+//	return nullptr;
+//}
 
 void UHSMAgentComponent::SetState(EState newState)
 {
