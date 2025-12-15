@@ -18,4 +18,12 @@ public:
 	virtual void StartState(UHSMAgentComponent* agent) override;
 	virtual void Update(float deltaTime) override;
 	virtual void EndState() override;
+
+private:
+	void EndTelegraph();
+
+private:
+	float m_TelegraphTimer = 0.0f;
+
+	FTimerHandle m_TelegraphTimerHandle;
 };

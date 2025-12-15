@@ -30,6 +30,7 @@ void UEngageAttackState::StartState(UHSMAgentComponent* agent)
 	if(const FQuickAttackData* attackData = &attackSetData->QuickAttackData)
 	{
 		m_AttackCombatState->m_CurrentTelegraphMontage = attackData->TelegraphMontage;
+		m_AttackCombatState->m_CurrentAttackMontage = attackData->AttackMontage;
 
 		if (m_AttackCombatState->m_CurrentTelegraphMontage.IsNull() == true)
 		{

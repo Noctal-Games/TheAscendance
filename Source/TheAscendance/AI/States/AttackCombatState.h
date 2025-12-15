@@ -29,9 +29,12 @@ protected:
 	friend class UAbstractAttackState;
 	friend class UEngageAttackState;
 	friend class UTelegraphAttackState;
+	friend class UExecuteAttackState;
 
 	UPROPERTY()
 	TSoftObjectPtr<UAnimMontage> m_CurrentTelegraphMontage;
+	UPROPERTY()
+	TSoftObjectPtr<UAnimMontage> m_CurrentAttackMontage;
 
 private:
 	UPROPERTY()

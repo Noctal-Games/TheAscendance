@@ -6,12 +6,19 @@
 #include "AbstractAttackState.h"
 #include "ExecuteAttackState.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class THEASCENDANCE_API UExecuteAttackState : public UAbstractAttackState
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void StartState(UHSMAgentComponent* agent) override;
+	virtual void Update(float deltaTime) override;
+	virtual void EndState() override;
+
+private:
+	void EndAttack();
+
+private:
+	FTimerHandle m_ExecuteTimerHandle;
 };
