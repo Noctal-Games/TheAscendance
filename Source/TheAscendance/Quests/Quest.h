@@ -7,6 +7,7 @@
 #include "Quest.generated.h"
 
 class UQuestData;
+class UBaseObjectiveNode;
 
 UCLASS()
 class THEASCENDANCE_API UQuest : public UObject
@@ -16,7 +17,14 @@ class THEASCENDANCE_API UQuest : public UObject
 public:
 	void Init(UQuestData* questData);
 
+	void StartQuest();
+	void UpdateQuest();
+	bool IsComplete() const;
+
 private:
 	UPROPERTY()
 	TObjectPtr<UQuestData> m_QuestData = nullptr;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UBaseObjectiveNode>> m_Objectives;
 };
