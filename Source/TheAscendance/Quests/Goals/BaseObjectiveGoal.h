@@ -6,17 +6,16 @@
 #include "UObject/NoExportTypes.h"
 #include "BaseObjectiveGoal.generated.h"
 
-struct FObjectiveTypeData;
-
 UCLASS()
 class THEASCENDANCE_API UBaseObjectiveGoal : public UObject
 {
 	GENERATED_BODY()
 	
 public:
-	virtual void Init(const FObjectiveTypeData& data);
 	virtual void Activate();
-	virtual bool IsCompleted() const;
+	virtual void Deactivate();
+
+	virtual bool IsComplete() const;
 
 protected:
 	bool m_IsComplete = false;

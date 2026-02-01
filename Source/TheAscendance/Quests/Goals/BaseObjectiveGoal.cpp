@@ -3,15 +3,16 @@
 
 #include "BaseObjectiveGoal.h"
 
-void UBaseObjectiveGoal::Init(const FObjectiveTypeData& data)
-{
-}
-
 void UBaseObjectiveGoal::Activate()
 {
+
+}
+void UBaseObjectiveGoal::Deactivate()
+{
+
 }
 
-bool UBaseObjectiveGoal::IsCompleted() const
+bool UBaseObjectiveGoal::IsComplete() const
 {
 	return m_IsComplete;
 }

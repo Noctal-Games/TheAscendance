@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "GameplayTagContainer.h"
 #include "Quest.generated.h"
 
 class UQuestData;
@@ -16,9 +17,14 @@ class THEASCENDANCE_API UQuest : public UObject
 	
 public:
 	void Init(UQuestData* questData);
-
 	void StartQuest();
-	void UpdateQuest();
+
+	void CheckCompletion();
+	void MarkAsComplete();
+
+	FGameplayTag GetQuestTag() const;
+
+protected:
 	bool IsComplete() const;
 
 private:

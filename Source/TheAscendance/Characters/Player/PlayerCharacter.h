@@ -27,6 +27,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Player Camera"))
 	TObjectPtr<UCameraComponent> m_Camera = nullptr;
 
+	UFUNCTION(BlueprintCallable)
+	void PickupItem(int id, int amount);
+
 	void SetIsSprinting(bool val);
 
 	void SetIsCrouching(bool val);

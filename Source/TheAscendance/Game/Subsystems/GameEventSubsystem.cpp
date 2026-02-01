@@ -1,0 +1,24 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "GameEventSubsystem.h"
+
+void UGameEventSubsystem::NotifyItemPickup(int id, int amount)
+{
+	OnItemPickup.Broadcast(id, amount);
+}
+
+void UGameEventSubsystem::NotifyEnemyKilled(int id)
+{
+	OnEnemyKilled.Broadcast(id);
+}
+
+void UGameEventSubsystem::Initialize(FSubsystemCollectionBase& collection)
+{
+	Super::Initialize(collection);
+}
+
+void UGameEventSubsystem::Deinitialize()
+{
+	Super::Deinitialize();
+}

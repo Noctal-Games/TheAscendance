@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Quests/Enums/ObjectiveType.h"
+#include "StructUtils/InstancedStruct.h"
 #include "ObjectiveData.generated.h"
 
 // OBJECTIVE GOALS
@@ -19,11 +20,11 @@ struct FObjectiveGoalData
 };
 
 USTRUCT(BlueprintType, meta = (ToolTip = "Gather a specified amount of an item"))
-struct FGatherQuest : public FObjectiveGoalData
+struct FGatherGoal : public FObjectiveGoalData
 {
 	GENERATED_BODY()
 
-	FGatherQuest() : FObjectiveGoalData(EObjectiveGoalType::GATHER) {};
+	FGatherGoal() : FObjectiveGoalData(EObjectiveGoalType::GATHER) {};
 
 	UPROPERTY(EditDefaultsOnly)
 	int ItemID = -1;

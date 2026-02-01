@@ -12,6 +12,7 @@
 #include "TheAscendance/Characters/CharacterGameplayTags.h"
 #include "TheAscendance/Game/Subsystems/AudioManagerSubsystem.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
+#include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -38,6 +39,14 @@ void APlayerCharacter::SetPlayerController(ATAPlayerController* PlayerController
 ATAPlayerController* APlayerCharacter::GetPlayerController()
 {
 	return m_PlayerController;
+}
+
+void APlayerCharacter::PickupItem(int id, int amount)
+{
+	if (UGameEventSubsystem* gameEvent = GetWorld()->GetGameInstance()->GetSubsystem<UGameEventSubsystem>())
+	{
+		gameEvent->NotifyItemPickup(id, amount);
+	}
 }
 
 void APlayerCharacter::SetIsSprinting(bool val)
