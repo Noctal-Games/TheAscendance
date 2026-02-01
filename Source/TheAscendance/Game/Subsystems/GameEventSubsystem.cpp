@@ -6,11 +6,13 @@
 void UGameEventSubsystem::NotifyItemPickup(int id, int amount)
 {
 	OnItemPickup.Broadcast(id, amount);
+	OnItemPickupBP.Broadcast(id, amount);
 }
 
 void UGameEventSubsystem::NotifyEnemyKilled(int id)
 {
 	OnEnemyKilled.Broadcast(id);
+	OnEnemyKilledBP.Broadcast(id);
 }
 
 void UGameEventSubsystem::Initialize(FSubsystemCollectionBase& collection)
