@@ -43,22 +43,14 @@ void UQuest::Init(UQuestData* questData)
 
 void UQuest::StartQuest()
 {
-	for (UBaseObjectiveNode* objective : m_Objectives)
-	{
-		if (objective == nullptr)
-		{
-			LOG_ERROR("[QUEST] Quest contains invalid ObjectiveNode")
-			continue;
-		}
-
-		objective->Start();
-	}
+	UpdateObjective();
 }
 
 void UQuest::CheckCompletion()
 {
-	if (IsComplete() == false)
+	if (IsComplete(true) == false)
 	{
+		UpdateObjective();
 		return;
 	}
 
@@ -86,7 +78,7 @@ void UQuest::MarkAsComplete()
 	}
 }
 
-bool UQuest::IsComplete() const
+bool UQuest::IsComplete(bool update) const
 {
 	for (UBaseObjectiveNode* objective : m_Objectives)
 	{
@@ -103,6 +95,30 @@ bool UQuest::IsComplete() const
 	}
 
 	return true;
+}
+
+void UQuest::UpdateObjective()
+{
+	for (UBaseObjectiveNode* objective : m_Objectives)
+	{
+		if (objective == nullptr)
+		{
+			LOG_ERROR("[QUEST] Quest contains invalid ObjectiveNode")
+			continue;
+		}
+
+		if (objective->IsComplete() == false)
+		{
+			if (m_ActiveObjective.IsValid() == true && objective == m_ActiveObjective)
+			{
+				return;
+			}
+
+			m_ActiveObjective = objective;
+			m_ActiveObjective->Start();
+			return;
+		}
+	}
 }
 
 FGameplayTag UQuest::GetQuestTag() const

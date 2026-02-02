@@ -24,6 +24,8 @@ public:
 	void Init(FEnemyTableData* data);
 	void SetSkeletalMesh();
 
+	virtual void Damage(int amount) override;
+
 	virtual void SetDestination(const FVector& destination) override;
 	void SetLocationToInvestigate(const FVector& location);
 	bool HasPath() const;
@@ -51,4 +53,6 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UHSMAgentComponent> m_Agent = nullptr;
+
+	int m_EnemyID = 0;
 };

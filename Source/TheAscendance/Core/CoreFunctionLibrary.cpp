@@ -163,7 +163,7 @@ void UCoreFunctionLibrary::RequestAsyncLoad(const TArray<FSoftObjectPath>& targe
 
 	for (const FSoftObjectPath& path : targetsToStream)
 	{
-		LOG_INFO("[CORE]Requesting ASync Load for: %s", *path.ToString());
+		LOG_INFO("[CORE] Requesting ASync Load for: %s", *path.ToString());
 	}
 
 	UAssetManager::GetStreamableManager().RequestAsyncLoad(targetsToStream, FStreamableDelegate::CreateLambda([delegate = MoveTemp(delegate), targetsToStream]()

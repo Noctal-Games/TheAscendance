@@ -2,6 +2,7 @@
 
 
 #include "GameEventSubsystem.h"
+#include "TheAscendance/Core/CoreMacros.h"
 
 void UGameEventSubsystem::NotifyItemPickup(int id, int amount)
 {

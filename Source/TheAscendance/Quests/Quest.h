@@ -25,7 +25,8 @@ public:
 	FGameplayTag GetQuestTag() const;
 
 protected:
-	bool IsComplete() const;
+	bool IsComplete(bool update) const;
+	void UpdateObjective();
 
 private:
 	UPROPERTY()
@@ -33,4 +34,6 @@ private:
 
 	UPROPERTY()
 	TArray<TObjectPtr<UBaseObjectiveNode>> m_Objectives;
+
+	TWeakObjectPtr<UBaseObjectiveNode> m_ActiveObjective = nullptr;
 };

@@ -9,6 +9,7 @@
 #include "TheAscendance/AI/TAAIController.h"
 #include "TheAscendance/AI/Components/HSMAgentComponent.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
+#include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
 #include "Structs/EnemyData.h"
 
 #include "Components/CapsuleComponent.h"
@@ -25,12 +26,13 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 
 	if (data == nullptr)
 	{
-		LOG_ERROR("Tried to Init BaseEnemy with invalid EnemyTableData")
+		LOG_ERROR("[BASE ENEMY] Tried to Init BaseEnemy with invalid EnemyTableData")
 		return;
 	}
 
-	TArray<FSoftObjectPath> assetPaths;
+	m_EnemyID = data->EnemyID;
 
+	TArray<FSoftObjectPath> assetPaths;
 	m_SkeletalMesh = data->EnemyMesh;
 
 	if (m_SkeletalMesh.IsNull() == false)
@@ -39,7 +41,7 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 	}
 	else
 	{
-		LOG_ERROR("Tried to Init BaseEnemy with invalid EnemyMesh");
+		LOG_ERROR("[BASE ENEMY] Tried to Init BaseEnemy with invalid EnemyMesh");
 	}
 
 	m_AnimationBP = data->EnemyAnimationBP;
@@ -50,7 +52,7 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 	}
 	else
 	{
-		LOG_ERROR("Tried to Init BaseEnemy with invalid EnemyAnimationBP");
+		LOG_ERROR("[BASE ENEMY]Tried to Init BaseEnemy with invalid EnemyAnimationBP");
 	}
 
 	UCoreFunctionLibrary::RequestAsyncLoad(assetPaths, [this]() { SetSkeletalMesh(); });
@@ -100,7 +102,7 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 	}
 	else
 	{
-		LOG_ERROR("Failed to initalise HSM_Agent");
+		LOG_ERROR("[BASE ENEMY] Failed to initalise HSM_Agent");
 	}
 }
 
@@ -116,7 +118,7 @@ void ABaseEnemy::SetSkeletalMesh()
 		}
 		else
 		{
-			LOG_ERROR("BaseEnemy AnimationBP is invalid");
+			LOG_ERROR("[BASE ENEMY] BaseEnemy AnimationBP is invalid");
 		}
 
 		FBoxSphereBounds bounds = GetMesh()->Bounds;
@@ -130,7 +132,22 @@ void ABaseEnemy::SetSkeletalMesh()
 	}
 	else
 	{
-		LOG_ERROR("BaseEnemy SkeletalMesh is invalid");
+		LOG_ERROR("[BASE ENEMY] BaseEnemy SkeletalMesh is invalid");
+	}
+}
+
+void ABaseEnemy::Damage(int amount)
+{
+	ABaseCharacter::Damage(amount);
+
+	if (IsDead() == false)
+	{
+		return;
+	}
+
+	if (UGameEventSubsystem* gameEvent = GetWorld()->GetGameInstance()->GetSubsystem<UGameEventSubsystem>())
+	{
+		gameEvent->NotifyEnemyKilled(m_EnemyID);
 	}
 }
 
@@ -138,7 +155,7 @@ void ABaseEnemy::SetDestination(const FVector& destination)
 {
 	if (m_Controller.IsValid() == false)
 	{
-		LOG_ERROR("Tried to set destination with invalid controller");
+		LOG_ERROR("[BASE ENEMY] Tried to set destination with invalid controller");
 		return;
 	}
 
@@ -159,7 +176,7 @@ bool ABaseEnemy::HasPath() const
 {
 	if (m_Controller.IsValid() == false)
 	{
-		LOG_ERROR("Tried to get HasPath with invalid Controller");
+		LOG_ERROR("[BASE ENEMY] Tried to get HasPath with invalid Controller");
 		return true;
 	}
 
@@ -180,7 +197,7 @@ void ABaseEnemy::SetFocus(AActor* target)
 {
 	if (m_Controller.IsValid() == false)
 	{
-		LOG_ERROR("Tried to set focus with invalid controller");
+		LOG_ERROR("[BASE ENEMY] Tried to set focus with invalid controller");
 		return;
 	}
 
@@ -191,7 +208,7 @@ void ABaseEnemy::ClearFocus()
 {
 	if (m_Controller.IsValid() == false)
 	{
-		LOG_ERROR("Tried to clear focus with invalid controller");
+		LOG_ERROR("[BASE ENEMY] Tried to clear focus with invalid controller");
 		return;
 	}
 

@@ -179,12 +179,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	ABaseCharacter::Tick(DeltaTime);
 
-	LOG_ONSCREEN(0, 1, FColor::Yellow, "USING ANIMATIONS: %s", m_AnimTest ? TEXT("TRUE") : TEXT("FALSE"));
+	LOG_ONSCREEN(0, 1, FColor::Yellow, "[PLAYER CHARACTER] USING ANIMATIONS: %s", m_AnimTest ? TEXT("TRUE") : TEXT("FALSE"));
 }
 
 void APlayerCharacter::TestFunction1()
 {
-	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 1");
+	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "[PLAYER CHARACTER] TEST 1");
 	m_AnimTest = !m_AnimTest;
 
 	if (m_TestSound != nullptr)
@@ -201,13 +201,13 @@ void APlayerCharacter::TestFunction1()
 
 void APlayerCharacter::TestFunction2()
 {
-	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 2");
+	//LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 2");
 	//EndMainHandAttack();
 	//EndOffHandAttack();
 
 	if (m_TestSpell == nullptr)
 	{
-		LOG_ONSCREEN(-1, 1.0f, FColor::Red, "TestSpell is invalid");
+		LOG_ONSCREEN(-1, 1.0f, FColor::Red, "[PLAYER CHARACTER] TestSpell is invalid");
 		return;
 	}
 
@@ -219,7 +219,7 @@ void APlayerCharacter::TestFunction2()
 
 void APlayerCharacter::TestFunction3()
 {
-	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 3");
+	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "[PLAYER CHARACTER] TEST 3");
 
 	if (m_TestEquipToggle == false)
 	{

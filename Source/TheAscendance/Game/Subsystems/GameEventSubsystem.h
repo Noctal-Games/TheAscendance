@@ -8,11 +8,11 @@
 
 //C++ only delegates for internal systems, better for performance. Also executed first.
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemPickup, int, int);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnEnemyKilled, int);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnEnemyKilled, int id);
 
 //BP assignable delegates for design exposure, less performant but more flexible
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickupBP, int, ID, int, Amount);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyKilledBP, int, ID);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickupBP, int, id, int, amount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyKilledBP, int, id);
 
 UCLASS()
 class THEASCENDANCE_API UGameEventSubsystem : public UGameInstanceSubsystem
@@ -22,6 +22,7 @@ class THEASCENDANCE_API UGameEventSubsystem : public UGameInstanceSubsystem
 public:
 	void NotifyItemPickup(int id, int amount);
 	void NotifyEnemyKilled(int id);
+	//void NotifyLocationEnterred(string locationName(?))
 
 	virtual void Initialize(FSubsystemCollectionBase& collection) override;
 	virtual void Deinitialize() override;
