@@ -8,7 +8,7 @@
 
 class APlayableGameMode;
 class APlayerCharacter;
-class ATAPlayerController;
+class ACustomPlayerController;
 class UDataHandlerSubsystem;
 class UQuestManagerSubsystem;
 
@@ -27,7 +27,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Core")
 	static APlayerCharacter* GetPlayerCharacter();
 	UFUNCTION(BlueprintPure, Category = "Core")
-	static ATAPlayerController* GetPlayerController();
+	static ACustomPlayerController* GetPlayerController();
 
 	UFUNCTION(BlueprintCallable, Category = "Core - Logging")
 	static void LogInfo(FString string);

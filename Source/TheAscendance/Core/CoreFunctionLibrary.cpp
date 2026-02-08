@@ -3,7 +3,7 @@
 
 #include "CoreFunctionLibrary.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
-#include "TheAscendance/Characters/Player/TAPlayerController.h"
+#include "TheAscendance/Characters/Player/CustomPlayerController.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Game/Subsystems/DataHandlerSubsystem.h"
 #include "TheAscendance/Game/Subsystems/QuestManagerSubsystem.h"
@@ -49,9 +49,9 @@ APlayerCharacter* UCoreFunctionLibrary::GetPlayerCharacter()
 	return nullptr;
 }
 
-ATAPlayerController* UCoreFunctionLibrary::GetPlayerController()
+ACustomPlayerController* UCoreFunctionLibrary::GetPlayerController()
 {
-	if (ATAPlayerController* controller = Cast<ATAPlayerController>(UGameplayStatics::GetPlayerController(GetGameWorld(), 0)))
+	if (ACustomPlayerController* controller = Cast<ACustomPlayerController>(UGameplayStatics::GetPlayerController(GetGameWorld(), 0)))
 	{
 		return controller;
 	}

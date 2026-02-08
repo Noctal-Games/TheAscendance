@@ -31,12 +31,12 @@ APlayerCharacter::APlayerCharacter() : ABaseCharacter()
 	m_Camera->bUsePawnControlRotation = true;
 }
 
-void APlayerCharacter::SetPlayerController(ATAPlayerController* PlayerController)
+void APlayerCharacter::SetPlayerController(ACustomPlayerController* PlayerController)
 {
 	m_PlayerController = PlayerController;
 }
 
-ATAPlayerController* APlayerCharacter::GetPlayerController()
+ACustomPlayerController* APlayerCharacter::GetPlayerController()
 {
 	return m_PlayerController;
 }
