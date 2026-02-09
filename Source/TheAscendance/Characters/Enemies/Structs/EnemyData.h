@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Characters/Structs/LoadoutSlotData.h"
+#include "TheAscendance/AI/Actions/Attacks/Structs/AttackData.h"
 #include "GameplayTags.h"
 #include "EnemyData.generated.h"
 
@@ -87,6 +88,8 @@ struct FEnemyData
 	FEnemyStats EnemyStats;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FEnemyEquipmentData EnemyEquipment;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FAttackSetData AttackSet;
 };
 
 USTRUCT(BlueprintType)

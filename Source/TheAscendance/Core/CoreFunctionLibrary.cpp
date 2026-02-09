@@ -3,9 +3,10 @@
 
 #include "CoreFunctionLibrary.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
-#include "TheAscendance/Characters/Player/TAPlayerController.h"
+#include "TheAscendance/Characters/Player/CustomPlayerController.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Game/Subsystems/DataHandlerSubsystem.h"
+#include "TheAscendance/Game/Subsystems/QuestManagerSubsystem.h"
 #include "TheAscendance/Core/CoreMacros.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -22,7 +23,7 @@ UWorld* UCoreFunctionLibrary::GetGameWorld()
 		}
 	}
 
-	LOG_ERROR("Unable to find a valid Game World Context");
+	LOG_ERROR("[CORE] Unable to find a valid Game World Context");
 	return nullptr;
 }
 
@@ -33,7 +34,7 @@ APlayableGameMode* UCoreFunctionLibrary::GetPlayableGameMode()
 		return world->GetAuthGameMode<APlayableGameMode>();
 	}
 
-	LOG_ERROR("GameWorld was invalid");
+	LOG_ERROR("[CORE] GameWorld was invalid");
 	return nullptr;
 }
 
@@ -44,18 +45,18 @@ APlayerCharacter* UCoreFunctionLibrary::GetPlayerCharacter()
 		return player;
 	}
 
-	LOG_ERROR("PlayerCharacter was invalid");
+	LOG_ERROR("[CORE] PlayerCharacter was invalid");
 	return nullptr;
 }
 
-ATAPlayerController* UCoreFunctionLibrary::GetPlayerController()
+ACustomPlayerController* UCoreFunctionLibrary::GetPlayerController()
 {
-	if (ATAPlayerController* controller = Cast<ATAPlayerController>(UGameplayStatics::GetPlayerController(GetGameWorld(), 0)))
+	if (ACustomPlayerController* controller = Cast<ACustomPlayerController>(UGameplayStatics::GetPlayerController(GetGameWorld(), 0)))
 	{
 		return controller;
 	}
 
-	LOG_ERROR("PlayerController was invalid");
+	LOG_ERROR("[CORE] PlayerController was invalid");
 	return nullptr;
 }
 
@@ -102,13 +103,24 @@ UDataHandlerSubsystem* UCoreFunctionLibrary::GetDataHandlerSubsystem()
 		return world->GetGameInstance()->GetSubsystem<UDataHandlerSubsystem>();
 	}
 
-	LOG_ERROR("GameWorld was invalid");
+	LOG_ERROR("[CORE] GameWorld was invalid");
+	return nullptr;
+}
+
+UQuestManagerSubsystem* UCoreFunctionLibrary::GetQuestManagerSubsystem()
+{
+	if (UWorld* world = GetGameWorld())
+	{
+		return world->GetGameInstance()->GetSubsystem<UQuestManagerSubsystem>();
+	}
+
+	LOG_ERROR("[CORE] GameWorld was invalid");
 	return nullptr;
 }
 
 void UCoreFunctionLibrary::RequestAsyncLoad(const FSoftObjectPath& targetToStream, TFunction<void()> delegate)
 {
-	LOG_INFO("Requesting ASync Load for: %s", *targetToStream.ToString());
+	LOG_INFO("[CORE] Requesting ASync Load for: %s", *targetToStream.ToString());
 
 	UAssetManager::GetStreamableManager().RequestAsyncLoad(targetToStream, FStreamableDelegate::CreateLambda([delegate = MoveTemp(delegate), targetToStream]()
 		{
@@ -135,7 +147,7 @@ void UCoreFunctionLibrary::RequestAsyncLoad(const TArray<FSoftObjectPath>& targe
 {
 	if (targetsToStream.Num() == 0)
 	{
-		LOG_WARNING("Tried to RequestASyncLoad for multiple items, but the array was empty");
+		LOG_WARNING("[CORE] Tried to RequestASyncLoad for multiple items, but the array was empty");
 
 		if (delegate.IsSet())
 		{
@@ -146,12 +158,12 @@ void UCoreFunctionLibrary::RequestAsyncLoad(const TArray<FSoftObjectPath>& targe
 	}
 	else if (targetsToStream.Num() == 1)
 	{
-		LOG_WARNING("Requesting ASync Load for multiple items, but the array only contains one item. Consider using the single load alternative.");
+		LOG_WARNING("[CORE] Requesting ASync Load for multiple items, but the array only contains one item. Consider using the single load alternative.");
 	}
 
 	for (const FSoftObjectPath& path : targetsToStream)
 	{
-		LOG_INFO("Requesting ASync Load for: %s", *path.ToString());
+		LOG_INFO("[CORE] Requesting ASync Load for: %s", *path.ToString());
 	}
 
 	UAssetManager::GetStreamableManager().RequestAsyncLoad(targetsToStream, FStreamableDelegate::CreateLambda([delegate = MoveTemp(delegate), targetsToStream]()
@@ -162,11 +174,11 @@ void UCoreFunctionLibrary::RequestAsyncLoad(const TArray<FSoftObjectPath>& targe
 
 				if (loadedObject != nullptr)
 				{
-					LOG_INFO("Successful ASync Load for: %s", *path.ToString());
+					LOG_INFO("[CORE] Successful ASync Load for: %s", *path.ToString());
 					continue;
 				}
 				
-				LOG_ERROR("Failed ASync Load for: %s", *path.ToString());
+				LOG_ERROR("[CORE] Failed ASync Load for: %s", *path.ToString());
 			}
 
 			if (delegate.IsSet())

@@ -14,4 +14,11 @@ class THEASCENDANCE_API UCooldownAttackState : public UAbstractAttackState
 {
 	GENERATED_BODY()
 	
+public:
+	virtual void StartState(UHSMAgentComponent* agent) override;
+	virtual void Update(float deltaTime) override;
+	virtual void EndState() override;
+
+private:
+	FTimerHandle m_CooldownTimerHandle;
 };

@@ -47,3 +47,12 @@ struct FLungeAttackData : public FAttackData
 
 	FLungeAttackData() : FAttackData(EMeleeAttackType::LUNGE_ATTACK) {};
 };
+
+USTRUCT(BlueprintType)
+struct FAttackSetData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	FQuickAttackData QuickAttackData;
+};

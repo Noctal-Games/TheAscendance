@@ -3,3 +3,14 @@
 
 #include "CooldownAttackState.h"
 
+void UCooldownAttackState::StartState(UHSMAgentComponent* agent)
+{
+}
+
+void UCooldownAttackState::Update(float deltaTime)
+{
+}
+
+void UCooldownAttackState::EndState()
+{
+}

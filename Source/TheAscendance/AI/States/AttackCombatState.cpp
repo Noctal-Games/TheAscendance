@@ -37,7 +37,7 @@ void UAttackCombatState::StartState(UHSMAgentComponent* owningAgent)
 
 void UAttackCombatState::Update(float deltaTime)
 {
-	if (m_AttackStates.Num() == 0 || m_AttackStates[m_CurrentAttackState] == nullptr)
+	if (m_AttackStates.IsEmpty() == true || m_AttackStates.Contains(m_CurrentAttackState) == false|| m_AttackStates[m_CurrentAttackState] == nullptr)
 	{
 		return;
 	}
