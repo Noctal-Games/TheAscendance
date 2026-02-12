@@ -34,6 +34,10 @@ void ACustomPlayerController::OnPossess(APawn* pawn)
 
         subsystem->CreateHUD();
     }
+    else
+    {
+        LOG_ERROR("[PLAYER CONTROLLER] Failed to get CustomLocalPlayerSubsystem");
+    }
 }
 
 void ACustomPlayerController::OnUnPossess()

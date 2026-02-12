@@ -494,6 +494,11 @@ void ABaseCharacter::UnEquipItem(EEquippablePart part)
 	}
 }
 
+UCharacterStatsComponent* ABaseCharacter::GetCharacterStatsComponent()
+{
+	return m_CharacterStatsComponent;
+}
+
 void ABaseCharacter::UpdateTurnTowards()
 {
 }
@@ -569,7 +574,16 @@ void ABaseCharacter::BeginPlay()
 		}
 	}
 
-	m_CharacterStatsComponent->OnSpeedChanged.BindLambda([this](float walkSpeed) { GetCharacterMovement()->MaxWalkSpeed = walkSpeed; });
+	m_CharacterStatsComponent->OnStatChanged.AddLambda([this](ECharacterStat stat, float walkSpeed, float ignore) 
+		{ 
+			if(stat != ECharacterStat::WALK_SPEED)
+			{
+				return;
+			}
+
+			GetCharacterMovement()->MaxWalkSpeed = walkSpeed; 
+		});
+
 	m_CharacterStatsComponent->Init();
 
 	//Test

@@ -7,8 +7,7 @@
 #include "TheAscendance/Characters/Enums/CharacterStat.h"
 #include "CharacterStatsComponent.generated.h"
 
-DECLARE_DELEGATE_TwoParams(FOnStatChanged, float, float);
-DECLARE_DELEGATE_OneParam(FOnSpeedStatChanged, float);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnStatChanged, ECharacterStat, float, float);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class THEASCENDANCE_API UCharacterStatsComponent : public UActorComponent
@@ -46,10 +45,7 @@ private:
 	void LogStatError(ECharacterStat stat);
 
 public:
-	FOnStatChanged OnStaminaChanged;
-	FOnStatChanged OnHealthChanged;
-	FOnStatChanged OnManaChanged;
-	FOnSpeedStatChanged OnSpeedChanged;
+	FOnStatChanged OnStatChanged;
 
 private:
 	UPROPERTY()

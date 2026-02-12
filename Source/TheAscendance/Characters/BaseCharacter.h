@@ -99,9 +99,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 protected:
 	friend class ULoadoutComponent;
+	friend class UPlayerHUD;
 
 	bool EquipItem(EEquippablePart part, int itemID);
 	void UnEquipItem(EEquippablePart part);
+
+	UCharacterStatsComponent* GetCharacterStatsComponent();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
