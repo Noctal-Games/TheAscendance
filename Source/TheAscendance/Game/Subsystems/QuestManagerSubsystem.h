@@ -18,6 +18,7 @@ struct FObjectiveTypeData;
 struct FObjectiveGoalData;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnQuestItemPickup, int32 /*id*/, int32 /*amount*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnQuestEnemyKilled, int32 /*id*/);
 
 UCLASS()
 class THEASCENDANCE_API UQuestManagerSubsystem : public UGameInstanceSubsystem
@@ -48,8 +49,11 @@ private:
 
 protected:
 	friend class UGatherObjectiveGoal;
+	friend class UKillAnyObjectiveGoal;
+	friend class UKillTypeObjectiveGoal;
 
 	FOnQuestItemPickup OnItemPickupEvent;
+	FOnQuestEnemyKilled OnEnemyKilledEvent;
 
 private:
 	FDelegateHandle OnItemPickupGameEventHandle;
