@@ -12,7 +12,7 @@ enum class EWidgets : uint8
 	PLAYER_HUD
 };
 
-class UCommonUserWidget;
+class UPlayerHUD;
 
 UCLASS(Blueprintable)
 class THEASCENDANCE_API UUIManagerSubsystem : public UGameInstanceSubsystem
@@ -25,7 +25,11 @@ public:
 
 	virtual bool ShouldCreateSubsystem(UObject* outer) const override;
 
+protected:
+	friend class UCustomLocalPlayerSubsystem;
+	UPlayerHUD* CreatePlayerHUD();
+
 private:
 	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Widget Defaults"))
-	TMap<EWidgets, TSubclassOf<UCommonUserWidget>> m_WidgetDefaults;
+	TMap<EWidgets, TSubclassOf<UUserWidget>> m_WidgetDefaults;
 };

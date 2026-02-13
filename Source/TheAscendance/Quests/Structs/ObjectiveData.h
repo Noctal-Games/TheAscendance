@@ -31,6 +31,28 @@ struct FGatherGoal : public FObjectiveGoalData
 	UPROPERTY(EditDefaultsOnly)
 	int Amount = 0;
 };
+USTRUCT(BlueprintType, meta = (ToolTip = "Kill specified amount of enemies of any type"))
+struct FKillAnyGoal : public FObjectiveGoalData
+{
+	GENERATED_BODY()
+
+	FKillAnyGoal() : FObjectiveGoalData(EObjectiveGoalType::KILL_ANY) {};
+
+	UPROPERTY(EditDefaultsOnly)
+	int Amount = 0;
+};
+USTRUCT(BlueprintType, meta = (ToolTip = "Kill specified amount of a specific enemy type"))
+struct FKillTypeGoal : public FObjectiveGoalData
+{
+	GENERATED_BODY()
+
+	FKillTypeGoal() : FObjectiveGoalData(EObjectiveGoalType::KILL_TYPE) {};
+
+	UPROPERTY(EditDefaultsOnly)
+	int EnemyID = -1;
+	UPROPERTY(EditDefaultsOnly)
+	int Amount = 0;
+};
 
 // OBJECTIVE TYPES
 USTRUCT()

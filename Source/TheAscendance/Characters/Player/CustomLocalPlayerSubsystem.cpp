@@ -4,8 +4,10 @@
 #include "CustomLocalPlayerSubsystem.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Game/Subsystems/UIManagerSubsystem.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 #include "TheAscendance/Characters/Player/CustomPlayerController.h"
+#include "TheAscendance/UI/Widgets/HUD/PlayerHUD.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -13,7 +15,13 @@
 
 void UCustomLocalPlayerSubsystem::ToggleHUDVisibility(bool isVisible)
 {
-	// Handle HUD Visibility Toggle
+	if(m_HUDWidget == nullptr)
+	{
+		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Attempted to toggle HUD visibility but HUD Widget reference was null");
+		return;
+	}
+
+	m_HUDWidget->SetVisibility(isVisible ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 }
 
 void UCustomLocalPlayerSubsystem::SetPlayer(APlayerCharacter* player)
@@ -33,6 +41,8 @@ void UCustomLocalPlayerSubsystem::Initialize(FSubsystemCollectionBase& Collectio
 
 void UCustomLocalPlayerSubsystem::Deinitialize()
 {
+	DestroyHUD();
+
 	Super::Deinitialize();
 }
 
@@ -48,7 +58,33 @@ bool UCustomLocalPlayerSubsystem::ShouldCreateSubsystem(UObject* Outer) const
 
 void UCustomLocalPlayerSubsystem::CreateHUD()
 {
-	// Handle HUD Creation
+	if(m_PlayerCharacter.IsValid() == false)
+	{
+		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Attempted to create HUD with invalid PlayerCharacter reference");
+		return;
+	}
+
+	if(UUIManagerSubsystem* uiManager = UCoreFunctionLibrary::GetUIManagerSubsystem())
+	{
+		if (m_HUDWidget = uiManager->CreatePlayerHUD())
+		{
+			m_HUDWidget->Init(m_PlayerCharacter.Get());
+			m_HUDWidget->AddToViewport();
+		}
+	}
+	else
+	{
+		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Failed to get UIManager reference");
+	}
+}
+
+void UCustomLocalPlayerSubsystem::DestroyHUD()
+{	
+	if (m_HUDWidget != nullptr)
+	{
+		m_HUDWidget->RemoveFromParent();
+		m_HUDWidget = nullptr;
+	}
 }
 
 void UCustomLocalPlayerSubsystem::SetupInput(UEnhancedInputComponent* enhancedInputComponent)
@@ -59,11 +95,6 @@ void UCustomLocalPlayerSubsystem::SetupInput(UEnhancedInputComponent* enhancedIn
 	{
 		inputSubsystem->AddMappingContext(InputMappingContext, 0);
 	}
-}
-
-void UCustomLocalPlayerSubsystem::DestroyHUD()
-{	
-	// Handle HUD Destruction
 }
 
 void UCustomLocalPlayerSubsystem::HandleLook(const FInputActionValue& value)
@@ -239,7 +270,7 @@ void UCustomLocalPlayerSubsystem::BindActions(UEnhancedInputComponent* enhancedI
 	enhancedInputComponent->BindAction(ActionSprint, ETriggerEvent::Started, this, &UCustomLocalPlayerSubsystem::HandleStartSprint);
 	enhancedInputComponent->BindAction(ActionSprint, ETriggerEvent::Completed, this, &UCustomLocalPlayerSubsystem::HandleEndSprint);
 
-	checkf(ActionSprint, TEXT("[LOCAL PLAYER SUBSYSTEM] Missing 'Crouch' Action"));
+	checkf(ActionCrouch, TEXT("[LOCAL PLAYER SUBSYSTEM] Missing 'Crouch' Action"));
 	enhancedInputComponent->BindAction(ActionCrouch, ETriggerEvent::Started, this, &UCustomLocalPlayerSubsystem::HandleStartCrouch);
 	enhancedInputComponent->BindAction(ActionCrouch, ETriggerEvent::Completed, this, &UCustomLocalPlayerSubsystem::HandleEndCrouch);
 

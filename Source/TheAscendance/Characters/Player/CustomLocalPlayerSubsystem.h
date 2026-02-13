@@ -12,6 +12,7 @@ class UEnhancedInputComponent;
 class UInputMappingContext;
 class UInputAction;
 class ACustomPlayerController;
+class UPlayerHUD;
 
 UCLASS(Blueprintable)
 class THEASCENDANCE_API UCustomLocalPlayerSubsystem : public ULocalPlayerSubsystem
@@ -108,7 +109,7 @@ public:
 
 private:
 	UPROPERTY()
-	TObjectPtr<UCommonUserWidget> m_HUDWidget = nullptr;
+	TObjectPtr<UPlayerHUD> m_HUDWidget = nullptr;
 
 	TWeakObjectPtr<ACustomPlayerController> m_Controller = nullptr;
 	TWeakObjectPtr<APlayerCharacter> m_PlayerCharacter = nullptr;
