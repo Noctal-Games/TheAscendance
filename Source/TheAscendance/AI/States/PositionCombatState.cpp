@@ -51,7 +51,9 @@ void UPositionCombatState::Update(float deltaTime)
 
 	if (m_Agent->IsTargetTooClose(targetLocation) == true)
 	{
-		moveToLocation -= (targetLocation - ownerLocation);
+		m_Agent->SetCombatState(ECombatState::ATTACK);
+		return;
+		//moveToLocation -= (targetLocation - ownerLocation);
 
 		//Setup too close options, will need movement component
 		//Backstep

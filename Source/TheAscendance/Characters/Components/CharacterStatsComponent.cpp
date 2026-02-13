@@ -103,7 +103,7 @@ void UCharacterStatsComponent::AdjustStatByValue(ECharacterStat stat, float amou
 		return;
 	}
 
-	LOG_ONSCREEN(-1, 3.0f, FColor::Green, "STAT: %s CHANGED FROM %.0f TO %.0f", *UEnum::GetValueAsString(stat), m_Stats[stat], m_Stats[stat] + amount);
+	LOG_ONSCREEN(-1, 3.0f, FColor::Green, "[CHARACTER STATS COMPONENT] STAT: %s CHANGED FROM %.0f TO %.0f", *UEnum::GetValueAsString(stat), m_Stats[stat], m_Stats[stat] + amount);
 
 	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA)
 	{
@@ -294,12 +294,12 @@ void UCharacterStatsComponent::ExecuteBindings(ECharacterStat stat)
 
 void UCharacterStatsComponent::LogStatWarning(ECharacterStat stat)
 {
-	LOG_WARNING("%s HAS NO BASE_%s", *GetOwner()->GetName(), *UEnum::GetValueAsString(stat));
+	LOG_WARNING("[CHARACTER STATS COMPONENT] %s HAS NO BASE_%s", *GetOwner()->GetName(), *UEnum::GetValueAsString(stat));
 }
 
 void UCharacterStatsComponent::LogStatError(ECharacterStat stat)
 {
-	LOG_ERROR("%s HAS NO %s STAT", *GetOwner()->GetName(), *UEnum::GetValueAsString(stat));
+	LOG_ERROR("[CHARACTER STATS COMPONENT] %s HAS NO %s STAT", *GetOwner()->GetName(), *UEnum::GetValueAsString(stat));
 }
 
 

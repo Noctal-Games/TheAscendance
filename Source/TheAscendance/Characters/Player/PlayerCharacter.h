@@ -8,7 +8,7 @@
 
 class UPlayerMovementComponent;
 class UCameraComponent;
-class ATAPlayerController;
+class ACustomPlayerController;
 class ISpell;
 class USoundBase;
 
@@ -21,11 +21,14 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
-	void SetPlayerController(ATAPlayerController* PlayerController);
-	ATAPlayerController* GetPlayerController();
+	void SetPlayerController(ACustomPlayerController* PlayerController);
+	ACustomPlayerController* GetPlayerController();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Player Camera"))
 	TObjectPtr<UCameraComponent> m_Camera = nullptr;
+
+	UFUNCTION(BlueprintCallable)
+	void PickupItem(int id, int amount);
 
 	void SetIsSprinting(bool val);
 
@@ -62,7 +65,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<UPlayerMovementComponent> m_MovementComponent = nullptr;
 	UPROPERTY()
-	TObjectPtr<ATAPlayerController> m_PlayerController = nullptr;
+	TObjectPtr<ACustomPlayerController> m_PlayerController = nullptr;
 
 	float m_CrouchCapsuleHeight = 0.0f;
 	float m_CurrentCapsuleHeight = 0.0f;

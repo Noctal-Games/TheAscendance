@@ -1,0 +1,39 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/NoExportTypes.h"
+#include "GameplayTagContainer.h"
+#include "Quest.generated.h"
+
+class UQuestData;
+class UBaseObjectiveNode;
+
+UCLASS()
+class THEASCENDANCE_API UQuest : public UObject
+{
+	GENERATED_BODY()
+	
+public:
+	void Init(UQuestData* questData);
+	void StartQuest();
+
+	void CheckCompletion();
+	void MarkAsComplete();
+
+	FGameplayTag GetQuestTag() const;
+
+protected:
+	bool IsComplete(bool update) const;
+	void UpdateObjective();
+
+private:
+	UPROPERTY()
+	TObjectPtr<UQuestData> m_QuestData = nullptr;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UBaseObjectiveNode>> m_Objectives;
+
+	TWeakObjectPtr<UBaseObjectiveNode> m_ActiveObjective = nullptr;
+};

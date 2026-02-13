@@ -368,13 +368,21 @@ float ABaseCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float pl
 {
 	if (montageToPlay == nullptr)
 	{
-		LOG_ERROR("Tried to play null animation montage");
+		LOG_ERROR("Tried to play invalid animation montage");
 		return 0.0f;
 	}
 
-	float duration = GetMesh()->GetAnimInstance()->Montage_Play(montageToPlay, playRate);
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 
-	if (startSection != NAME_None)
+	if(animInstance == nullptr)
+	{
+		LOG_ERROR("Tried to play animation montage with invalid anim instance");
+		return 0.0f;
+	}
+
+	float duration = animInstance->Montage_Play(montageToPlay, playRate);
+
+	if (startSection.IsNone() == false)
 	{
 		GetMesh()->GetAnimInstance()->Montage_JumpToSection(startSection, montageToPlay);
 	}

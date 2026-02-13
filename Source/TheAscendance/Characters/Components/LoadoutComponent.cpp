@@ -23,7 +23,7 @@ void ULoadoutComponent::EquipItem(EEquippablePart part, int itemID)
 
 		if(m_Owner.IsValid() == false)
 		{
-			LOG_ERROR("LoadoutComponent has invalid owner");
+			LOG_ERROR("[LOADOUT COMPONENT] LoadoutComponent has invalid owner");
 			return;
 		}
 	}
@@ -32,12 +32,12 @@ void ULoadoutComponent::EquipItem(EEquippablePart part, int itemID)
 
 	if(m_Owner->EquipItem(part, itemID) == false)
 	{
-		LOG_ERROR("%s failed to equip item %i", *m_Owner->GetName(), itemID);
+		LOG_ERROR("[LOADOUT COMPONENT] %s failed to equip item %i", *m_Owner->GetName(), itemID);
 		return;
 	}
 
 	m_Loadout.Add(MakeShared<FLoadoutSlotData>(itemID, part));
-	LOG_INFO("%s equipped item %i", *m_Owner->GetName(), itemID);
+	LOG_INFO("[LOADOUT COMPONENT] %s equipped item %i", *m_Owner->GetName(), itemID);
 }
 
 void ULoadoutComponent::UnEquipItem(EEquippablePart part)
@@ -46,7 +46,7 @@ void ULoadoutComponent::UnEquipItem(EEquippablePart part)
 	{
 		if (data->EquippedPart == part)
 		{
-			LOG_INFO("%s unequipped item %i", *m_Owner->GetName(), data->ItemID);
+			LOG_INFO("[LOADOUT COMPONENT] %s unequipped item %i", *m_Owner->GetName(), data->ItemID);
 			data->ItemID = 0;
 			m_Owner->UnEquipItem(part);
 			return;

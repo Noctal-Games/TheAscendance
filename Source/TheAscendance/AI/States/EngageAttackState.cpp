@@ -17,11 +17,28 @@ void UEngageAttackState::StartState(UHSMAgentComponent* agent)
 		return;
 	}
 
-	/*if(FQuickAttackData* attackData = Cast<FQuickAttackData>(m_Agent->GetMeleeAttackData(EMeleeAttackType::QUICK_ATTACK)))
+	const FAttackSetData* attackSetData = m_Agent->GetAttackSetData();
+
+	if(attackSetData == nullptr)
+	{
+		LOG_ERROR("EngageAttackState could not get AttackSetData from HSMAgentComponent");
+		return;
+	}
+
+	//Attack decision logic would go here to pick which attack to use
+
+	if(const FQuickAttackData* attackData = &attackSetData->QuickAttackData)
 	{
 		m_AttackCombatState->m_CurrentTelegraphMontage = attackData->TelegraphMontage;
+		m_AttackCombatState->m_CurrentAttackMontage = attackData->AttackMontage;
 
-		UCoreFunctionLibrary::RequestAsyncLoad(attackData->AttackMontage.ToSoftObjectPath(), [this, attackData]()
+		if (m_AttackCombatState->m_CurrentTelegraphMontage.IsNull() == true)
+		{
+			LOG_ERROR("TelegraphMontage for QuickAttackData was invalid");
+			return;
+		}
+
+		UCoreFunctionLibrary::RequestAsyncLoad(m_AttackCombatState->m_CurrentTelegraphMontage.ToSoftObjectPath(), [this, attackData]()
 			{
 				m_AttackCombatState->SetAttackState(EAttackState::TELEGRAPH);
 			}
@@ -29,8 +46,8 @@ void UEngageAttackState::StartState(UHSMAgentComponent* agent)
 	}
 	else
 	{
-		LOG_ERROR("EngageAttackState could not get QuickAttackData from HSMAgentComponent");
-	}*/
+		LOG_ERROR("EngageAttackState could not get QuickAttackData from AttackSetData");
+	}
 }
 
 void UEngageAttackState::Update(float deltaTime)
@@ -41,3 +58,18 @@ void UEngageAttackState::EndState()
 {
 	UAbstractState::EndState();
 }
+
+//if(FQuickAttackData* attackData = StaticCast<FQuickAttackData*>(m_Agent->GetMeleeAttackData(EMeleeAttackType::QUICK_ATTACK)))
+//{
+//	m_AttackCombatState->m_CurrentTelegraphMontage = attackData->TelegraphMontage;
+
+//	UCoreFunctionLibrary::RequestAsyncLoad(attackData->AttackMontage.ToSoftObjectPath(), [this, attackData]()
+//		{
+//			m_AttackCombatState->SetAttackState(EAttackState::TELEGRAPH);
+//		}
+//	);
+//}
+//else
+//{
+//	LOG_ERROR("EngageAttackState could not get QuickAttackData from HSMAgentComponent");
+//}

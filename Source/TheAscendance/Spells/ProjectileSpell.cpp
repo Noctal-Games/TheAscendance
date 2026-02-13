@@ -25,7 +25,7 @@ void UProjectileSpell::Init(USpellData* spellData, ISpellCaster* spellOwner)
 	}
 	else
 	{
-		LOG_ERROR("Tried to Init ProjectileSpellBase with invalid SpellData");
+		LOG_ERROR("[PROJECTILE SPELL] Tried to Init ProjectileSpellBase with invalid SpellData");
 	}
 }
 
@@ -33,7 +33,7 @@ void UProjectileSpell::LoadHitNiagara()
 {
 	if(m_SpellData.IsValid() == false)
 	{
-		LOG_ERROR("Tried to Load HitNiagara for ProjectileSpell with invalid SpellData");
+		LOG_ERROR("[PROJECTILE SPELL] Tried to Load HitNiagara for ProjectileSpell with invalid SpellData");
 		return;
 	}
 
@@ -41,7 +41,7 @@ void UProjectileSpell::LoadHitNiagara()
 
 	if (m_HitNiagara.IsNull() == true)
 	{
-		LOG_WARNING("Tried to Load HitNiagara for ProjectileSpell with invalid SpellHitNiagara");
+		LOG_WARNING("[PROJECTILE SPELL] Tried to Load HitNiagara for ProjectileSpell with invalid SpellHitNiagara");
 		return;
 	}
 
@@ -67,7 +67,7 @@ void UProjectileSpell::Fire(FVector direction)
 {
 	if (m_DecoratedSelf == nullptr)
 	{
-		LOG_ERROR("Tried to Fire Projectile with invalid DecoratedSelf");
+		LOG_ERROR("[PROJECTILE SPELL] Tried to Fire Projectile with invalid DecoratedSelf");
 		return;
 	}
 
@@ -116,8 +116,6 @@ bool UProjectileSpell::DealDamage(AActor* hitActor, int damage)
 	if (ISusceptible* target = Cast<ISusceptible>(hitActor))
 	{
 		target->Damage(damage);
-
-		LOG_ONSCREEN(-1, 5.0f, FColor::Green, "%s", *FString(target->IsDead() ? "TARGET DEAD" : "TARGET ALIVE"));
 		return target->IsDead();
 	}
 
