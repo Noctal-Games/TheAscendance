@@ -130,4 +130,5 @@ void UQuestManagerSubsystem::HandleItemPickup(int id, int amount)
 
 void UQuestManagerSubsystem::HandleEnemyKilled(int id)
 {
+	OnEnemyKilledEvent.Broadcast(id);
 }

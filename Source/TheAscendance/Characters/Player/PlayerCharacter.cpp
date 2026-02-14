@@ -231,5 +231,16 @@ void APlayerCharacter::TestFunction3()
 	}
 
 	m_TestEquipToggle = !m_TestEquipToggle;
+
+	float rand = FMath::RandRange(0, 100);
+
+	if (rand < 50)
+	{
+		m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::SHIELD, 20);
+	}
+	else
+	{
+		m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::SHIELD, -10);
+	}
 }
 
