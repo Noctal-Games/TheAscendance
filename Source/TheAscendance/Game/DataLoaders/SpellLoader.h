@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "TheAscendance/Spells/SpellFactory.h"
+#include "GameplayTagContainer.h"
 #include "SpellLoader.generated.h"
 
 class ISpell;
 class ISpellCaster;
+struct FSpellTableData;
 
 UCLASS()
 class THEASCENDANCE_API USpellLoader : public UObject
@@ -18,7 +20,8 @@ class THEASCENDANCE_API USpellLoader : public UObject
 public:
 	void Init();
 
-	ISpell* CreateSpellFromID(int spellID, ISpellCaster* spellOwner);
+	ISpell* CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const;
+	FSpellTableData* GetSpellTableDataFromTag(const FGameplayTag& spellTag) const;
 
 private:
 	UPROPERTY()

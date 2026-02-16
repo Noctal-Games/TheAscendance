@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Characters/Enums/EquippablePart.h"
+#include "GameplayTagContainer.h"
 #include "LoadoutSlotData.generated.h"
 
 USTRUCT(BlueprintType)
@@ -11,8 +12,8 @@ struct FLoadoutSlotData
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int ItemID = 0;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Item.Equipment"))
+	FGameplayTag ItemTag;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	EEquippablePart EquippedPart = EEquippablePart::NONE;
 };

@@ -276,7 +276,7 @@ void UCharacterStatsComponent::BeginPlay()
 void UCharacterStatsComponent::ExecuteBindings(ECharacterStat stat)
 {
 	const float current = m_Stats[stat];
-	float max;
+	float max = 0.0f;
 
 	if (m_StatsMax.Contains(stat) == true)
 	{

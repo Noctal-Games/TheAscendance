@@ -3,6 +3,7 @@
 
 #include "LoadoutComponent.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Characters/BaseCharacter.h"
 
 // Sets default values for this component's properties
@@ -15,8 +16,16 @@ ULoadoutComponent::ULoadoutComponent()
 	// ...
 }
 
-void ULoadoutComponent::EquipItem(EEquippablePart part, int itemID)
+void ULoadoutComponent::EquipItem(EEquippablePart part, const FGameplayTag& itemTag)
 {
+	FGameplayTag equipmentTag = FGameplayTag::RequestGameplayTag(TEXT("Item.Equipment"));
+
+	if (itemTag.MatchesTag(equipmentTag) == false)
+	{
+		LOG_ERROR("[LOADOUT COMPONENT] Tried to equip non-equipment Item");
+		return;
+	}
+
 	if (m_Owner.IsValid() == false)
 	{
 		m_Owner = Cast<ABaseCharacter>(GetOwner());
@@ -30,33 +39,81 @@ void ULoadoutComponent::EquipItem(EEquippablePart part, int itemID)
 
 	UnEquipItem(part);
 
-	if(m_Owner->EquipItem(part, itemID) == false)
+	if(m_Owner->EquipItem(part, itemTag) == false)
 	{
-		LOG_ERROR("[LOADOUT COMPONENT] %s failed to equip item %i", *m_Owner->GetName(), itemID);
+		LOG_ERROR("[LOADOUT COMPONENT] %s failed to equip item %s", *m_Owner->GetName(), *itemTag.ToString());
 		return;
 	}
 
-	m_Loadout.Add(MakeShared<FLoadoutSlotData>(itemID, part));
-	LOG_INFO("[LOADOUT COMPONENT] %s equipped item %i", *m_Owner->GetName(), itemID);
+	m_Loadout.Add(MakeShared<FLoadoutSlotData>(itemTag, part));
+	LOG_INFO("[LOADOUT COMPONENT] %s equipped item %s", *m_Owner->GetName(), *itemTag.ToString());
+
+	if (OnEquipmentUpdated.IsBound())
+	{
+		FEquipmentMap newMap;
+
+		for (const auto& data : m_Loadout)
+		{
+			if (data.IsValid() == false)
+			{
+				continue;
+			}
+
+			newMap.Map.Add(data->EquippedPart, data->ItemTag);
+		}
+
+		OnEquipmentUpdated.Broadcast(newMap);
+	}
 }
 
 void ULoadoutComponent::UnEquipItem(EEquippablePart part)
 {
+	bool loadoutChanged = false;
+
 	for (const auto data : m_Loadout)
 	{
 		if (data->EquippedPart == part)
 		{
-			LOG_INFO("[LOADOUT COMPONENT] %s unequipped item %i", *m_Owner->GetName(), data->ItemID);
-			data->ItemID = 0;
+			LOG_INFO("[LOADOUT COMPONENT] %s unequipped item %s", *m_Owner->GetName(), *data->ItemTag.ToString());
 			m_Owner->UnEquipItem(part);
-			return;
+			m_Loadout.Remove(data);
+			loadoutChanged = true;
+			break;
 		}
+	}
+
+	if (loadoutChanged == true && OnEquipmentUpdated.IsBound())
+	{
+		FEquipmentMap newMap;
+
+		for (const auto& data : m_Loadout)
+		{
+			if (data.IsValid() == false)
+			{
+				continue;
+			}
+
+			newMap.Map.Add(data->EquippedPart, data->ItemTag);
+		}
+
+		OnEquipmentUpdated.Broadcast(newMap);
 	}
 }
 
-void ULoadoutComponent::SetSpells(const TArray<int>& spells)
+void ULoadoutComponent::SetSpells(const TArray<FGameplayTag>& spellTags)
 {
-	m_Spells = spells;
+	if (m_SpellTags == spellTags)
+	{
+		LOG_INFO("[LOADOUT COMPONENT] SetSpells made no changes")
+		return;
+	}
+
+	m_SpellTags = spellTags;
+
+	if (OnSpellsUpdated.IsBound())
+	{
+		OnSpellsUpdated.Broadcast(spellTags);
+	}
 }
 
 bool ULoadoutComponent::Contains(EEquippablePart part)

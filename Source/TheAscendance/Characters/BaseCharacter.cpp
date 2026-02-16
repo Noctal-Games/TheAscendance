@@ -9,6 +9,7 @@
 #include "TheAscendance/Effects/Components/EffectHandlerComponent.h"
 #include "TheAscendance/Items/HeldItem.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
+#include "TheAscendance/Spells/Components/SpellCasterComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -28,6 +29,8 @@ ABaseCharacter::ABaseCharacter()
 	checkf(m_CharacterTrajectoryComponent, TEXT("Character Trajectory Component failed to initialise"));
 	m_LoadoutComponent = CreateDefaultSubobject<ULoadoutComponent>(TEXT("Loadout Component"));
 	checkf(m_LoadoutComponent, TEXT("Loadout Component failed to initialise"));
+	m_SpellCasterComponent = CreateDefaultSubobject<USpellCasterComponent>(TEXT("SpellCaster Component"));
+	checkf(m_SpellCasterComponent, TEXT("SpellCaster Component failed to initialise"));
 
 	SetRootComponent(GetCapsuleComponent());
 
@@ -55,6 +58,11 @@ void ABaseCharacter::Damage(int amount)
 	}
 
 	m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::HEALTH, -amount);
+
+	if (m_CharacterStatsComponent->GetStatAsValue(ECharacterStat::HEALTH) <= 0.0f)
+	{
+		m_LoadoutComponent->OnSpellsUpdated.Remove(m_OnSpellsUpdatedHandle);
+	}
 }
 
 void ABaseCharacter::ReduceStamina(int amount)
@@ -311,12 +319,22 @@ const FVector ABaseCharacter::GetSpellOwnerForward()
 
 const FVector ABaseCharacter::GetCastStartLocation()
 {
-	return GetActorLocation();
+	if (GetCastStartFunc.IsBound() == false)
+	{
+		return GetSpellOwnerLocation();
+	}
+
+	return GetCastStartFunc.Execute();
 }
 
 const FVector ABaseCharacter::GetCastStartForward()
 {
-	return GetActorForwardVector();
+	if (GetCastForwardFunc.IsBound() == false)
+	{
+		return GetSpellOwnerForward();
+	}
+
+	return GetCastForwardFunc.Execute();
 }
 
 void ABaseCharacter::GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const
@@ -337,6 +355,17 @@ bool ABaseCharacter::HasAllMatchingGameplayTags(const FGameplayTagContainer& tag
 bool ABaseCharacter::HasAnyMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const
 {
 	return OwnedTags.HasAny(tagContainer);
+}
+
+void ABaseCharacter::CastSpell(int slot)
+{
+	if (m_SpellCasterComponent == nullptr)
+	{
+		LOG_ERROR("[BASE CHARACTER] Tried to cast spell but SpellCasterComponent was invalid");
+		return;
+	}
+
+	m_SpellCasterComponent->CastSpell(slot);
 }
 
 bool ABaseCharacter::IsSprinting()
@@ -390,9 +419,9 @@ float ABaseCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float pl
 	return duration;
 }
 
-bool ABaseCharacter::EquipItem(EEquippablePart part, int itemID)
+bool ABaseCharacter::EquipItem(EEquippablePart part, const FGameplayTag& itemTag)
 {
-	if(itemID <= 0)
+	if(itemTag.IsValid() == false)
 	{
 		UnEquipItem(part);
 		return true;
@@ -412,7 +441,7 @@ bool ABaseCharacter::EquipItem(EEquippablePart part, int itemID)
 					return false;
 				}
 
-				FItemData* itemData = gameMode->GetItemData(itemID);
+				FItemData* itemData = gameMode->GetItemData(itemTag);
 
 				if (itemData == nullptr)
 				{
@@ -435,7 +464,7 @@ bool ABaseCharacter::EquipItem(EEquippablePart part, int itemID)
 					return false;
 				}
 
-				FItemData* itemData = gameMode->GetItemData(itemID);
+				FItemData* itemData = gameMode->GetItemData(itemTag);
 
 				if (itemData == nullptr)
 				{
@@ -497,6 +526,11 @@ void ABaseCharacter::UnEquipItem(EEquippablePart part)
 UCharacterStatsComponent* ABaseCharacter::GetCharacterStatsComponent()
 {
 	return m_CharacterStatsComponent;
+}
+
+ULoadoutComponent* ABaseCharacter::GetLoadoutComponent() const
+{
+	return m_LoadoutComponent;
 }
 
 void ABaseCharacter::UpdateTurnTowards()
@@ -562,6 +596,8 @@ void ABaseCharacter::BeginPlay()
 
 			m_MainHandItem->SetActorLocation(GetMesh()->GetSocketLocation("WeaponSocket_r"));
 			m_MainHandItem->K2_AttachToComponent(GetMesh(), "WeaponSocket_r", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+
+			m_MainHandItem->m_IsOffHand = false;
 		}
 
 		if (m_OffHandItem = world->SpawnActor<AHeldItem>(AHeldItem::StaticClass()))
@@ -571,6 +607,8 @@ void ABaseCharacter::BeginPlay()
 
 			m_OffHandItem->SetActorLocation(GetMesh()->GetSocketLocation("WeaponSocket_l"));
 			m_OffHandItem->K2_AttachToComponent(GetMesh(), "WeaponSocket_l", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+
+			m_MainHandItem->m_IsOffHand = true;
 		}
 	}
 
@@ -582,9 +620,22 @@ void ABaseCharacter::BeginPlay()
 			}
 
 			GetCharacterMovement()->MaxWalkSpeed = walkSpeed; 
-		});
+		}
+	);
 
 	m_CharacterStatsComponent->Init();
+
+	m_OnSpellsUpdatedHandle = m_LoadoutComponent->OnSpellsUpdated.AddLambda([this](const TArray<FGameplayTag>& spellTags)
+		{
+			if (m_SpellCasterComponent == nullptr)
+			{
+				LOG_ERROR("[BASE CHARACTER] Tried to UpdateSpells but SpellCasterComponent is invalid")
+				return;
+			}
+
+			m_SpellCasterComponent->SetSpells(spellTags);
+		}
+	);
 
 	//Test
 	m_TestEquipToggle = false;

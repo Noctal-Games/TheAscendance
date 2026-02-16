@@ -14,7 +14,7 @@ class THEASCENDANCE_API UQuestData : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Quest"))
 	FGameplayTag QuestTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
@@ -26,7 +26,7 @@ struct FQuestlineTableData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Quest"))
 	FGameplayTag QuestlineTag;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<TSoftObjectPtr<UQuestData>> QuestData;

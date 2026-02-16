@@ -73,8 +73,6 @@ private:
 	float m_DefaultCapsuleRadius = 0.0f;
 
 	//Test
-	UPROPERTY()
-	TScriptInterface<ISpell> m_TestSpell = nullptr;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> m_TestSound = nullptr;
 };

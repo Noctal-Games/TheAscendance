@@ -17,8 +17,8 @@ class UBaseObjectiveGoal;
 struct FObjectiveTypeData;
 struct FObjectiveGoalData;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnQuestItemPickup, int32 /*id*/, int32 /*amount*/);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnQuestEnemyKilled, int32 /*id*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnQuestItemPickup, int /*id*/, int /*amount*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnQuestEnemyKilled, int /*id*/);
 
 UCLASS()
 class THEASCENDANCE_API UQuestManagerSubsystem : public UGameInstanceSubsystem

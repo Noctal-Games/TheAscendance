@@ -7,6 +7,7 @@
 #include "SpellModifierData.h"
 #include "Engine/DataAsset.h"
 #include "InstancedStruct.h"
+#include "GameplayTagContainer.h"
 #include "SpellData.generated.h"
 
 class UNiagaraSystem;
@@ -17,6 +18,8 @@ class THEASCENDANCE_API USpellData : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Spell"))
+	FGameplayTag SpellTag;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float SpellCooldown = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -101,12 +104,18 @@ struct FSpellTableData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int SpellID = 0;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Spell"))
+	FGameplayTag SpellTag;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName SpellName = "";
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FString SpellDescription = "";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UTexture2D> SpellIcon = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftObjectPtr<USpellData> SpellData = nullptr;
 };

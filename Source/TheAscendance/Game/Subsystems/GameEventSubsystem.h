@@ -7,8 +7,8 @@
 #include "GameEventSubsystem.generated.h"
 
 //C++ only delegates for internal systems, better for performance. Also executed first.
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemPickup, int, int);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnEnemyKilled, int id);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemPickup, int /*ID*/, int /*Amount*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnEnemyKilled, int /*ID*/);
 
 //BP assignable delegates for design exposure, less performant but more flexible
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickupBP, int, id, int, amount);

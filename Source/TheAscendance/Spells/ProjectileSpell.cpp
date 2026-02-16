@@ -126,3 +126,14 @@ void UProjectileSpell::DecorateProjectile(IProjectile* projectile)
 {
 	projectile->SetDecoratedSelf(projectile);
 }
+
+USpellData* UProjectileSpell::GetSpellData()
+{
+	if (m_SpellData.IsValid() == false)
+	{
+		LOG_ERROR("[PROJECTILE SPELL] Tried to GetSpellData for ProjectileSpell but SpellData is invalid");
+		return nullptr;
+	}
+
+	return m_SpellData.Get();
+}
