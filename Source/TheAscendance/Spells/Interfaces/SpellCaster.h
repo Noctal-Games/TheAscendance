@@ -22,7 +22,6 @@ class THEASCENDANCE_API ISpellCaster
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-
 	virtual AActor* GetActor() = 0;
 	const virtual FVector GetSpellOwnerLocation() = 0;
 	const virtual FVector GetSpellOwnerForward() = 0;

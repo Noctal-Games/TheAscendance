@@ -54,9 +54,20 @@ void ULoadoutComponent::UnEquipItem(EEquippablePart part)
 	}
 }
 
-void ULoadoutComponent::SetSpells(const TArray<int>& spells)
+void ULoadoutComponent::SetSpells(const TArray<FGameplayTag>& spellTags)
 {
-	m_Spells = spells;
+	if (m_SpellTags == spellTags)
+	{
+		LOG_INFO("[LOADOUT COMPONENT] SetSpells made no changes")
+		return;
+	}
+
+	m_SpellTags = spellTags;
+
+	if (OnSpellsUpdated.IsBound())
+	{
+		OnSpellsUpdated.Broadcast(spellTags);
+	}
 }
 
 bool ULoadoutComponent::Contains(EEquippablePart part)

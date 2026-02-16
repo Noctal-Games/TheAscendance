@@ -3,12 +3,13 @@
 
 #include "PlayableGameMode.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Game/DataLoaders/ItemLoader.h"
 #include "TheAscendance/Game/DataLoaders/SpellLoader.h"
 #include "TheAscendance/Game/DataLoaders/EnemyLoader.h"
 #include "TheAscendance/Game/DataLoaders/EffectLoader.h"
 
-UBaseEffect* APlayableGameMode::CreateEffectFromTag(const FGameplayTag& effectTag)
+UBaseEffect* APlayableGameMode::CreateEffectFromTag(const FGameplayTag& effectTag) const
 {
 	if (m_EffectLoader == nullptr)
 	{
@@ -19,7 +20,7 @@ UBaseEffect* APlayableGameMode::CreateEffectFromTag(const FGameplayTag& effectTa
 	return m_EffectLoader->CreateEffectFromTag(effectTag);
 }
 
-UBaseEffect* APlayableGameMode::CreateEffectFromEffectData(UEffectData* effectData)
+UBaseEffect* APlayableGameMode::CreateEffectFromEffectData(UEffectData* effectData) const
 {
 	if (m_EffectLoader == nullptr)
 	{
@@ -30,7 +31,7 @@ UBaseEffect* APlayableGameMode::CreateEffectFromEffectData(UEffectData* effectDa
 	return m_EffectLoader->CreateEffectFromEffectData(effectData);
 }
 
-UEffectData* APlayableGameMode::LoadEffectData(const FGameplayTag& effectTag)
+UEffectData* APlayableGameMode::LoadEffectData(const FGameplayTag& effectTag) const
 {
 	if (m_EffectLoader == nullptr)
 	{
@@ -41,7 +42,7 @@ UEffectData* APlayableGameMode::LoadEffectData(const FGameplayTag& effectTag)
 	return m_EffectLoader->LoadEffectData(effectTag);
 }
 
-FItemData* APlayableGameMode::GetItemData(int id)
+FItemData* APlayableGameMode::GetItemData(int id) const
 {
 	if (m_ItemLoader == nullptr)
 	{
@@ -52,7 +53,7 @@ FItemData* APlayableGameMode::GetItemData(int id)
 	return m_ItemLoader->GetItemData(id);
 }
 
-FWeaponData* APlayableGameMode::GetWeaponData(int id)
+FWeaponData* APlayableGameMode::GetWeaponData(int id) const
 {
 	if (m_ItemLoader == nullptr)
 	{
@@ -63,7 +64,7 @@ FWeaponData* APlayableGameMode::GetWeaponData(int id)
 	return m_ItemLoader->GetWeaponData(id);
 }
 
-const FWeaponTypeData* APlayableGameMode::GetWeaponTypeData(EWeaponType type)
+const FWeaponTypeData* APlayableGameMode::GetWeaponTypeData(EWeaponType type) const
 {
 	if (m_ItemLoader == nullptr)
 	{
@@ -74,7 +75,7 @@ const FWeaponTypeData* APlayableGameMode::GetWeaponTypeData(EWeaponType type)
 	return m_ItemLoader->GetWeaponTypeData(type);
 }
 
-ISpell* APlayableGameMode::CreateSpellFromID(int spellID, ISpellCaster* spellOwner)
+ISpell* APlayableGameMode::CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const
 {
 	if (m_SpellLoader == nullptr)
 	{
@@ -82,10 +83,10 @@ ISpell* APlayableGameMode::CreateSpellFromID(int spellID, ISpellCaster* spellOwn
 		return nullptr;
 	}
 
-	return m_SpellLoader->CreateSpellFromID(spellID, spellOwner);
+	return m_SpellLoader->CreateSpellFromTag(spellTag, spellOwner);
 }
 
-ABaseEnemy* APlayableGameMode::CreateEnemyFromID(int enemyID)
+ABaseEnemy* APlayableGameMode::CreateEnemyFromID(int enemyID) const
 {
 	if (m_EnemyLoader == nullptr)
 	{

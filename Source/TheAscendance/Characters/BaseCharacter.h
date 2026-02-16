@@ -18,6 +18,10 @@ class UEffectHandlerComponent;
 class AHeldItem;
 class UCharacterTrajectoryComponent;
 class ULoadoutComponent;
+class USpellCasterComponent;
+
+DECLARE_DELEGATE_RetVal(const FVector, FGetCastStart);
+DECLARE_DELEGATE_RetVal(const FVector, FGetCastForward);
 
 UCLASS()
 class THEASCENDANCE_API ABaseCharacter : public ACharacter, public ISusceptible, public ISpellCaster, public IGameplayTagAssetInterface
@@ -116,6 +120,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameplayTags")
 	FGameplayTagContainer OwnedTags;
 
+	FGetCastStart GetCastStartFunc;
+	FGetCastForward GetCastForwardFunc;
 protected:
 	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Character Stats Component"))
 	TObjectPtr<UCharacterStatsComponent> m_CharacterStatsComponent = nullptr;
@@ -125,6 +131,8 @@ protected:
 	TObjectPtr<UCharacterTrajectoryComponent> m_CharacterTrajectoryComponent = nullptr;
 	UPROPERTY()
 	TObjectPtr<ULoadoutComponent> m_LoadoutComponent = nullptr;
+	UPROPERTY()
+	TObjectPtr<USpellCasterComponent> m_SpellCasterComponent = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<AHeldItem> m_MainHandItem = nullptr;

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "TheAscendance/Items/Enums/WeaponType.h"
-#include "TheAscendance/Core/GameplayTagHelpers.h"
+#include "GameplayTagContainer.h"
 #include "PlayableGameMode.generated.h"
 
 class UEffectLoader;
@@ -27,18 +27,18 @@ class THEASCENDANCE_API APlayableGameMode : public AGameModeBase
 	GENERATED_BODY()
 	
 public:
-	UBaseEffect* CreateEffectFromTag(const FGameplayTag& effectTag);
-	UBaseEffect* CreateEffectFromEffectData(UEffectData* effectData);
-	UEffectData* LoadEffectData(const FGameplayTag& effectTag);
+	UBaseEffect* CreateEffectFromTag(const FGameplayTag& effectTag) const;
+	UBaseEffect* CreateEffectFromEffectData(UEffectData* effectData) const;
+	UEffectData* LoadEffectData(const FGameplayTag& effectTag) const;
 
-	FItemData* GetItemData(int id);
-	FWeaponData* GetWeaponData(int itemID);
-	const FWeaponTypeData* GetWeaponTypeData(EWeaponType type);
+	FItemData* GetItemData(int id) const;
+	FWeaponData* GetWeaponData(int itemID) const;
+	const FWeaponTypeData* GetWeaponTypeData(EWeaponType type) const;
 
-	ISpell* CreateSpellFromID(int spellID, ISpellCaster* spellOwner);
+	ISpell* CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const;
 
 	UFUNCTION(BlueprintCallable)
-	ABaseEnemy* CreateEnemyFromID(int enemyID);
+	ABaseEnemy* CreateEnemyFromID(int enemyID) const;
 
 	virtual void InitGameState() override;
 

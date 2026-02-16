@@ -13,6 +13,8 @@
 #include "TheAscendance/Game/Subsystems/AudioManagerSubsystem.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
 #include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
+#include "TheAscendance/Spells/SpellGameplayTags.h"
+#include "TheAscendance/Spells/Components/SpellCasterComponent.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -165,13 +167,11 @@ void APlayerCharacter::BeginPlay()
 	m_CrouchCapsuleHeight = m_DefaultCapsuleHeight / 2;
 
 	//Test
-	if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
-	{
-		if (ISpell* spell = gameMode->CreateSpellFromID(1, this))
-		{
-			m_TestSpell = spell->_getUObject();
-		}
-	}
+	TArray<FGameplayTag> testSpells;
+	testSpells.SetNum(4);
+	testSpells[1] = SPELL_FIRE_BOLT;
+
+	m_LoadoutComponent->SetSpells(testSpells);
 }
 
 // Called every frame
@@ -205,15 +205,9 @@ void APlayerCharacter::TestFunction2()
 	//EndMainHandAttack();
 	//EndOffHandAttack();
 
-	if (m_TestSpell == nullptr)
+	if (m_SpellCasterComponent != nullptr)
 	{
-		LOG_ONSCREEN(-1, 1.0f, FColor::Red, "[PLAYER CHARACTER] TestSpell is invalid");
-		return;
-	}
-
-	if (m_TestSpell->CanCast() == true)
-	{
-		m_TestSpell->CastSpell();
+		m_SpellCasterComponent->CastSpell(2);
 	}
 }
 

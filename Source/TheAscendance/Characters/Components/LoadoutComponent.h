@@ -6,9 +6,12 @@
 #include "Components/ActorComponent.h"
 #include "TheAscendance/Characters/Enums/EquippablePart.h"
 #include "TheAscendance/Characters/Structs/LoadoutSlotData.h"
+#include "GameplayTagContainer.h"
 #include "LoadoutComponent.generated.h"
 
 class ABaseCharacter;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnSpellsUpdated, const TArray<FGameplayTag>& /*SpellTags*/);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API ULoadoutComponent : public UActorComponent
@@ -22,7 +25,7 @@ public:
 	void EquipItem(EEquippablePart part, int itemID);
 	void UnEquipItem(EEquippablePart part);
 
-	void SetSpells(const TArray<int>& spells);
+	void SetSpells(const TArray<FGameplayTag>& spellTags);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -30,9 +33,12 @@ protected:
 private:
 	bool Contains(EEquippablePart part);
 
+public:
+	FOnSpellsUpdated OnSpellsUpdated;
+
 private:
 	TWeakObjectPtr<ABaseCharacter> m_Owner = nullptr;
 
 	TArray<TSharedPtr<FLoadoutSlotData>> m_Loadout;
-	TArray<int> m_Spells;
+	TArray<FGameplayTag> m_SpellTags;
 };

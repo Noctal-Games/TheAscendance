@@ -9,6 +9,7 @@
 #include "TheAscendance/Effects/Components/EffectHandlerComponent.h"
 #include "TheAscendance/Items/HeldItem.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
+#include "TheAscendance/Spells/Components/SpellCasterComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -28,6 +29,8 @@ ABaseCharacter::ABaseCharacter()
 	checkf(m_CharacterTrajectoryComponent, TEXT("Character Trajectory Component failed to initialise"));
 	m_LoadoutComponent = CreateDefaultSubobject<ULoadoutComponent>(TEXT("Loadout Component"));
 	checkf(m_LoadoutComponent, TEXT("Loadout Component failed to initialise"));
+	m_SpellCasterComponent = CreateDefaultSubobject<USpellCasterComponent>(TEXT("SpellCaster Component"));
+	checkf(m_SpellCasterComponent, TEXT("SpellCaster Component failed to initialise"));
 
 	SetRootComponent(GetCapsuleComponent());
 
@@ -311,12 +314,22 @@ const FVector ABaseCharacter::GetSpellOwnerForward()
 
 const FVector ABaseCharacter::GetCastStartLocation()
 {
-	return GetActorLocation();
+	if (GetCastStartFunc.IsBound() == false)
+	{
+		return GetSpellOwnerLocation();
+	}
+
+	return GetCastStartFunc.Execute();
 }
 
 const FVector ABaseCharacter::GetCastStartForward()
 {
-	return GetActorForwardVector();
+	if (GetCastForwardFunc.IsBound() == false)
+	{
+		return GetSpellOwnerForward();
+	}
+
+	return GetCastForwardFunc.Execute();
 }
 
 void ABaseCharacter::GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const
@@ -582,9 +595,22 @@ void ABaseCharacter::BeginPlay()
 			}
 
 			GetCharacterMovement()->MaxWalkSpeed = walkSpeed; 
-		});
+		}
+	);
 
 	m_CharacterStatsComponent->Init();
+
+	m_LoadoutComponent->OnSpellsUpdated.AddLambda([this](const TArray<FGameplayTag>& spellTags)
+		{
+			if (m_SpellCasterComponent == nullptr)
+			{
+				LOG_ERROR("[BASE CHARACTER] Tried to UpdateSpells but SpellCasterComponent is invalid")
+				return;
+			}
+
+			m_SpellCasterComponent->SetSpells(spellTags);
+		}
+	);
 
 	//Test
 	m_TestEquipToggle = false;
