@@ -16,33 +16,33 @@ void UItemLoader::Init()
 
 		if (m_ItemTable == nullptr)
 		{
-			LOG_ERROR("ItemLoader failed to load Item DataTable");
+			LOG_ERROR("[ITEM LOADER] Failed to load Item DataTable");
 		}
 		else
 		{
-			LOG_INFO("ItemLoader succeeded to load Item DataTable");
+			LOG_INFO("[ITEM LOADER] Succeeded to load Item DataTable");
 		}
 
 		m_WeaponTable = dataHandler->LoadData(EDataGroup::WEAPONS);
 
 		if (m_WeaponTable == nullptr)
 		{
-			LOG_ERROR("ItemLoader failed to load Weapon DataTable");
+			LOG_ERROR("[ITEM LOADER] Failed to load Weapon DataTable");
 		}
 		else
 		{
-			LOG_INFO("ItemLoader succeeded to load Weapon DataTable");
+			LOG_INFO("[ITEM LOADER] Succeeded to load Weapon DataTable");
 		}
 
 		m_WeaponTypeData = &dataHandler->GetWeaponTypeMap();
 	}
 }
 
-FItemData* UItemLoader::GetItemData(int itemID)
+FItemData* UItemLoader::GetItemData(const FGameplayTag& itemTag)
 {
 	if (m_ItemTable == nullptr)
 	{
-		LOG_ERROR("ItemLoader tried to load ItemData without a valid ItemTable");
+		LOG_ERROR("[ITEM LOADER] Tried to load ItemData without a valid ItemTable");
 		return nullptr;
 	}
 
@@ -53,21 +53,21 @@ FItemData* UItemLoader::GetItemData(int itemID)
 
 	for (const auto data : itemStructs)
 	{
-		if (data->ItemID == itemID)
+		if (data->ItemTag == itemTag)
 		{
 			return data;
 		}
 	}
 
-	LOG_ERROR("ItemLoader could not load ItemData for Item ID: %i", itemID);
+	LOG_ERROR("[ITEM LOADER] Could not load ItemData for Item: %s", *itemTag.ToString());
 	return nullptr;
 }
 
-FWeaponData* UItemLoader::GetWeaponData(int itemID)
+FWeaponData* UItemLoader::GetWeaponData(const FGameplayTag& itemTag)
 {
 	if (m_WeaponTable == nullptr)
 	{
-		LOG_ERROR("ItemLoader tried to load Equippable without a valid WeaponTable");
+		LOG_ERROR("[ITEM LOADER] Tried to load Equippable without a valid WeaponTable");
 		return nullptr;
 	}
 
@@ -78,13 +78,13 @@ FWeaponData* UItemLoader::GetWeaponData(int itemID)
 
 	for (const auto weaponData : weaponStructs)
 	{
-		if (weaponData->ItemID == itemID)
+		if (weaponData->ItemTag == itemTag)
 		{
 			return weaponData;
 		}
 	}
 
-	LOG_ERROR("ItemLoader could not load WeaponData for Item ID: %i", itemID);
+	LOG_ERROR("[ITEM LOADER] Could not load WeaponData for Item: %s", *itemTag.ToString());
 	return nullptr;
 }
 
@@ -92,7 +92,7 @@ const FWeaponTypeData* UItemLoader::GetWeaponTypeData(EWeaponType type)
 {
 	if (m_WeaponTypeData == nullptr || m_WeaponTypeData->Contains(type) == false)
 	{
-		LOG_ERROR("WeaponTypeData doesn't contain data for Weapon Type: %s", *UEnum::GetValueAsString(type));
+		LOG_ERROR("[ITEM LOADER] WeaponTypeData doesn't contain data for Weapon Type: %s", *UEnum::GetValueAsString(type));
 		return nullptr;
 	}
 

@@ -13,6 +13,9 @@
 #include "TheAscendance/Game/Subsystems/AudioManagerSubsystem.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
 #include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
+#include "TheAscendance/Spells/SpellGameplayTags.h"
+#include "TheAscendance/Spells/Components/SpellCasterComponent.h"
+#include "TheAscendance/Items/ItemGameplayTags.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -165,13 +168,11 @@ void APlayerCharacter::BeginPlay()
 	m_CrouchCapsuleHeight = m_DefaultCapsuleHeight / 2;
 
 	//Test
-	if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
-	{
-		if (ISpell* spell = gameMode->CreateSpellFromID(1, this))
-		{
-			m_TestSpell = spell->_getUObject();
-		}
-	}
+	TArray<FGameplayTag> testSpells;
+	testSpells.SetNum(4);
+	testSpells[2] = SPELL_FIRE_BOLT;
+
+	m_LoadoutComponent->SetSpells(testSpells);
 }
 
 // Called every frame
@@ -205,16 +206,6 @@ void APlayerCharacter::TestFunction2()
 	//EndMainHandAttack();
 	//EndOffHandAttack();
 
-	if (m_TestSpell == nullptr)
-	{
-		LOG_ONSCREEN(-1, 1.0f, FColor::Red, "[PLAYER CHARACTER] TestSpell is invalid");
-		return;
-	}
-
-	if (m_TestSpell->CanCast() == true)
-	{
-		m_TestSpell->CastSpell();
-	}
 }
 
 void APlayerCharacter::TestFunction3()
@@ -223,13 +214,24 @@ void APlayerCharacter::TestFunction3()
 
 	if (m_TestEquipToggle == false)
 	{
-		m_LoadoutComponent->EquipItem(EEquippablePart::RIGHT_HAND, 2);
+		m_LoadoutComponent->EquipItem(EEquippablePart::LEFT_HAND, ITEM_EQUIPMENT_SWORD);
 	}
 	else
 	{
-		m_LoadoutComponent->UnEquipItem(EEquippablePart::RIGHT_HAND);
+		m_LoadoutComponent->UnEquipItem(EEquippablePart::LEFT_HAND);
 	}
 
 	m_TestEquipToggle = !m_TestEquipToggle;
+
+	float rand = FMath::RandRange(0, 100);
+
+	if (rand < 50)
+	{
+		m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::SHIELD, 20);
+	}
+	else
+	{
+		m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::SHIELD, -10);
+	}
 }
 

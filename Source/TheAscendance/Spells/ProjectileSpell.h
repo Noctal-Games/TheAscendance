@@ -27,6 +27,8 @@ public:
 	virtual bool DealDamage(AActor* hitActor, int damage) override;
 	virtual void DecorateProjectile(IProjectile* projectile) override;
 
+	virtual USpellData* GetSpellData() override;
+
 private:
 	TWeakObjectPtr<UProjectileSpellData> m_SpellData = nullptr;
 };

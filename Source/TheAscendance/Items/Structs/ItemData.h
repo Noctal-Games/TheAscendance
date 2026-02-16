@@ -6,6 +6,7 @@
 #include "TheAscendance/Items/Enums/ItemType.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Items/Structs/WeaponData.h"
+#include "GameplayTagContainer.h"
 #include "ItemData.generated.h"
 
 USTRUCT(BlueprintType)
@@ -13,16 +14,21 @@ struct FItemData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly)
-	int ItemID = 0;
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "Item"))
+	FGameplayTag ItemTag;
+
 	UPROPERTY(EditDefaultsOnly)
 	FName ItemName = "";
-	UPROPERTY(EditDefaultsOnly)
-	EItemType ItemType = EItemType::DEFAULT;
+
 	UPROPERTY(EditDefaultsOnly)
 	FString ItemDescription = "";
+
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UTexture2D> ItemIcon = nullptr;
+
 	UPROPERTY(EditDefaultsOnly)
 	bool IsStackable = true;
+
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UStaticMesh> ItemMesh = nullptr;
 

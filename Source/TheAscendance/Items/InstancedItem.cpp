@@ -11,19 +11,19 @@ void AInstancedItem::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (m_InstanceID == 0)
+	if (m_InstanceTag.IsValid() == false)
 	{
-		LOG_ERROR("Tried to create InstancedItem with ID of 0");
+		LOG_ERROR("[INSTANCED ITEM] Tried to create InstancedItem with invalid ItemTag");
 		return;
 	}
 
 	if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
 	{
-		Init(gameMode->GetItemData(m_InstanceID));
+		Init(gameMode->GetItemData(m_InstanceTag));
 	}
 	else
 	{
-		LOG_ERROR("Tried to create InstancedItem in world without PlayableGameMode");
+		LOG_ERROR("[INSTANCED ITEM] Tried to create InstancedItem in world without PlayableGameMode");
 	}
 }
 
