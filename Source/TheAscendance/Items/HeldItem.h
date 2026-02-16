@@ -44,6 +44,11 @@ protected:
 private:
 	void EndPrimaryAttack();
 	void EndSecondaryAttack();
+
+protected:
+	friend class ABaseCharacter;
+
+	bool m_IsOffHand = false;
 private:
 	TWeakObjectPtr<ABaseCharacter> m_Owner = nullptr;
 

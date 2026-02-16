@@ -13,7 +13,7 @@ UBaseEffect* APlayableGameMode::CreateEffectFromTag(const FGameplayTag& effectTa
 {
 	if (m_EffectLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid EffectLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid EffectLoader");
 		return nullptr;
 	}
 
@@ -24,7 +24,7 @@ UBaseEffect* APlayableGameMode::CreateEffectFromEffectData(UEffectData* effectDa
 {
 	if (m_EffectLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid EffectLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid EffectLoader");
 		return nullptr;
 	}
 
@@ -35,40 +35,40 @@ UEffectData* APlayableGameMode::LoadEffectData(const FGameplayTag& effectTag) co
 {
 	if (m_EffectLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid EffectLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid EffectLoader");
 		return nullptr;
 	}
 
 	return m_EffectLoader->LoadEffectData(effectTag);
 }
 
-FItemData* APlayableGameMode::GetItemData(int id) const
+FItemData* APlayableGameMode::GetItemData(const FGameplayTag& itemTag) const
 {
 	if (m_ItemLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid ItemLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid ItemLoader");
 		return nullptr;
 	}
 
-	return m_ItemLoader->GetItemData(id);
+	return m_ItemLoader->GetItemData(itemTag);
 }
 
-FWeaponData* APlayableGameMode::GetWeaponData(int id) const
+FWeaponData* APlayableGameMode::GetWeaponData(const FGameplayTag& itemTag) const
 {
 	if (m_ItemLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid ItemLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid ItemLoader");
 		return nullptr;
 	}
 
-	return m_ItemLoader->GetWeaponData(id);
+	return m_ItemLoader->GetWeaponData(itemTag);
 }
 
 const FWeaponTypeData* APlayableGameMode::GetWeaponTypeData(EWeaponType type) const
 {
 	if (m_ItemLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid ItemLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid ItemLoader");
 		return nullptr;
 	}
 
@@ -79,18 +79,29 @@ ISpell* APlayableGameMode::CreateSpellFromTag(const FGameplayTag& spellTag, ISpe
 {
 	if (m_SpellLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid SpellLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
 		return nullptr;
 	}
 
 	return m_SpellLoader->CreateSpellFromTag(spellTag, spellOwner);
 }
 
+const FSpellTableData* APlayableGameMode::GetSpellTableData(const FGameplayTag& spellTag) const
+{
+	if (m_SpellLoader == nullptr)
+	{
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
+		return nullptr;
+	}
+
+	return m_SpellLoader->GetSpellTableDataFromTag(spellTag);
+}
+
 ABaseEnemy* APlayableGameMode::CreateEnemyFromID(int enemyID) const
 {
 	if (m_EnemyLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid EnemyLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid EnemyLoader");
 		return nullptr;
 	}
 
@@ -104,7 +115,7 @@ void APlayableGameMode::InitGameState()
 #if WITH_EDITOR
 	if (GIsEditor && !GetWorld()->IsGameWorld())
 	{
-		LOG_INFO("Opened PlayableGameMode BP in Editor");
+		LOG_INFO("[PLAYABLE GAMEMODE] Opened PlayableGameMode BP in Editor");
 		return;
 	}
 #endif
@@ -115,7 +126,7 @@ void APlayableGameMode::InitGameState()
 	}
 	else
 	{
-		LOG_ERROR("PlayableGameMode failed to create ItemLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create ItemLoader");
 	}
 
 	if (m_SpellLoader = NewObject<USpellLoader>())
@@ -124,7 +135,7 @@ void APlayableGameMode::InitGameState()
 	}
 	else
 	{
-		LOG_ERROR("PlayableGameMode failed to create SpellLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create SpellLoader");
 	}
 
 	if (m_EnemyLoader = NewObject<UEnemyLoader>())
@@ -134,7 +145,7 @@ void APlayableGameMode::InitGameState()
 	}
 	else
 	{
-		LOG_ERROR("PlayableGameMode failed to create EnemyLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create EnemyLoader");
 	}
 
 	if (m_EffectLoader = NewObject<UEffectLoader>())
@@ -143,7 +154,7 @@ void APlayableGameMode::InitGameState()
 	}
 	else
 	{
-		LOG_ERROR("PlayableGameMode failed to create EffectLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create EffectLoader");
 	}
 }
 

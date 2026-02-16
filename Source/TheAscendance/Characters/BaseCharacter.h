@@ -89,6 +89,8 @@ public:
 	virtual bool HasAllMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const override;
 	virtual bool HasAnyMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const override;
 
+	void CastSpell(int slot);
+
 	UFUNCTION(BlueprintPure)
 	virtual bool IsSprinting();
 
@@ -99,16 +101,18 @@ public:
 
 	float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None);
 
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
 	friend class ULoadoutComponent;
 	friend class UPlayerHUD;
 
-	bool EquipItem(EEquippablePart part, int itemID);
+	bool EquipItem(EEquippablePart part, const FGameplayTag& itemTag);
 	void UnEquipItem(EEquippablePart part);
 
 	UCharacterStatsComponent* GetCharacterStatsComponent();
+	ULoadoutComponent* GetLoadoutComponent() const;
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -160,4 +164,6 @@ private:
 	FRotator m_TurnTargetRotation = FRotator::ZeroRotator;
 	float m_TurnInterpSpeed = 5.0f;
 	bool m_IsTurning = false;
+
+	FDelegateHandle m_OnSpellsUpdatedHandle;
 };

@@ -8,6 +8,7 @@
 
 class APlayerCharacter;
 class UStatBoundProgressBar;
+class UActionBar;
 
 UCLASS()
 class THEASCENDANCE_API UPlayerHUD : public UCommonUserWidget
@@ -29,6 +30,9 @@ private:
 	TObjectPtr<UStatBoundProgressBar> m_StaminaBar = nullptr;
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget, DisplayName = "Mana Bar"))
 	TObjectPtr<UStatBoundProgressBar> m_ManaBar = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget, DisplayName = "Action Bar"))
+	TObjectPtr<UActionBar> m_ActionBar = nullptr;
 
 	TWeakObjectPtr<APlayerCharacter> m_OwnerCharacter = nullptr;
 };

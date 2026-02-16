@@ -106,10 +106,16 @@ struct FSpellTableData : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Spell"))
 	FGameplayTag SpellTag;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName SpellName = "";
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FString SpellDescription = "";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UTexture2D> SpellIcon = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftObjectPtr<USpellData> SpellData = nullptr;
 };

@@ -15,6 +15,7 @@
 #include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
 #include "TheAscendance/Spells/SpellGameplayTags.h"
 #include "TheAscendance/Spells/Components/SpellCasterComponent.h"
+#include "TheAscendance/Items/ItemGameplayTags.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -169,7 +170,7 @@ void APlayerCharacter::BeginPlay()
 	//Test
 	TArray<FGameplayTag> testSpells;
 	testSpells.SetNum(4);
-	testSpells[1] = SPELL_FIRE_BOLT;
+	testSpells[2] = SPELL_FIRE_BOLT;
 
 	m_LoadoutComponent->SetSpells(testSpells);
 }
@@ -205,10 +206,6 @@ void APlayerCharacter::TestFunction2()
 	//EndMainHandAttack();
 	//EndOffHandAttack();
 
-	if (m_SpellCasterComponent != nullptr)
-	{
-		m_SpellCasterComponent->CastSpell(2);
-	}
 }
 
 void APlayerCharacter::TestFunction3()
@@ -217,11 +214,11 @@ void APlayerCharacter::TestFunction3()
 
 	if (m_TestEquipToggle == false)
 	{
-		m_LoadoutComponent->EquipItem(EEquippablePart::RIGHT_HAND, 2);
+		m_LoadoutComponent->EquipItem(EEquippablePart::LEFT_HAND, ITEM_EQUIPMENT_SWORD);
 	}
 	else
 	{
-		m_LoadoutComponent->UnEquipItem(EEquippablePart::RIGHT_HAND);
+		m_LoadoutComponent->UnEquipItem(EEquippablePart::LEFT_HAND);
 	}
 
 	m_TestEquipToggle = !m_TestEquipToggle;

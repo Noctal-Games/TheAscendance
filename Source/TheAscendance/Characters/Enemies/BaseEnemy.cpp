@@ -81,17 +81,17 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 
 	const FEnemyEquipmentData& equipment = data->EnemyData.EnemyEquipment;
 
-	TArray<int> spells;
+	TArray<FGameplayTag> spells;
 	spells.Add(equipment.MainHandSpells.PrimarySpell);
 	spells.Add(equipment.MainHandSpells.SecondarySpell);
 	spells.Add(equipment.OffHandSpells.PrimarySpell);
 	spells.Add(equipment.OffHandSpells.SecondarySpell);
 
-	//m_LoadoutComponent->SetSpells(spells);
+	m_LoadoutComponent->SetSpells(spells);
 
 	for (const FLoadoutSlotData& loadoutData : equipment.LoadoutData)
 	{
-		m_LoadoutComponent->EquipItem(loadoutData.EquippedPart, loadoutData.ItemID);
+		m_LoadoutComponent->EquipItem(loadoutData.EquippedPart, loadoutData.ItemTag);
 	}
 
 	if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))

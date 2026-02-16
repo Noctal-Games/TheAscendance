@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "TheAscendance/Items/Structs/WeaponData.h"
 #include "TheAscendance/Items/Enums/WeaponType.h"
+#include "GameplayTagContainer.h"
 #include "ItemLoader.generated.h"
 
 struct FItemData;
@@ -18,8 +19,8 @@ class THEASCENDANCE_API UItemLoader : public UObject
 public:
 	void Init();
 
-	FItemData* GetItemData(int itemID);
-	FWeaponData* GetWeaponData(int itemID);
+	FItemData* GetItemData(const FGameplayTag& itemTag);
+	FWeaponData* GetWeaponData(const FGameplayTag& itemTag);
 	const FWeaponTypeData* GetWeaponTypeData(EWeaponType type);
 
 private:

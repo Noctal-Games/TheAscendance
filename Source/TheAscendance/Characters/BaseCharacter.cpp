@@ -58,6 +58,11 @@ void ABaseCharacter::Damage(int amount)
 	}
 
 	m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::HEALTH, -amount);
+
+	if (m_CharacterStatsComponent->GetStatAsValue(ECharacterStat::HEALTH) <= 0.0f)
+	{
+		m_LoadoutComponent->OnSpellsUpdated.Remove(m_OnSpellsUpdatedHandle);
+	}
 }
 
 void ABaseCharacter::ReduceStamina(int amount)
@@ -352,6 +357,17 @@ bool ABaseCharacter::HasAnyMatchingGameplayTags(const FGameplayTagContainer& tag
 	return OwnedTags.HasAny(tagContainer);
 }
 
+void ABaseCharacter::CastSpell(int slot)
+{
+	if (m_SpellCasterComponent == nullptr)
+	{
+		LOG_ERROR("[BASE CHARACTER] Tried to cast spell but SpellCasterComponent was invalid");
+		return;
+	}
+
+	m_SpellCasterComponent->CastSpell(slot);
+}
+
 bool ABaseCharacter::IsSprinting()
 {
 	return m_IsSprinting;
@@ -403,9 +419,9 @@ float ABaseCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float pl
 	return duration;
 }
 
-bool ABaseCharacter::EquipItem(EEquippablePart part, int itemID)
+bool ABaseCharacter::EquipItem(EEquippablePart part, const FGameplayTag& itemTag)
 {
-	if(itemID <= 0)
+	if(itemTag.IsValid() == false)
 	{
 		UnEquipItem(part);
 		return true;
@@ -425,7 +441,7 @@ bool ABaseCharacter::EquipItem(EEquippablePart part, int itemID)
 					return false;
 				}
 
-				FItemData* itemData = gameMode->GetItemData(itemID);
+				FItemData* itemData = gameMode->GetItemData(itemTag);
 
 				if (itemData == nullptr)
 				{
@@ -448,7 +464,7 @@ bool ABaseCharacter::EquipItem(EEquippablePart part, int itemID)
 					return false;
 				}
 
-				FItemData* itemData = gameMode->GetItemData(itemID);
+				FItemData* itemData = gameMode->GetItemData(itemTag);
 
 				if (itemData == nullptr)
 				{
@@ -510,6 +526,11 @@ void ABaseCharacter::UnEquipItem(EEquippablePart part)
 UCharacterStatsComponent* ABaseCharacter::GetCharacterStatsComponent()
 {
 	return m_CharacterStatsComponent;
+}
+
+ULoadoutComponent* ABaseCharacter::GetLoadoutComponent() const
+{
+	return m_LoadoutComponent;
 }
 
 void ABaseCharacter::UpdateTurnTowards()
@@ -575,6 +596,8 @@ void ABaseCharacter::BeginPlay()
 
 			m_MainHandItem->SetActorLocation(GetMesh()->GetSocketLocation("WeaponSocket_r"));
 			m_MainHandItem->K2_AttachToComponent(GetMesh(), "WeaponSocket_r", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+
+			m_MainHandItem->m_IsOffHand = false;
 		}
 
 		if (m_OffHandItem = world->SpawnActor<AHeldItem>(AHeldItem::StaticClass()))
@@ -584,6 +607,8 @@ void ABaseCharacter::BeginPlay()
 
 			m_OffHandItem->SetActorLocation(GetMesh()->GetSocketLocation("WeaponSocket_l"));
 			m_OffHandItem->K2_AttachToComponent(GetMesh(), "WeaponSocket_l", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+
+			m_MainHandItem->m_IsOffHand = true;
 		}
 	}
 
@@ -600,7 +625,7 @@ void ABaseCharacter::BeginPlay()
 
 	m_CharacterStatsComponent->Init();
 
-	m_LoadoutComponent->OnSpellsUpdated.AddLambda([this](const TArray<FGameplayTag>& spellTags)
+	m_OnSpellsUpdatedHandle = m_LoadoutComponent->OnSpellsUpdated.AddLambda([this](const TArray<FGameplayTag>& spellTags)
 		{
 			if (m_SpellCasterComponent == nullptr)
 			{

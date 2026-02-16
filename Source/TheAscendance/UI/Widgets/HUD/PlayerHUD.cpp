@@ -5,6 +5,7 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 #include "TheAscendance/UI/Elements/StatBoundProgressBar.h"
+#include "ActionBar.h"
 
 void UPlayerHUD::Init(APlayerCharacter* ownerCharacter)
 {
@@ -15,6 +16,8 @@ void UPlayerHUD::Init(APlayerCharacter* ownerCharacter)
 		LOG_ERROR("PLAYER HUD] Attempted to Init with invalid owner character reference");
 		return;
 	}
+
+	m_ActionBar->Init(m_OwnerCharacter->GetLoadoutComponent());
 
 	m_HealthBar->BoundHUDStat = EHUDBarStat::HEALTH;
 	m_ManaBar->BoundHUDStat = EHUDBarStat::MANA;

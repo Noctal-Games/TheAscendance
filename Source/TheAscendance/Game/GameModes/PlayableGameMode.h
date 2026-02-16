@@ -20,6 +20,7 @@ class UItemLoader;
 struct FItemData;
 struct FWeaponData;
 struct FWeaponTypeData;
+struct FSpellTableData;
 
 UCLASS(Blueprintable)
 class THEASCENDANCE_API APlayableGameMode : public AGameModeBase
@@ -31,11 +32,12 @@ public:
 	UBaseEffect* CreateEffectFromEffectData(UEffectData* effectData) const;
 	UEffectData* LoadEffectData(const FGameplayTag& effectTag) const;
 
-	FItemData* GetItemData(int id) const;
-	FWeaponData* GetWeaponData(int itemID) const;
+	FItemData* GetItemData(const FGameplayTag& itemTag) const;
+	FWeaponData* GetWeaponData(const FGameplayTag& itemTag) const;
 	const FWeaponTypeData* GetWeaponTypeData(EWeaponType type) const;
 
 	ISpell* CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const;
+	const FSpellTableData* GetSpellTableData(const FGameplayTag& spellTag) const;
 
 	UFUNCTION(BlueprintCallable)
 	ABaseEnemy* CreateEnemyFromID(int enemyID) const;
