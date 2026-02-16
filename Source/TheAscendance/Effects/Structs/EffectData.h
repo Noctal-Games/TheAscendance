@@ -19,7 +19,7 @@ class THEASCENDANCE_API UEffectData : public UPrimaryDataAsset
 
 public:
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Effect"))
 	FGameplayTag EffectTag;
 
 	EEffectType EffectType = EEffectType::INSTANT;

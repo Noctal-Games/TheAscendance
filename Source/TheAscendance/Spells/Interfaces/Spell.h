@@ -52,4 +52,5 @@ public:
 
 	virtual void DecorateProjectile(IProjectile* projectile) {};
 
+	virtual USpellData* GetSpellData() { return nullptr; };
 };

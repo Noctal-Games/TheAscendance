@@ -3,93 +3,105 @@
 
 #include "PlayableGameMode.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Game/DataLoaders/ItemLoader.h"
 #include "TheAscendance/Game/DataLoaders/SpellLoader.h"
 #include "TheAscendance/Game/DataLoaders/EnemyLoader.h"
 #include "TheAscendance/Game/DataLoaders/EffectLoader.h"
 
-UBaseEffect* APlayableGameMode::CreateEffectFromTag(const FGameplayTag& effectTag)
+UBaseEffect* APlayableGameMode::CreateEffectFromTag(const FGameplayTag& effectTag) const
 {
 	if (m_EffectLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid EffectLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid EffectLoader");
 		return nullptr;
 	}
 
 	return m_EffectLoader->CreateEffectFromTag(effectTag);
 }
 
-UBaseEffect* APlayableGameMode::CreateEffectFromEffectData(UEffectData* effectData)
+UBaseEffect* APlayableGameMode::CreateEffectFromEffectData(UEffectData* effectData) const
 {
 	if (m_EffectLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid EffectLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid EffectLoader");
 		return nullptr;
 	}
 
 	return m_EffectLoader->CreateEffectFromEffectData(effectData);
 }
 
-UEffectData* APlayableGameMode::LoadEffectData(const FGameplayTag& effectTag)
+UEffectData* APlayableGameMode::LoadEffectData(const FGameplayTag& effectTag) const
 {
 	if (m_EffectLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid EffectLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid EffectLoader");
 		return nullptr;
 	}
 
 	return m_EffectLoader->LoadEffectData(effectTag);
 }
 
-FItemData* APlayableGameMode::GetItemData(int id)
+FItemData* APlayableGameMode::GetItemData(const FGameplayTag& itemTag) const
 {
 	if (m_ItemLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid ItemLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid ItemLoader");
 		return nullptr;
 	}
 
-	return m_ItemLoader->GetItemData(id);
+	return m_ItemLoader->GetItemData(itemTag);
 }
 
-FWeaponData* APlayableGameMode::GetWeaponData(int id)
+FWeaponData* APlayableGameMode::GetWeaponData(const FGameplayTag& itemTag) const
 {
 	if (m_ItemLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid ItemLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid ItemLoader");
 		return nullptr;
 	}
 
-	return m_ItemLoader->GetWeaponData(id);
+	return m_ItemLoader->GetWeaponData(itemTag);
 }
 
-const FWeaponTypeData* APlayableGameMode::GetWeaponTypeData(EWeaponType type)
+const FWeaponTypeData* APlayableGameMode::GetWeaponTypeData(EWeaponType type) const
 {
 	if (m_ItemLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid ItemLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid ItemLoader");
 		return nullptr;
 	}
 
 	return m_ItemLoader->GetWeaponTypeData(type);
 }
 
-ISpell* APlayableGameMode::CreateSpellFromID(int spellID, ISpellCaster* spellOwner)
+ISpell* APlayableGameMode::CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const
 {
 	if (m_SpellLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid SpellLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
 		return nullptr;
 	}
 
-	return m_SpellLoader->CreateSpellFromID(spellID, spellOwner);
+	return m_SpellLoader->CreateSpellFromTag(spellTag, spellOwner);
 }
 
-ABaseEnemy* APlayableGameMode::CreateEnemyFromID(int enemyID)
+const FSpellTableData* APlayableGameMode::GetSpellTableData(const FGameplayTag& spellTag) const
+{
+	if (m_SpellLoader == nullptr)
+	{
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
+		return nullptr;
+	}
+
+	return m_SpellLoader->GetSpellTableDataFromTag(spellTag);
+}
+
+ABaseEnemy* APlayableGameMode::CreateEnemyFromID(int enemyID) const
 {
 	if (m_EnemyLoader == nullptr)
 	{
-		LOG_ERROR("PlayableGameMode has invalid EnemyLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid EnemyLoader");
 		return nullptr;
 	}
 
@@ -103,7 +115,7 @@ void APlayableGameMode::InitGameState()
 #if WITH_EDITOR
 	if (GIsEditor && !GetWorld()->IsGameWorld())
 	{
-		LOG_INFO("Opened PlayableGameMode BP in Editor");
+		LOG_INFO("[PLAYABLE GAMEMODE] Opened PlayableGameMode BP in Editor");
 		return;
 	}
 #endif
@@ -114,7 +126,7 @@ void APlayableGameMode::InitGameState()
 	}
 	else
 	{
-		LOG_ERROR("PlayableGameMode failed to create ItemLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create ItemLoader");
 	}
 
 	if (m_SpellLoader = NewObject<USpellLoader>())
@@ -123,7 +135,7 @@ void APlayableGameMode::InitGameState()
 	}
 	else
 	{
-		LOG_ERROR("PlayableGameMode failed to create SpellLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create SpellLoader");
 	}
 
 	if (m_EnemyLoader = NewObject<UEnemyLoader>())
@@ -133,7 +145,7 @@ void APlayableGameMode::InitGameState()
 	}
 	else
 	{
-		LOG_ERROR("PlayableGameMode failed to create EnemyLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create EnemyLoader");
 	}
 
 	if (m_EffectLoader = NewObject<UEffectLoader>())
@@ -142,7 +154,7 @@ void APlayableGameMode::InitGameState()
 	}
 	else
 	{
-		LOG_ERROR("PlayableGameMode failed to create EffectLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create EffectLoader");
 	}
 }
 

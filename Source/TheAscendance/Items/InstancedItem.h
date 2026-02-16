@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item.h"
+#include "GameplayTagContainer.h"
 #include "InstancedItem.generated.h"
 
 UCLASS()
@@ -16,6 +17,6 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditInstanceOnly, meta = (DisplayName = "Instance ID"))
-	int m_InstanceID = 0;
+	UPROPERTY(EditInstanceOnly, meta = (DisplayName = "Instance Tag"))
+	FGameplayTag m_InstanceTag;
 };

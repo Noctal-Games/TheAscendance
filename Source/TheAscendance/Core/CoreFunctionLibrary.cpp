@@ -62,17 +62,17 @@ ACustomPlayerController* UCoreFunctionLibrary::GetPlayerController()
 
 void UCoreFunctionLibrary::LogInfo(FString string)
 {
-	LOG_INFO("%s", *string);
+	LOG_INFO("[CORE - BLUEPRINT] %s", *string);
 }
 
 void UCoreFunctionLibrary::LogWarning(FString string)
 {
-	LOG_WARNING("%s", *string);
+	LOG_WARNING("[CORE - BLUEPRINT] %s", *string);
 }
 
 void UCoreFunctionLibrary::LogError(FString string)
 {
-	LOG_ERROR("%s", *string);
+	LOG_ERROR("[CORE - BLUEPRINT] %s", *string);
 }
 
 void UCoreFunctionLibrary::DrawDebugLine(const FVector& start, const FVector& end, const FColor colour, const float duration)
@@ -118,6 +118,17 @@ UQuestManagerSubsystem* UCoreFunctionLibrary::GetQuestManagerSubsystem()
 	return nullptr;
 }
 
+UUIManagerSubsystem* UCoreFunctionLibrary::GetUIManagerSubsystem()
+{
+	if (UWorld* world = GetGameWorld())
+	{
+		return world->GetGameInstance()->GetSubsystem<UUIManagerSubsystem>();
+	}
+
+	LOG_ERROR("[CORE] GameWorld was invalid");
+	return nullptr;
+}
+
 void UCoreFunctionLibrary::RequestAsyncLoad(const FSoftObjectPath& targetToStream, TFunction<void()> delegate)
 {
 	LOG_INFO("[CORE] Requesting ASync Load for: %s", *targetToStream.ToString());
@@ -128,11 +139,11 @@ void UCoreFunctionLibrary::RequestAsyncLoad(const FSoftObjectPath& targetToStrea
 
 			if (loadedObject != nullptr)
 			{
-				LOG_INFO("Successful ASync Load for: %s", *targetToStream.ToString());
+				LOG_INFO("[CORE] Successful ASync Load for: %s", *targetToStream.ToString());
 			}
 			else
 			{
-				LOG_ERROR("Failed ASync Load for: %s", *targetToStream.ToString());
+				LOG_ERROR("[CORE] Failed ASync Load for: %s", *targetToStream.ToString());
 			}
 
 			if (delegate.IsSet())

@@ -54,7 +54,7 @@ void AHeldItem::Init(FItemData* itemData)
 
 	if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
 	{
-		if (FWeaponData* weaponData = gameMode->GetWeaponData(m_ItemData->ItemID))
+		if (FWeaponData* weaponData = gameMode->GetWeaponData(m_ItemData->ItemTag))
 		{
 			m_WeaponData = MakeShared<FWeaponData>(*weaponData);
 		}
@@ -204,12 +204,9 @@ void AHeldItem::EndPrimaryAttack()
 	else
 	{
 		LOG_ONSCREEN(-1, 0.5, FColor::Green, "End Spell Attack: %s", *(m_ItemData != nullptr ? m_ItemData->ItemName.ToString() : FString("HAND")));
+		m_Owner->GetCastStartFunc.BindLambda([this]() { return GetActorLocation(); });
+		m_Owner->CastSpell(m_IsOffHand == false ? 1 : 3);
 	}
-
-	//If Melee
-	//Turn off collider and reduce stamina
-	//Else Spell
-	//Cast spell
 }
 
 void AHeldItem::EndSecondaryAttack()
@@ -221,10 +218,7 @@ void AHeldItem::EndSecondaryAttack()
 	else
 	{
 		LOG_ONSCREEN(-1, 0.5, FColor::Green, "End Spell Attack: %s", *(m_ItemData != nullptr ? m_ItemData->ItemName.ToString() : FString("HAND")));
+		m_Owner->GetCastStartFunc.BindLambda([this]() { return GetActorLocation(); });
+		m_Owner->CastSpell(m_IsOffHand == false ? 2 : 4);
 	}
-
-	//If Melee
-	//Turn off collider and reduce stamina
-	//Else Spell
-	//Cast spell
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Items/Enums/WeaponType.h"
+#include "GameplayTagContainer.h"
 #include "WeaponData.generated.h"
 
 USTRUCT(BlueprintType)
@@ -11,8 +12,8 @@ struct FWeaponData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly)
-	int ItemID = 0;
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "Item.Equipment.Weapon"))
+	FGameplayTag ItemTag;
 	UPROPERTY(EditDefaultsOnly)
 	EWeaponType WeaponType = EWeaponType::HAND;
 

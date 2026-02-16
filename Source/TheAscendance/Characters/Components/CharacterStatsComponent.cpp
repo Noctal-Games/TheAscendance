@@ -16,6 +16,8 @@ UCharacterStatsComponent::UCharacterStatsComponent()
 
 void UCharacterStatsComponent::Init()
 {
+	AddStat(ECharacterStat::SHIELD, 0);
+
 	AddStat(ECharacterStat::HEALTH, m_BaseHealth);
 	AddStat(ECharacterStat::STAMINA, m_BaseStamina);
 	AddStat(ECharacterStat::MANA, m_BaseMana);
@@ -50,14 +52,13 @@ void UCharacterStatsComponent::AddStat(ECharacterStat stat, float maxValue)
 		m_StatsBase.Add(stat, maxValue);
 	}
 
-	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA && stat != ECharacterStat::WALK_SPEED)
+	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA && stat != ECharacterStat::WALK_SPEED && stat != ECharacterStat::SHIELD)
 	{
 		return;
 	}
 
-	if (stat != ECharacterStat::WALK_SPEED)
+	if (stat != ECharacterStat::WALK_SPEED && stat != ECharacterStat::SHIELD)
 	{
-
 		if (m_StatsMax.Contains(stat) == true)
 		{
 			m_StatsMax[stat] = maxValue;
@@ -82,12 +83,12 @@ void UCharacterStatsComponent::SetStat(ECharacterStat stat, float amount)
 	m_StatsBase[stat] = amount;
 	m_Stats[stat] = amount;
 
-	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA && stat != ECharacterStat::WALK_SPEED)
+	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA && stat != ECharacterStat::WALK_SPEED && stat != ECharacterStat::SHIELD)
 	{
 		return;
 	}
 
-	if (stat != ECharacterStat::WALK_SPEED)
+	if (stat != ECharacterStat::WALK_SPEED && stat != ECharacterStat::SHIELD)
 	{
 		m_StatsMax[stat] = amount;
 	}
@@ -103,7 +104,7 @@ void UCharacterStatsComponent::AdjustStatByValue(ECharacterStat stat, float amou
 		return;
 	}
 
-	LOG_ONSCREEN(-1, 3.0f, FColor::Green, "[CHARACTER STATS COMPONENT] STAT: %s CHANGED FROM %.0f TO %.0f", *UEnum::GetValueAsString(stat), m_Stats[stat], m_Stats[stat] + amount);
+	LOG_ONSCREEN(-1, 3.0f, FColor::Green, "[CHARACTER STATS COMPONENT] Stat: %s changed from %.0f TO %.0f", *UEnum::GetValueAsString(stat), m_Stats[stat], m_Stats[stat] + amount);
 
 	if (stat != ECharacterStat::HEALTH && stat != ECharacterStat::STAMINA && stat != ECharacterStat::MANA)
 	{
@@ -114,7 +115,7 @@ void UCharacterStatsComponent::AdjustStatByValue(ECharacterStat stat, float amou
 			m_Stats[stat] = 0;
 		}
 
-		if (stat == ECharacterStat::WALK_SPEED)
+		if (stat == ECharacterStat::WALK_SPEED || stat == ECharacterStat::SHIELD)
 		{
 			ExecuteBindings(stat);
 		}
@@ -274,22 +275,22 @@ void UCharacterStatsComponent::BeginPlay()
 
 void UCharacterStatsComponent::ExecuteBindings(ECharacterStat stat)
 {
-	if (stat == ECharacterStat::HEALTH && OnHealthChanged.IsBound() == true)
+	const float current = m_Stats[stat];
+	float max = 0.0f;
+
+	if (m_StatsMax.Contains(stat) == true)
 	{
-		OnHealthChanged.Execute(m_Stats[stat], m_StatsMax[stat]);
+		max = m_StatsMax[stat];
 	}
-	else if (stat == ECharacterStat::STAMINA && OnStaminaChanged.IsBound() == true)
+	else
 	{
-		OnStaminaChanged.Execute(m_Stats[stat], m_StatsMax[stat]);
+		if (stat == ECharacterStat::SHIELD)
+		{
+			max = m_StatsMax.Contains(ECharacterStat::HEALTH) ? m_StatsMax[ECharacterStat::HEALTH] : 0.0f;
+		}
 	}
-	else if (stat == ECharacterStat::MANA && OnManaChanged.IsBound() == true)
-	{
-		OnManaChanged.Execute(m_Stats[stat], m_StatsMax[stat]);
-	}
-	else if (stat == ECharacterStat::WALK_SPEED && OnSpeedChanged.IsBound() == true)
-	{
-		OnSpeedChanged.Execute(m_Stats[stat]);
-	}
+
+	OnStatChanged.Broadcast(stat, current, max);
 }
 
 void UCharacterStatsComponent::LogStatWarning(ECharacterStat stat)

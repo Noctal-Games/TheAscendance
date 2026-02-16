@@ -60,10 +60,10 @@ struct FSpellPair
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly)
-	int PrimarySpell = 0;
-	UPROPERTY(EditDefaultsOnly)
-	int SecondarySpell = 0;
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "Spell"))
+	FGameplayTag PrimarySpell;
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "Spell"))
+	FGameplayTag SecondarySpell;
 };
 
 USTRUCT(BlueprintType)
