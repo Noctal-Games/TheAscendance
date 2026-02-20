@@ -5,6 +5,8 @@
 #include "Structs/ItemData.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Characters/Player/PlayerCharacter.h"
+
 #include "Components/StaticMeshComponent.h"
 
 // Sets default values
@@ -45,4 +47,24 @@ void AItem::SetStaticMesh()
 	{
 		m_MeshComponent->SetStaticMesh(m_Mesh.Get());
 	}
+}
+
+void AItem::Interact(APlayerCharacter* player)
+{
+	Super::Interact(player);
+
+	if (player == nullptr || m_ItemData == nullptr)
+	{
+		return;
+	}
+
+	if (player->PickupItem(m_ItemData->ItemTag, 1) == true)
+	{
+		Destroy();
+	}
+}
+
+EInteractType AItem::GetInteractType()
+{
+	return EInteractType::PICKUP;
 }

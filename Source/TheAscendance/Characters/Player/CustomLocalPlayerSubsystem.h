@@ -50,6 +50,8 @@ private:
 	void HandleOffhandPrimaryAttack();
 	void HandleOffhandSecondaryAttack();
 
+	void HandleInteract();
+
 	void HandleTestFunction1();
 	void HandleTestFunction2();
 	void HandleTestFunction3();

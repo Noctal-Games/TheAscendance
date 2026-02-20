@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "TheAscendance/Quests/Enums/ObjectiveType.h"
 #include "StructUtils/InstancedStruct.h"
+#include "GameplayTagContainer.h"
 #include "ObjectiveData.generated.h"
 
 // OBJECTIVE GOALS
@@ -27,7 +28,7 @@ struct FGatherGoal : public FObjectiveGoalData
 	FGatherGoal() : FObjectiveGoalData(EObjectiveGoalType::GATHER) {};
 
 	UPROPERTY(EditDefaultsOnly)
-	int ItemID = -1;
+	FGameplayTag ItemTag;
 	UPROPERTY(EditDefaultsOnly)
 	int Amount = 0;
 };
