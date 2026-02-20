@@ -189,7 +189,7 @@ void APlayerCharacter::BeginPlay()
 	m_LoadoutComponent->SetSpells(testSpells);
 }
 
-void APlayerCharacter::CheckForInteractTarget()
+void APlayerCharacter::HandleLookAtInteractions()
 {
 	FVector loc;
 	FRotator rot;
@@ -200,7 +200,7 @@ void APlayerCharacter::CheckForInteractTarget()
 	if (controller == nullptr)
 	{
 		LOG_ERROR("[PLAYER CHARACTER] Controller was invalid")
-		return;
+			return;
 	}
 
 	controller->GetPlayerViewPoint(loc, rot);
@@ -213,6 +213,11 @@ void APlayerCharacter::CheckForInteractTarget()
 
 	bool iHit = GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility, traceParams);
 
+	CheckForInteractTarget(iHit, hit);
+}
+
+void APlayerCharacter::CheckForInteractTarget(bool iHit, const FHitResult& hit)
+{
 	if (iHit == true)
 	{
 		AActor* hitActor = hit.GetActor();
@@ -256,7 +261,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	LOG_ONSCREEN(0, 1, FColor::Yellow, "[PLAYER CHARACTER] USING ANIMATIONS: %s", m_AnimTest ? TEXT("TRUE") : TEXT("FALSE"));
 
-	CheckForInteractTarget();
+	HandleLookAtInteractions();
 }
 
 void APlayerCharacter::TestFunction1()

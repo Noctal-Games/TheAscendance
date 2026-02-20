@@ -65,7 +65,8 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	void CheckForInteractTarget();
+	void HandleLookAtInteractions();
+	void CheckForInteractTarget(bool iHit, const FHitResult& hit);
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Player Camera"))
