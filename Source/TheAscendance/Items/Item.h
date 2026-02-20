@@ -4,14 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "TheAscendance/Actors/Interaction/BaseInteractableActor.h"
+#include "TheAscendance/Actors/Interaction/Interfaces/Interactable.h"
 #include "Item.generated.h"
 
 class UStaticMeshComponent;
 class UStaticMesh;
+class APlayerCharacter;
 struct FItemData;
 
 UCLASS()
-class THEASCENDANCE_API AItem : public AActor
+class THEASCENDANCE_API AItem : public ABaseInteractableActor
 {
 	GENERATED_BODY()
 	
@@ -22,6 +25,8 @@ public:
 	void Init(FItemData* itemData);
 	void SetStaticMesh();
 
+	virtual void Interact(APlayerCharacter* player) override;
+	virtual EInteractType GetInteractType() override;
 private:
 	UPROPERTY();
 	TSoftObjectPtr<UStaticMesh> m_Mesh = nullptr;

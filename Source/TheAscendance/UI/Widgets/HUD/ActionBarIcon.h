@@ -39,6 +39,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget, DisplayName = "Action Icon Border"))
 	TObjectPtr<UBorder> m_ActionIconBorder = nullptr;
 
+	UPROPERTY()
 	TSoftObjectPtr<UTexture2D> m_Texture = nullptr;
 
 	FGameplayTag m_SpellTag;

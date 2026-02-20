@@ -8,7 +8,7 @@
 
 void UGatherObjectiveGoal::Init(const FGatherGoal& data)
 {
-	m_ItemID = data.ItemID;
+	m_ItemTag = data.ItemTag;
 	m_ToGather = data.Amount;
 }
 
@@ -28,9 +28,9 @@ void UGatherObjectiveGoal::Deactivate()
 	}
 }
 
-void UGatherObjectiveGoal::OnItemPickup(int id, int amount)
+void UGatherObjectiveGoal::OnItemPickup(const FGameplayTag& itemTag, int amount)
 {
-	if (id != m_ItemID || IsComplete() == true)
+	if (itemTag != m_ItemTag || IsComplete() == true)
 	{
 		return;
 	}

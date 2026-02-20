@@ -16,10 +16,10 @@
 #include "TheAscendance/Spells/SpellGameplayTags.h"
 #include "TheAscendance/Spells/Components/SpellCasterComponent.h"
 #include "TheAscendance/Items/ItemGameplayTags.h"
+#include "TheAscendance/Actors/Interaction/Interfaces/Interactable.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
-
 
 // Sets default values
 APlayerCharacter::APlayerCharacter() : ABaseCharacter()
@@ -44,12 +44,26 @@ ACustomPlayerController* APlayerCharacter::GetPlayerController()
 	return m_PlayerController;
 }
 
-void APlayerCharacter::PickupItem(int id, int amount)
+void APlayerCharacter::Interact()
+{
+	if (m_InteractTarget == nullptr)
+	{
+		LOG_INFO("[PLAYER CHARACTER] Interact Target is invalid");
+		return;
+	}
+
+	m_InteractTarget->Interact(this);
+}
+
+bool APlayerCharacter::PickupItem(const FGameplayTag& itemTag, int amount)
 {
 	if (UGameEventSubsystem* gameEvent = GetWorld()->GetGameInstance()->GetSubsystem<UGameEventSubsystem>())
 	{
-		gameEvent->NotifyItemPickup(id, amount);
+		gameEvent->NotifyItemPickup(itemTag, amount);
+		return true;
 	}
+
+	return false;
 }
 
 void APlayerCharacter::SetIsSprinting(bool val)
@@ -175,12 +189,79 @@ void APlayerCharacter::BeginPlay()
 	m_LoadoutComponent->SetSpells(testSpells);
 }
 
+void APlayerCharacter::HandleLookAtInteractions()
+{
+	FVector loc;
+	FRotator rot;
+	FHitResult hit;
+
+	AController* controller = GetController();
+
+	if (controller == nullptr)
+	{
+		LOG_ERROR("[PLAYER CHARACTER] Controller was invalid")
+			return;
+	}
+
+	controller->GetPlayerViewPoint(loc, rot);
+
+	FVector start = loc;
+	FVector end = start + (rot.Vector() * InteractRange);
+
+	FCollisionQueryParams traceParams;
+	traceParams.AddIgnoredActor(this);
+
+	bool iHit = GetWorld()->LineTraceSingleByChannel(hit, start, end, ECC_Visibility, traceParams);
+
+	CheckForInteractTarget(iHit, hit);
+}
+
+void APlayerCharacter::CheckForInteractTarget(bool iHit, const FHitResult& hit)
+{
+	if (iHit == true)
+	{
+		AActor* hitActor = hit.GetActor();
+
+		if (m_InteractTarget.GetObject() == hitActor)
+		{
+			return;
+		}
+
+		if (IInteractable* target = Cast<IInteractable>(hitActor))
+		{
+			m_InteractTarget.SetObject(hitActor);
+			m_InteractTarget.SetInterface(target);
+		}
+		else
+		{
+			m_InteractTarget = nullptr;
+		}
+	}
+	else
+	{
+		m_InteractTarget = nullptr;
+	}
+
+	if (m_OnInteractTargetChanged.IsBound())
+	{
+		if (m_InteractTarget == nullptr)
+		{
+			m_OnInteractTargetChanged.Execute(EInteractType::MAX);
+			return;
+		}
+
+		m_OnInteractTargetChanged.Execute(m_InteractTarget->GetInteractType());
+	}
+}
+
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	ABaseCharacter::Tick(DeltaTime);
 
 	LOG_ONSCREEN(0, 1, FColor::Yellow, "[PLAYER CHARACTER] USING ANIMATIONS: %s", m_AnimTest ? TEXT("TRUE") : TEXT("FALSE"));
+
+	HandleLookAtInteractions();
 }
 
 void APlayerCharacter::TestFunction1()

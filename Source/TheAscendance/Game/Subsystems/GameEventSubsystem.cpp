@@ -4,10 +4,10 @@
 #include "GameEventSubsystem.h"
 #include "TheAscendance/Core/CoreMacros.h"
 
-void UGameEventSubsystem::NotifyItemPickup(int id, int amount)
+void UGameEventSubsystem::NotifyItemPickup(const FGameplayTag& itemTag, int amount)
 {
-	OnItemPickup.Broadcast(id, amount);
-	OnItemPickupBP.Broadcast(id, amount);
+	OnItemPickup.Broadcast(itemTag, amount);
+	OnItemPickupBP.Broadcast(itemTag, amount);
 }
 
 void UGameEventSubsystem::NotifyEnemyKilled(int id)

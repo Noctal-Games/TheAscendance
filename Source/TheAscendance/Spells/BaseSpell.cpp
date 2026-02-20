@@ -26,6 +26,8 @@ void UBaseSpell::Init(USpellData* spellData, ISpellCaster* spellOwner)
 		return;
 	}
 
+	m_Cooldown = spellData->SpellCooldown;
+
 	UCoreFunctionLibrary::RequestAsyncLoad(m_SpellNiagara.ToSoftObjectPath());
 }
 

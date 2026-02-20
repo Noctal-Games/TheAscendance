@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Characters/BaseCharacter.h"
+#include "TheAscendance/Actors/Interaction/Enums/InteractType.h"
 #include "PlayerCharacter.generated.h"
 
 class UPlayerMovementComponent;
@@ -11,6 +12,9 @@ class UCameraComponent;
 class ACustomPlayerController;
 class ISpell;
 class USoundBase;
+class IInteractable;
+
+DECLARE_DELEGATE_OneParam(FOnInteractTargetChanged, EInteractType);
 
 UCLASS()
 class THEASCENDANCE_API APlayerCharacter : public ABaseCharacter
@@ -24,11 +28,10 @@ public:
 	void SetPlayerController(ACustomPlayerController* PlayerController);
 	ACustomPlayerController* GetPlayerController();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Player Camera"))
-	TObjectPtr<UCameraComponent> m_Camera = nullptr;
+	void Interact();
 
 	UFUNCTION(BlueprintCallable)
-	void PickupItem(int id, int amount);
+	bool PickupItem(const FGameplayTag& itemTag, int amount);
 
 	void SetIsSprinting(bool val);
 
@@ -62,6 +65,25 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	void HandleLookAtInteractions();
+	void CheckForInteractTarget(bool iHit, const FHitResult& hit);
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (DisplayName = "Player Camera"))
+	TObjectPtr<UCameraComponent> m_Camera = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+	float InteractRange = 500.0f;
+
+protected:
+	friend class UPlayerHUD;
+
+	FOnInteractTargetChanged m_OnInteractTargetChanged;
+
+private:
+	UPROPERTY()
+	TScriptInterface<IInteractable> m_InteractTarget = nullptr;
+
 	UPROPERTY()
 	TObjectPtr<UPlayerMovementComponent> m_MovementComponent = nullptr;
 	UPROPERTY()
