@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseObjectiveGoal.h"
+#include "GameplayTagContainer.h"
 #include "GatherObjectiveGoal.generated.h"
 
 struct FGatherGoal;
@@ -20,10 +21,10 @@ public:
 	virtual void Deactivate() override;
 
 protected:
-	void OnItemPickup(int id, int amount);
+	void OnItemPickup(const FGameplayTag& itemTag, int amount);
 
 private:
-	int m_ItemID = 0;
+	FGameplayTag m_ItemTag;
 	int m_ToGather = 0;
 	int m_CurrentAmount = 0;
 

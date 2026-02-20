@@ -3,9 +3,13 @@
 
 #include "PlayerHUD.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 #include "TheAscendance/UI/Elements/StatBoundProgressBar.h"
 #include "ActionBar.h"
+
+#include "Components/WidgetSwitcher.h"
+#include "Components/Image.h"
 
 void UPlayerHUD::Init(APlayerCharacter* ownerCharacter)
 {
@@ -16,6 +20,8 @@ void UPlayerHUD::Init(APlayerCharacter* ownerCharacter)
 		LOG_ERROR("PLAYER HUD] Attempted to Init with invalid owner character reference");
 		return;
 	}
+
+	m_OwnerCharacter->m_OnInteractTargetChanged.BindUObject(this, &UPlayerHUD::UpdateCrosshair);
 
 	m_ActionBar->Init(m_OwnerCharacter->GetLoadoutComponent());
 
@@ -60,4 +66,16 @@ void UPlayerHUD::NativeConstruct()
 void UPlayerHUD::NativeDestruct()
 {
 	Super::NativeDestruct();
+}
+
+void UPlayerHUD::UpdateCrosshair(EInteractType targetType)
+{
+	if (UWidget* newCrosshair = m_Crosshair->GetWidgetAtIndex((int32)targetType))
+	{
+		m_Crosshair->SetActiveWidget(newCrosshair);
+	}
+	else
+	{
+		LOG_ERROR("[PLAYER HUD] Tried to UpdateCrosshair but crosshair doesn't exist for: %s", *UEnum::GetValueAsString(targetType));
+	}
 }

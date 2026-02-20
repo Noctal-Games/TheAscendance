@@ -123,9 +123,9 @@ UQuest* UQuestManagerSubsystem::CreateQuest(UQuestData* data)
 	return nullptr;
 }
 
-void UQuestManagerSubsystem::HandleItemPickup(int id, int amount)
+void UQuestManagerSubsystem::HandleItemPickup(const FGameplayTag& itemTag, int amount)
 {
-	OnItemPickupEvent.Broadcast(id, amount);
+	OnItemPickupEvent.Broadcast(itemTag, amount);
 }
 
 void UQuestManagerSubsystem::HandleEnemyKilled(int id)
