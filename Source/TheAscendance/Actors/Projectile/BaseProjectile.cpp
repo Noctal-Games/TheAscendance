@@ -204,19 +204,6 @@ void ABaseProjectile::BeginOverlap(UPrimitiveComponent* overlappedComponent, AAc
 	}
 
 	m_DecoratedSelf->HandleOnOverlap(overlappedComponent, otherActor, otherComp, otherBodyIndex, bFromSweep, sweepResult);
-	
-    /*if (_canPenetrate == false || Cast<ACharacter>(otherActor) == nullptr)
-	{
-		_spell->ProcessHit(OtherActor, GetActorLocation(), 0);
-		_spell = nullptr;
-		Destroy();
-		//ReturnToPool();
-
-		return;
-	}*/
-
-
-	//m_Collider->IgnoreActorWhenMoving(otherActor, true);
 }
 
 // Called when the game starts or when spawned

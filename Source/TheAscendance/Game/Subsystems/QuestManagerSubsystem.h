@@ -17,7 +17,7 @@ class UBaseObjectiveGoal;
 struct FObjectiveTypeData;
 struct FObjectiveGoalData;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnQuestItemPickup, int /*id*/, int /*amount*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnQuestItemPickup, const FGameplayTag& /*itemTag*/, int /*amount*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnQuestEnemyKilled, int /*id*/);
 
 UCLASS()
@@ -44,7 +44,7 @@ protected:
 	UQuest* CreateQuest(UQuestData* data);
 
 private:
-	void HandleItemPickup(int id, int amount);
+	void HandleItemPickup(const FGameplayTag& itemTag, int amount);
 	void HandleEnemyKilled(int id);
 
 protected:
