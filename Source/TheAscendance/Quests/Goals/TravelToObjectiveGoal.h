@@ -5,26 +5,26 @@
 #include "CoreMinimal.h"
 #include "BaseObjectiveGoal.h"
 #include "GameplayTagContainer.h"
-#include "GatherObjectiveGoal.generated.h"
+#include "TravelToObjectiveGoal.generated.h"
 
-struct FGatherGoal;
+struct FTravelToGoal;
 
 UCLASS()
-class THEASCENDANCE_API UGatherObjectiveGoal : public UBaseObjectiveGoal
+class THEASCENDANCE_API UTravelToObjectiveGoal : public UBaseObjectiveGoal
 {
 	GENERATED_BODY()
 	
 public:
-	void Init(const FGatherGoal& data);
+	void Init(const FTravelToGoal& data);
 
 	virtual void Activate() override;
 	virtual void Deactivate() override;
 
 protected:
-	void OnItemPickup(const FGameplayTag& itemTag, int amount);
+	void OnLocationEnterred(const FGameplayTag& locationTag);
 
 private:
-	FGameplayTag m_ItemTag;
-	int m_ToGather = 0;
-	int m_CurrentAmount = 0;
+	FGameplayTag m_LocationTag;
+
+	FDelegateHandle m_TravelToHandle;
 };
