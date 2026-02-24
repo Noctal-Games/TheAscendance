@@ -27,7 +27,7 @@ struct FGatherGoal : public FObjectiveGoalData
 
 	FGatherGoal() : FObjectiveGoalData(EObjectiveGoalType::GATHER) {};
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "Item"))
 	FGameplayTag ItemTag;
 	UPROPERTY(EditDefaultsOnly)
 	int Amount = 0;
@@ -53,6 +53,16 @@ struct FKillTypeGoal : public FObjectiveGoalData
 	int EnemyID = -1;
 	UPROPERTY(EditDefaultsOnly)
 	int Amount = 0;
+};
+USTRUCT(BlueprintType, meta = (ToolTip = "Travel to a specified location"))
+struct FTravelToGoal : public FObjectiveGoalData
+{
+	GENERATED_BODY()
+
+	FTravelToGoal() : FObjectiveGoalData(EObjectiveGoalType::TRAVEL_TO) {};
+
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "Location"))
+	FGameplayTag LocationTag;
 };
 
 // OBJECTIVE TYPES

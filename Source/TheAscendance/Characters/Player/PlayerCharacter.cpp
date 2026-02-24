@@ -57,7 +57,7 @@ void APlayerCharacter::Interact()
 
 bool APlayerCharacter::PickupItem(const FGameplayTag& itemTag, int amount)
 {
-	if (UGameEventSubsystem* gameEvent = GetWorld()->GetGameInstance()->GetSubsystem<UGameEventSubsystem>())
+	if (UGameEventSubsystem* gameEvent = UCoreFunctionLibrary::GetGameEventSubsystem())
 	{
 		gameEvent->NotifyItemPickup(itemTag, amount);
 		return true;
