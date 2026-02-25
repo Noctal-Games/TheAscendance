@@ -9,10 +9,12 @@
 UENUM()
 enum class EWidgets : uint8
 {
-	PLAYER_HUD
+	PLAYER_HUD,
+	GRIMOIRE
 };
 
 class UPlayerHUD;
+class UGrimoire;
 
 UCLASS(Blueprintable)
 class THEASCENDANCE_API UUIManagerSubsystem : public UGameInstanceSubsystem
@@ -28,6 +30,7 @@ public:
 protected:
 	friend class UCustomLocalPlayerSubsystem;
 	UPlayerHUD* CreatePlayerHUD();
+	UGrimoire* CreateGrimoire();
 
 private:
 	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Widget Defaults"))

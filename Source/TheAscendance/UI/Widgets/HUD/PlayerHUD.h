@@ -31,14 +31,14 @@ protected:
 	void UpdateCrosshair(EInteractType targetType);
 
 private:
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget, DisplayName = "Health Bar"))
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	TObjectPtr<UStatBoundProgressBar> m_HealthBar = nullptr;
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget, DisplayName = "Stamina Bar"))
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	TObjectPtr<UStatBoundProgressBar> m_StaminaBar = nullptr;
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget, DisplayName = "Mana Bar"))
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	TObjectPtr<UStatBoundProgressBar> m_ManaBar = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget, DisplayName = "Action Bar"))
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	TObjectPtr<UActionBar> m_ActionBar = nullptr;
 
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
