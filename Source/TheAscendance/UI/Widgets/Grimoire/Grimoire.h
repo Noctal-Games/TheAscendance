@@ -7,6 +7,10 @@
 #include "Grimoire.generated.h"
 
 class USpellInventoryGrid;
+class USpellLoadoutDisplay;
+class USpellInfoDisplay;
+class USpellDataEntryObject;
+class ULoadoutComponent;
 
 UCLASS()
 class THEASCENDANCE_API UGrimoire : public UCommonActivatableWidget
@@ -16,10 +20,22 @@ class THEASCENDANCE_API UGrimoire : public UCommonActivatableWidget
 public:
 	virtual bool NativeOnHandleBackAction() override;
 
+	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
-	virtual void NativeDestruct() override;
+protected:
+	friend class USpellLoadoutIcon;
+	friend class USpellInventoryEntry;
+
+	void UpdateDisplayedSpellInfo(const USpellDataEntryObject* spellDataEntry);
 
 private:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	TObjectPtr<USpellInventoryGrid> m_SpellInventoryGrid = nullptr;
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	TObjectPtr<USpellLoadoutDisplay> m_SpellLoadoutDisplay = nullptr;
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	TObjectPtr<USpellInfoDisplay> m_SpellInfoDisplay = nullptr;
+
+	UPROPERTY()
+	TWeakObjectPtr<ULoadoutComponent> m_PlayerLoadout = nullptr;
 };

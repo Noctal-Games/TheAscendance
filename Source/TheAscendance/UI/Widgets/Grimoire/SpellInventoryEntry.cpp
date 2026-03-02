@@ -6,21 +6,55 @@
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Spells/Structs/SpellData.h"
 #include "TheAscendance/UI/Data/SpellDataEntryObject.h"
+#include "TheAscendance/Game/Subsystems/UIManagerSubsystem.h"
+#include "Grimoire.h"
 
 #include "Components/Image.h"
 
+FReply USpellInventoryEntry::NativeOnFocusReceived(const FGeometry& geometryEvent, const FFocusEvent& focusEvent)
+{
+	FReply reply = Super::NativeOnFocusReceived(geometryEvent, focusEvent);
+
+	if (m_Grimoire.IsValid())
+	{
+		m_Grimoire->UpdateDisplayedSpellInfo(m_SpellDataEntry);
+	}
+
+	return reply;
+}
+
+void USpellInventoryEntry::NativeOnMouseEnter(const FGeometry& geometryEvent, const FPointerEvent& pointerEvent)
+{
+	SetFocus();
+}
+
+void USpellInventoryEntry::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+
+	if (UUIManagerSubsystem* uiManager = UCoreFunctionLibrary::GetUIManagerSubsystem())
+	{
+		m_Grimoire = uiManager->GetGrimoire();
+	}
+}
+
 void USpellInventoryEntry::NativeOnListItemObjectSet(UObject* listItemObject)
 {
-	USpellDataEntryObject* data = Cast<USpellDataEntryObject>(listItemObject);
+	m_SpellDataEntry = Cast<USpellDataEntryObject>(listItemObject);
 
-	if (!data)
+	if (m_SpellDataEntry == nullptr)
 	{
+		LOG_ERROR("[SPELL INVENTORY ENTRY] Failed to set list item object - Object was not of type USpellDataEntryObject");
 		return;
 	}
 
-	if (data->Icon)
+	if (m_SpellDataEntry->Icon != nullptr)
 	{
-		m_SpellIcon->SetBrushFromTexture(data->Icon);
+		m_SpellIcon->SetBrushFromTexture(m_SpellDataEntry->Icon);
+	}
+	else
+	{
+		LOG_ERROR("[SPELL INVENTORY ENTRY] Spell Icon was invalid");
 	}
 }
 

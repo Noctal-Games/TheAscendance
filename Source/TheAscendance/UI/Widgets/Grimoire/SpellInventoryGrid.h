@@ -6,6 +6,7 @@
 #include "CommonTileView.h"
 #include "SpellInventoryGrid.generated.h"
 
+class UGrimoire;
 class USpellInventoryEntry;
 struct FSpellTableData;
 

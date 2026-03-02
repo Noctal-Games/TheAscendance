@@ -67,11 +67,11 @@ void UCustomLocalPlayerSubsystem::CreateHUD()
 
 	if(UUIManagerSubsystem* uiManager = UCoreFunctionLibrary::GetUIManagerSubsystem())
 	{
-		if (m_HUDWidget = uiManager->CreatePlayerHUD())
-		{
-			m_HUDWidget->Init(m_PlayerCharacter.Get());
-			m_HUDWidget->AddToPlayerScreen(1);
-		}
+		//if (m_HUDWidget = uiManager->CreatePlayerHUD())
+		//{
+			//m_HUDWidget->Init(m_PlayerCharacter.Get());
+			//m_HUDWidget->AddToPlayerScreen(1);
+		//}
 	}
 	else
 	{
@@ -247,13 +247,9 @@ void UCustomLocalPlayerSubsystem::HandleToggleGrimoire()
 {
 	if (m_GrimoireWidget != nullptr)
 	{
-		if (m_GrimoireWidget->IsActivated())
+		if (m_GrimoireWidget->IsActivated() == false)
 		{
-			m_GrimoireWidget->DeactivateWidget();
-		}
-		else
-		{
-			m_GrimoireWidget->ActivateWidget();
+			//m_GrimoireWidget->ActivateWidget();
 		}
 
 		return;
@@ -261,11 +257,11 @@ void UCustomLocalPlayerSubsystem::HandleToggleGrimoire()
 
 	if (UUIManagerSubsystem* uiManager = UCoreFunctionLibrary::GetUIManagerSubsystem())
 	{
-		if (m_GrimoireWidget = uiManager->CreateGrimoire())
-		{
-			m_GrimoireWidget->AddToPlayerScreen(50);
-			m_GrimoireWidget->ActivateWidget();
-		}
+		//if (m_GrimoireWidget = uiManager->CreateGrimoire())
+		//{
+			//m_GrimoireWidget->AddToPlayerScreen(50);
+			//m_GrimoireWidget->ActivateWidget();
+		//}
 	}
 	else
 	{

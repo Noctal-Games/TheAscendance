@@ -27,12 +27,21 @@ public:
 
 	virtual bool ShouldCreateSubsystem(UObject* outer) const override;
 
+	UGrimoire* GetGrimoire();
+
 protected:
 	friend class UCustomLocalPlayerSubsystem;
+	friend class UGrimoire;
+
 	UPlayerHUD* CreatePlayerHUD();
 	UGrimoire* CreateGrimoire();
+
+	void SetGrimoireRef(UGrimoire* grimoire);
 
 private:
 	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Widget Defaults"))
 	TMap<EWidgets, TSubclassOf<UUserWidget>> m_WidgetDefaults;
+
+	UPROPERTY()
+	TWeakObjectPtr<UGrimoire> m_Grimoire = nullptr;
 };

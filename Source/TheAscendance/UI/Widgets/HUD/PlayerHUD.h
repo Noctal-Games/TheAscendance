@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CommonUserWidget.h"
+#include "CommonActivatableWidget.h"
 #include "TheAscendance/Actors/Interaction/Interfaces/Interactable.h"
 #include "PlayerHUD.generated.h"
 
@@ -14,7 +14,7 @@ class UWidgetSwitcher;
 class UImage;
 
 UCLASS()
-class THEASCENDANCE_API UPlayerHUD : public UCommonUserWidget
+class THEASCENDANCE_API UPlayerHUD : public UCommonActivatableWidget
 {
 	GENERATED_BODY()
 	
@@ -24,10 +24,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void BindStatBar(UStatBoundProgressBar* statBar);
 
-	virtual void NativeConstruct() override;
-	virtual void NativeDestruct() override;
+	virtual void NativePreConstruct() override;
 
-protected:
+private:
 	void UpdateCrosshair(EInteractType targetType);
 
 private:

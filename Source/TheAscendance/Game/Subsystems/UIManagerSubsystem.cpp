@@ -27,6 +27,16 @@ bool UUIManagerSubsystem::ShouldCreateSubsystem(UObject* outer) const
 	return false;
 }
 
+UGrimoire* UUIManagerSubsystem::GetGrimoire()
+{
+	if (m_Grimoire.IsValid() == false)
+	{
+		return nullptr;
+	}
+
+	return m_Grimoire.Get();
+}
+
 UPlayerHUD* UUIManagerSubsystem::CreatePlayerHUD()
 {
 	if(m_WidgetDefaults.Contains(EWidgets::PLAYER_HUD) == false)
@@ -79,4 +89,9 @@ UGrimoire* UUIManagerSubsystem::CreateGrimoire()
 	}
 
 	return nullptr;
+}
+
+void UUIManagerSubsystem::SetGrimoireRef(UGrimoire* grimoire)
+{
+	m_Grimoire = grimoire;
 }

@@ -3,28 +3,33 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CommonUserWidget.h"
-#include "Blueprint/IUserObjectListEntry.h"
-#include "SpellInventoryEntry.generated.h"
+#include "CommonActivatableWidget.h"
+#include "SpellLoadoutIcon.generated.h"
 
-class USpellDataEntryObject;
 class UGrimoire;
+class USpellDataEntryObject;
 class UImage;
-struct FSpellTableData;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHovered);
 
 UCLASS()
-class THEASCENDANCE_API USpellInventoryEntry : public UCommonUserWidget, public IUserObjectListEntry
+class THEASCENDANCE_API USpellLoadoutIcon : public UCommonActivatableWidget
 {
 	GENERATED_BODY()
 	
-public:
+public: 
+	void Init(USpellDataEntryObject* spellDataEntry);
+
+
 	virtual FReply NativeOnFocusReceived(const FGeometry& geometryEvent, const FFocusEvent& focusEvent) override;
 	virtual void NativeOnMouseEnter(const FGeometry& geometryEvent, const FPointerEvent& pointerEvent) override;
 
-	virtual void NativePreConstruct() override;
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& geometryEvent, const FPointerEvent& pointerEvent) override;
 
-protected:
-	virtual void NativeOnListItemObjectSet(UObject* listItemObject) override;
+	virtual void NativePreConstruct() override;
+private:
+	UFUNCTION()
+	void UpdateGrimoireSpellInfo();
 
 private:
 	UPROPERTY()
@@ -36,10 +41,3 @@ private:
 	UPROPERTY()
 	TWeakObjectPtr<UGrimoire> m_Grimoire = nullptr;
 };
-
-//void Init(const TSharedPtr<FSpellTableData> spellData);
-
-//void SetIcon();
-
-//TSharedPtr<FSpellTableData> m_SpellData = nullptr;
-//TSoftObjectPtr<UTexture2D> m_SpellIconTexture = nullptr;
