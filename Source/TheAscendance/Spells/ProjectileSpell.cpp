@@ -115,7 +115,7 @@ bool UProjectileSpell::DealDamage(AActor* hitActor, int damage)
 {
 	if (ISusceptible* target = Cast<ISusceptible>(hitActor))
 	{
-		target->Damage(damage);
+		target->Damage(damage, true);
 		return target->IsDead();
 	}
 

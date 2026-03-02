@@ -26,7 +26,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Susceptible Interface")
 	virtual void Heal(int amount) {};
 	UFUNCTION(BlueprintCallable, Category = "Susceptible Interface")
-	virtual void Damage(int amount) {};
+	virtual void Damage(int amount, bool triggerOnHit) {};
 	UFUNCTION(BlueprintCallable, Category = "Susceptible Interface")
 	virtual void ReduceStamina(int amount) {};
 	UFUNCTION(BlueprintCallable, Category = "Susceptible Interface")

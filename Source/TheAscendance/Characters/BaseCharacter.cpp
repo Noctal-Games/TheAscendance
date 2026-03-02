@@ -49,7 +49,7 @@ void ABaseCharacter::Heal(int amount)
 	m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::HEALTH, amount);
 }
 
-void ABaseCharacter::Damage(int amount)
+void ABaseCharacter::Damage(int amount, bool triggerOnHit)
 {
 	if (m_CharacterStatsComponent == nullptr)
 	{
@@ -57,11 +57,19 @@ void ABaseCharacter::Damage(int amount)
 		return;
 	}
 
+	if (triggerOnHit == true)
+	{
+		OnHit.Broadcast();
+	}
+
 	m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::HEALTH, -amount);
+	
+	OnDamageTaken.Broadcast();
 
 	if (m_CharacterStatsComponent->GetStatAsValue(ECharacterStat::HEALTH) <= 0.0f)
 	{
 		m_LoadoutComponent->OnSpellsUpdated.Remove(m_OnSpellsUpdatedHandle);
+		OnDeath.Broadcast(this);
 	}
 }
 
