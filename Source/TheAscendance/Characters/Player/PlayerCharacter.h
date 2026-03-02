@@ -56,6 +56,9 @@ public:
 	void TestFunction2();
 	void TestFunction3();
 
+	UFUNCTION(BlueprintCallable)
+	void TestSetSpells(const TArray<FGameplayTag>& spellTags);
+
 	virtual bool IsSprinting() override;
 
 	// Called every frame

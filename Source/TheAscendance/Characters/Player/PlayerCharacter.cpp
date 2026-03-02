@@ -180,13 +180,6 @@ void APlayerCharacter::BeginPlay()
 	m_DefaultCapsuleHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
 	m_CurrentCapsuleHeight = m_DefaultCapsuleHeight;
 	m_CrouchCapsuleHeight = m_DefaultCapsuleHeight / 2;
-
-	//Test
-	TArray<FGameplayTag> testSpells;
-	testSpells.SetNum(4);
-	testSpells[2] = SPELL_FIRE_BOLT;
-
-	m_LoadoutComponent->SetSpells(testSpells);
 }
 
 void APlayerCharacter::HandleLookAtInteractions()
@@ -314,5 +307,10 @@ void APlayerCharacter::TestFunction3()
 	{
 		m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::SHIELD, -10);
 	}
+}
+
+void APlayerCharacter::TestSetSpells(const TArray<FGameplayTag>& spellTags)
+{
+	m_LoadoutComponent->SetSpells(spellTags);
 }
 
