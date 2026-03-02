@@ -31,8 +31,36 @@ void USpellLoadoutDisplay::Init(const TArray<FGameplayTag>& equippedSpellTags, c
 
 		const FGameplayTag& tag = equippedSpellTags[i];
 
-		if (tag.IsValid() == false)
+		if (tag.IsValid() == false || tag == FGameplayTag::EmptyTag)
 		{
+			switch (i)
+			{
+			case 0:
+			{
+				m_SpellOneIcon->Init(nullptr);
+				break;
+			}
+			case 1:
+			{
+				m_SpellTwoIcon->Init(nullptr);
+				break;
+			}
+			case 2:
+			{
+				m_SpellThreeIcon->Init(nullptr);
+				break;
+			}
+			case 3:
+			{
+				m_SpellFourIcon->Init(nullptr);
+				break;
+			}
+			default:
+			{
+				break;
+			}
+			}
+
 			continue;
 		}
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CommonActivatableWidget.h"
+#include "GameplayTagContainer.h"
 #include "Grimoire.generated.h"
 
 class USpellInventoryGrid;
@@ -22,11 +23,16 @@ public:
 
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
+
 protected:
 	friend class USpellLoadoutIcon;
 	friend class USpellInventoryEntry;
 
 	void UpdateDisplayedSpellInfo(const USpellDataEntryObject* spellDataEntry);
+
+private:
+	void UpdateGrimoire(const TArray<FGameplayTag>& spellTags);
 
 private:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))

@@ -14,7 +14,11 @@ void USpellInfoDisplay::Init(const USpellDataEntryObject* spellDataEntry)
 {
 	if (spellDataEntry == nullptr)
 	{
-		LOG_ERROR("[SPELL INFO DISPLAY] SpellDataEntry was invalid");
+		m_SpellName->SetText(FText::GetEmpty());
+		m_SpellDescription->SetText(FText::GetEmpty());
+		m_SpellIcon->SetBrushFromTexture(nullptr);
+
+		m_SpellData = nullptr;		
 		return;
 	}
 

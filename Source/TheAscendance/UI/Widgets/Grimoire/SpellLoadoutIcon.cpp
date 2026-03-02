@@ -58,29 +58,15 @@ void USpellLoadoutIcon::NativePreConstruct()
 	if (UUIManagerSubsystem* uiManager = UCoreFunctionLibrary::GetUIManagerSubsystem())
 	{
 		m_Grimoire = uiManager->GetGrimoire();
-
-		if (m_Grimoire.IsValid())
-		{
-			LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "YES");
-		}
-		else
-		{
-			LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "NO");
-
-		}
 	}
 }
 
 void USpellLoadoutIcon::UpdateGrimoireSpellInfo()
 {
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "%s", m_SpellDataEntry ? *m_SpellDataEntry->Data.SpellName.ToString() : *FString("EMPTY"));
+
 	if(m_Grimoire.IsValid())
 	{
 		m_Grimoire->UpdateDisplayedSpellInfo(m_SpellDataEntry);
-	}
-	else
-	{
-		LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "WOWOWOW");
-
 	}
 }

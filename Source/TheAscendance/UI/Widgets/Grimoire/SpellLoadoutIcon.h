@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CommonActivatableWidget.h"
+#include "CommonUserWidget.h"
 #include "SpellLoadoutIcon.generated.h"
 
 class UGrimoire;
@@ -13,13 +13,12 @@ class UImage;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHovered);
 
 UCLASS()
-class THEASCENDANCE_API USpellLoadoutIcon : public UCommonActivatableWidget
+class THEASCENDANCE_API USpellLoadoutIcon : public UCommonUserWidget
 {
 	GENERATED_BODY()
 	
 public: 
-	void Init(USpellDataEntryObject* spellDataEntry);
-
+	virtual void Init(USpellDataEntryObject* spellDataEntry);
 
 	virtual FReply NativeOnFocusReceived(const FGeometry& geometryEvent, const FFocusEvent& focusEvent) override;
 	virtual void NativeOnMouseEnter(const FGeometry& geometryEvent, const FPointerEvent& pointerEvent) override;
@@ -31,13 +30,13 @@ private:
 	UFUNCTION()
 	void UpdateGrimoireSpellInfo();
 
-private:
+protected:
 	UPROPERTY()
 	TObjectPtr<USpellDataEntryObject> m_SpellDataEntry = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	TObjectPtr<UImage> m_SpellIcon = nullptr;
-
 	UPROPERTY()
 	TWeakObjectPtr<UGrimoire> m_Grimoire = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	TObjectPtr<UImage> m_SpellIcon = nullptr;
 };

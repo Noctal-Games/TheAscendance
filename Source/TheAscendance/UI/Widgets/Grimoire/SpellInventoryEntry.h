@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "CommonUserWidget.h"
+#include "SpellLoadoutIcon.h"
 #include "Blueprint/IUserObjectListEntry.h"
 #include "SpellInventoryEntry.generated.h"
 
@@ -13,28 +13,15 @@ class UImage;
 struct FSpellTableData;
 
 UCLASS()
-class THEASCENDANCE_API USpellInventoryEntry : public UCommonUserWidget, public IUserObjectListEntry
+class THEASCENDANCE_API USpellInventoryEntry : public USpellLoadoutIcon, public IUserObjectListEntry
 {
 	GENERATED_BODY()
 	
 public:
-	virtual FReply NativeOnFocusReceived(const FGeometry& geometryEvent, const FFocusEvent& focusEvent) override;
-	virtual void NativeOnMouseEnter(const FGeometry& geometryEvent, const FPointerEvent& pointerEvent) override;
-
-	virtual void NativePreConstruct() override;
+	virtual void Init(USpellDataEntryObject* spellDataEntry) override;
 
 protected:
 	virtual void NativeOnListItemObjectSet(UObject* listItemObject) override;
-
-private:
-	UPROPERTY()
-	TObjectPtr<USpellDataEntryObject> m_SpellDataEntry = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-	TObjectPtr<UImage> m_SpellIcon = nullptr;
-
-	UPROPERTY()
-	TWeakObjectPtr<UGrimoire> m_Grimoire = nullptr;
 };
 
 //void Init(const TSharedPtr<FSpellTableData> spellData);

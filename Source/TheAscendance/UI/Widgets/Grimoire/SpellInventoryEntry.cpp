@@ -11,31 +11,9 @@
 
 #include "Components/Image.h"
 
-FReply USpellInventoryEntry::NativeOnFocusReceived(const FGeometry& geometryEvent, const FFocusEvent& focusEvent)
+void USpellInventoryEntry::Init(USpellDataEntryObject* spellDataEntry)
 {
-	FReply reply = Super::NativeOnFocusReceived(geometryEvent, focusEvent);
-
-	if (m_Grimoire.IsValid())
-	{
-		m_Grimoire->UpdateDisplayedSpellInfo(m_SpellDataEntry);
-	}
-
-	return reply;
-}
-
-void USpellInventoryEntry::NativeOnMouseEnter(const FGeometry& geometryEvent, const FPointerEvent& pointerEvent)
-{
-	SetFocus();
-}
-
-void USpellInventoryEntry::NativePreConstruct()
-{
-	Super::NativePreConstruct();
-
-	if (UUIManagerSubsystem* uiManager = UCoreFunctionLibrary::GetUIManagerSubsystem())
-	{
-		m_Grimoire = uiManager->GetGrimoire();
-	}
+	LOG_WARNING("[SPELL INVENTORY ENTRY] No need to call Init on this child class");
 }
 
 void USpellInventoryEntry::NativeOnListItemObjectSet(UObject* listItemObject)

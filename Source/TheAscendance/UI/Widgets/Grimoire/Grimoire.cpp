@@ -49,6 +49,29 @@ void UGrimoire::NativeConstruct()
 		return;
 	}
 
+	m_PlayerLoadout->OnSpellsUpdated.AddUObject(this, &UGrimoire::UpdateGrimoire);
+
+	UpdateGrimoire(m_PlayerLoadout->GetSpellTags());
+}
+
+void UGrimoire::NativeDestruct()
+{
+	if (m_PlayerLoadout != nullptr)
+	{
+		m_PlayerLoadout->OnSpellsUpdated.RemoveAll(this);
+	}
+
+	Super::NativeDestruct();
+}
+
+
+void UGrimoire::UpdateDisplayedSpellInfo(const USpellDataEntryObject* spellDataEntry)
+{
+	m_SpellInfoDisplay->Init(spellDataEntry);
+}
+
+void UGrimoire::UpdateGrimoire(const TArray<FGameplayTag>& spellTags)
+{
 	if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
 	{
 		TArray<TSharedPtr<FSpellTableData>> spellDataEntries = gameMode->GetAllSpellTableDataEntries();
@@ -56,11 +79,9 @@ void UGrimoire::NativeConstruct()
 		TArray<TSharedPtr<FSpellTableData>> equippedSpellEntries;
 		TArray<TSharedPtr<FSpellTableData>> unequippedSpellEntries;
 
-		TSet<FGameplayTag> equippedTags(m_PlayerLoadout->GetSpellTags());
-
 		for (const TSharedPtr<FSpellTableData>& spell : spellDataEntries)
 		{
-			if (equippedTags.Contains(spell->SpellTag))
+			if (spellTags.Contains(spell->SpellTag))
 			{
 				equippedSpellEntries.Add(spell);
 			}
@@ -77,10 +98,4 @@ void UGrimoire::NativeConstruct()
 	{
 		LOG_ERROR("[GRIMOIRE] Failed to get PlayableGameMode reference in NativeConstruct");
 	}
-}
-
-
-void UGrimoire::UpdateDisplayedSpellInfo(const USpellDataEntryObject* spellDataEntry)
-{
-	m_SpellInfoDisplay->Init(spellDataEntry);
 }

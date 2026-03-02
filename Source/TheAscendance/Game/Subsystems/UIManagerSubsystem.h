@@ -9,10 +9,12 @@
 UENUM()
 enum class EWidgets : uint8
 {
+	GAME_HUD,
 	PLAYER_HUD,
 	GRIMOIRE
 };
 
+class UGameHUD;
 class UPlayerHUD;
 class UGrimoire;
 
