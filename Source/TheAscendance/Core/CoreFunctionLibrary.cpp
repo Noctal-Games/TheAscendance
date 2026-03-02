@@ -7,6 +7,8 @@
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Game/Subsystems/DataHandlerSubsystem.h"
 #include "TheAscendance/Game/Subsystems/QuestManagerSubsystem.h"
+#include "TheAscendance/Game/Subsystems/UIManagerSubsystem.h"
+#include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
 #include "TheAscendance/Core/CoreMacros.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -123,6 +125,17 @@ UUIManagerSubsystem* UCoreFunctionLibrary::GetUIManagerSubsystem()
 	if (UWorld* world = GetGameWorld())
 	{
 		return world->GetGameInstance()->GetSubsystem<UUIManagerSubsystem>();
+	}
+
+	LOG_ERROR("[CORE] GameWorld was invalid");
+	return nullptr;
+}
+
+UGameEventSubsystem* UCoreFunctionLibrary::GetGameEventSubsystem()
+{
+	if (UWorld* world = GetGameWorld())
+	{
+		return world->GetGameInstance()->GetSubsystem<UGameEventSubsystem>();
 	}
 
 	LOG_ERROR("[CORE] GameWorld was invalid");

@@ -3,6 +3,7 @@
 
 #include "QuestManagerSubsystem.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Quests/Quest.h"
 #include "TheAscendance/Quests/Structs/QuestData.h"
 #include "TheAscendance/Quests/Objectives/ObjectiveFactory.h"
@@ -93,19 +94,21 @@ void UQuestManagerSubsystem::Initialize(FSubsystemCollectionBase& collection)
 	m_ObjectiveFactory = NewObject<UObjectiveFactory>(this);
 	m_ObjectiveGoalFactory = NewObject<UObjectiveGoalFactory>(this);
 
-	if (UGameEventSubsystem* EventSystem = GetGameInstance()->GetSubsystem<UGameEventSubsystem>())
+	if (UGameEventSubsystem* eventSystem = UCoreFunctionLibrary::GetGameEventSubsystem())
 	{
-		OnItemPickupGameEventHandle = EventSystem->OnItemPickup.AddUObject(this, &UQuestManagerSubsystem::HandleItemPickup);
-		OnEnemyKilledGameEventHandle = EventSystem->OnEnemyKilled.AddUObject(this, &UQuestManagerSubsystem::HandleEnemyKilled);
+		OnItemPickupGameEventHandle = eventSystem->OnItemPickup.AddUObject(this, &UQuestManagerSubsystem::HandleItemPickup);
+		OnEnemyKilledGameEventHandle = eventSystem->OnEnemyKilled.AddUObject(this, &UQuestManagerSubsystem::HandleEnemyKilled);
+		OnLocationEnterredGameEventHandle = eventSystem->OnLocationEnterred.AddUObject(this, &UQuestManagerSubsystem::HandleLocationEnterred);
 	}
 }
 
 void UQuestManagerSubsystem::Deinitialize()
 {
-	if (UGameEventSubsystem* EventSystem = GetGameInstance()->GetSubsystem<UGameEventSubsystem>())
+	if (UGameEventSubsystem* eventSystem = UCoreFunctionLibrary::GetGameEventSubsystem())
 	{
-		EventSystem->OnItemPickup.Remove(OnItemPickupGameEventHandle);
-		EventSystem->OnEnemyKilled.Remove(OnEnemyKilledGameEventHandle);
+		eventSystem->OnItemPickup.Remove(OnItemPickupGameEventHandle);
+		eventSystem->OnEnemyKilled.Remove(OnEnemyKilledGameEventHandle);
+		eventSystem->OnLocationEnterred.Remove(OnLocationEnterredGameEventHandle);
 	}
 
 	Super::Deinitialize();
@@ -131,4 +134,9 @@ void UQuestManagerSubsystem::HandleItemPickup(const FGameplayTag& itemTag, int a
 void UQuestManagerSubsystem::HandleEnemyKilled(int id)
 {
 	OnEnemyKilledEvent.Broadcast(id);
+}
+
+void UQuestManagerSubsystem::HandleLocationEnterred(const FGameplayTag& locationTag)
+{
+	OnLocationEnterredEvent.Broadcast(locationTag);
 }

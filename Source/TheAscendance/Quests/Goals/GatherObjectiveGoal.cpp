@@ -16,7 +16,7 @@ void UGatherObjectiveGoal::Activate()
 {
 	if (UQuestManagerSubsystem* questManager = UCoreFunctionLibrary::GetQuestManagerSubsystem())
 	{
-		m_ItemPickupHandle = questManager->OnItemPickupEvent.AddUObject(this, &UGatherObjectiveGoal::OnItemPickup);
+		questManager->OnItemPickupEvent.AddUObject(this, &UGatherObjectiveGoal::OnItemPickup);
 	}
 }
 
@@ -24,7 +24,7 @@ void UGatherObjectiveGoal::Deactivate()
 {
 	if (UQuestManagerSubsystem* questManager = UCoreFunctionLibrary::GetQuestManagerSubsystem())
 	{
-		questManager->OnItemPickupEvent.Remove(m_ItemPickupHandle);
+		questManager->OnItemPickupEvent.RemoveAll(this);
 	}
 }
 
@@ -44,6 +44,7 @@ void UGatherObjectiveGoal::OnItemPickup(const FGameplayTag& itemTag, int amount)
 
 		if (USingleObjectiveNode* node = Cast<USingleObjectiveNode>(GetOuter()))
 		{
+			LOG_ONSCREEN(-1, 5.0f, FColor::Green, "GOAL COMPLETE");
 			node->TriggerQuestCompletionCheck();
 		}
 	}

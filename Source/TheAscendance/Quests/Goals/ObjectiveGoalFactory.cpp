@@ -8,6 +8,7 @@
 #include "TheAscendance/Quests/Goals/GatherObjectiveGoal.h"
 #include "TheAscendance/Quests/Goals/KillAnyObjectiveGoal.h"
 #include "TheAscendance/Quests/Goals/KillTypeObjectiveGoal.h"
+#include "TheAscendance/Quests/Goals/TravelToObjectiveGoal.h"
 
 UBaseObjectiveGoal* UObjectiveGoalFactory::CreateGoal(UObject* Outer, const TInstancedStruct<FObjectiveGoalData>& data)
 {
@@ -35,6 +36,12 @@ UBaseObjectiveGoal* UObjectiveGoalFactory::CreateGoal(UObject* Outer, const TIns
 	{
 		UKillTypeObjectiveGoal* goal = NewObject<UKillTypeObjectiveGoal>(Outer);
 		goal->Init(data.Get<FKillTypeGoal>());
+		return goal;
+	}
+	else if (structType == FTravelToGoal::StaticStruct())
+	{
+		UTravelToObjectiveGoal* goal = NewObject<UTravelToObjectiveGoal>(Outer);
+		goal->Init(data.Get<FTravelToGoal>());
 		return goal;
 	}
 

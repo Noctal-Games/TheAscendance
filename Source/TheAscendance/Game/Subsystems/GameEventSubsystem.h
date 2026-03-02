@@ -10,10 +10,12 @@
 //C++ only delegates for internal systems, better for performance. Also executed first.
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnItemPickup, const FGameplayTag& /*ItemTag*/, int /*Amount*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEnemyKilled, int /*ID*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnLocationEnterred, const FGameplayTag& /*LocationTag*/);
 
 //BP assignable delegates for design exposure, less performant but more flexible
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemPickupBP, const FGameplayTag&, itemTag, int, amount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyKilledBP, int, id);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLocationEnterredBP, const FGameplayTag&, locationTag);
 
 UCLASS()
 class THEASCENDANCE_API UGameEventSubsystem : public UGameInstanceSubsystem
@@ -23,17 +25,23 @@ class THEASCENDANCE_API UGameEventSubsystem : public UGameInstanceSubsystem
 public:
 	void NotifyItemPickup(const FGameplayTag& itemTag, int amount);
 	void NotifyEnemyKilled(int id);
-	//void NotifyLocationEnterred(string locationName(?))
+	void NotifyLocationEnterred(const FGameplayTag& locationTag);
 
 	virtual void Initialize(FSubsystemCollectionBase& collection) override;
 	virtual void Deinitialize() override;
 
+private:
+	void OnLevelLoaded(UWorld* world);
+
 public:
 	FOnItemPickup OnItemPickup;
 	FOnEnemyKilled OnEnemyKilled;
+	FOnLocationEnterred OnLocationEnterred;
 
 	UPROPERTY(BlueprintAssignable, Category = "Game Events")
 	FOnItemPickupBP OnItemPickupBP;
 	UPROPERTY(BlueprintAssignable, Category = "Game Events")
 	FOnEnemyKilledBP OnEnemyKilledBP;
+	UPROPERTY(BlueprintAssignable, Category = "Game Events")
+	FOnLocationEnterredBP OnLocationEnterredBP;
 };
