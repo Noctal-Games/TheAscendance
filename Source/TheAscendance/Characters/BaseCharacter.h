@@ -20,6 +20,10 @@ class UCharacterTrajectoryComponent;
 class ULoadoutComponent;
 class USpellCasterComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterDeath, ABaseCharacter*, character);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTakeDamage);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHit);
+
 DECLARE_DELEGATE_RetVal(const FVector, FGetCastStart);
 DECLARE_DELEGATE_RetVal(const FVector, FGetCastForward);
 
@@ -33,7 +37,7 @@ public:
 	ABaseCharacter();
 
 	virtual void Heal(int amount) override;
-	virtual void Damage(int amount) override;
+	virtual void Damage(int amount, bool triggerOnHit) override;
 	virtual void ReduceStamina(int amount) override;
 	virtual int GetStat(ECharacterStat stat) override;
 	virtual bool IsDead() override;
@@ -126,6 +130,14 @@ public:
 
 	FGetCastStart GetCastStartFunc;
 	FGetCastForward GetCastForwardFunc;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnCharacterDeath OnDeath;
+	UPROPERTY(BlueprintAssignable)
+	FOnTakeDamage OnDamageTaken;
+	UPROPERTY(BlueprintAssignable)
+	FOnHit OnHit;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Character Stats Component"))
 	TObjectPtr<UCharacterStatsComponent> m_CharacterStatsComponent = nullptr;

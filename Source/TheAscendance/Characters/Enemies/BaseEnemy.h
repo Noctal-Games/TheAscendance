@@ -24,7 +24,7 @@ public:
 	void Init(FEnemyTableData* data);
 	void SetSkeletalMesh();
 
-	virtual void Damage(int amount) override;
+	virtual void Damage(int amount, bool triggerOnHit) override;
 
 	virtual void SetDestination(const FVector& destination) override;
 	void SetLocationToInvestigate(const FVector& location);
