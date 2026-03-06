@@ -4,6 +4,7 @@
 #include "UI/MainMenu/MainMenu.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerController.h"
 
 
 MainMenu::MainMenu()
@@ -42,6 +43,16 @@ void MainMenu::Show()
 	if (MainMenuWidgetInstance)
 	{
 		MainMenuWidgetInstance->AddToViewport();
+
+		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContext, 0);
+		if (PlayerController)
+		{
+			FInputModeUIOnly InputMode;
+			InputMode.SetWidgetToFocus(MainMenuWidgetInstance->TakeWidget());
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			PlayerController->SetInputMode(InputMode);
+			PlayerController->bShowMouseCursor = true;
+		}
 	}
 }
 
@@ -50,5 +61,13 @@ void MainMenu::Hide()
 	if (MainMenuWidgetInstance)
 	{
 		MainMenuWidgetInstance->RemoveFromParent();
+
+		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContext, 0);
+		if (PlayerController)
+		{
+			FInputModeGameOnly InputMode;
+			PlayerController->SetInputMode(InputMode);
+			PlayerController->bShowMouseCursor = false;
+		}
 	}
 }
