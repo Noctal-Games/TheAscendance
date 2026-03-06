@@ -137,9 +137,9 @@ void ABaseEnemy::SetSkeletalMesh()
 	}
 }
 
-void ABaseEnemy::Damage(int amount)
+void ABaseEnemy::Damage(int amount, bool triggerOnHit)
 {
-	ABaseCharacter::Damage(amount);
+	ABaseCharacter::Damage(amount, triggerOnHit);
 
 	if (IsDead() == false)
 	{

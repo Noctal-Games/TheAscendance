@@ -27,6 +27,4 @@ private:
 	FGameplayTag m_ItemTag;
 	int m_ToGather = 0;
 	int m_CurrentAmount = 0;
-
-	FDelegateHandle m_ItemPickupHandle;
 };

@@ -19,6 +19,7 @@ struct FObjectiveGoalData;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnQuestItemPickup, const FGameplayTag& /*itemTag*/, int /*amount*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnQuestEnemyKilled, int /*id*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnQuestLocationEnterred, const FGameplayTag& /*locationTag*/);
 
 UCLASS()
 class THEASCENDANCE_API UQuestManagerSubsystem : public UGameInstanceSubsystem
@@ -46,19 +47,24 @@ protected:
 private:
 	void HandleItemPickup(const FGameplayTag& itemTag, int amount);
 	void HandleEnemyKilled(int id);
+	void HandleLocationEnterred(const FGameplayTag& locationTag);
 
 protected:
 	friend class UGatherObjectiveGoal;
 	friend class UKillAnyObjectiveGoal;
 	friend class UKillTypeObjectiveGoal;
+	friend class UTravelToObjectiveGoal;
 
 	FOnQuestItemPickup OnItemPickupEvent;
 	FOnQuestEnemyKilled OnEnemyKilledEvent;
+	FOnQuestLocationEnterred OnLocationEnterredEvent;
 
 private:
 	FDelegateHandle OnItemPickupGameEventHandle;
 	FDelegateHandle OnEnemyKilledGameEventHandle;
+	FDelegateHandle OnLocationEnterredGameEventHandle;
 
+	UPROPERTY()
 	TArray<TObjectPtr<UQuest>> m_ActiveQuests;
 
 	UPROPERTY()
