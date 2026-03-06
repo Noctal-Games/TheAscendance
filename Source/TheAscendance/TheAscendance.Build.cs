@@ -8,7 +8,7 @@ public class TheAscendance : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Niagara", "GameplayTags", "AIModule", "NavigationSystem", "MotionTrajectory", "AnimGraphRuntime", "CommonUI", "UMG", "Slate", "SlateCore" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "Niagara", "GameplayTags", "AIModule", "NavigationSystem", "MotionTrajectory", "AnimGraphRuntime", "CommonUI" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
