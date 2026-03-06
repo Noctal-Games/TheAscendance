@@ -111,6 +111,7 @@ public:
 protected:
 	friend class ULoadoutComponent;
 	friend class UPlayerHUD;
+	friend class UGrimoire;
 
 	bool EquipItem(EEquippablePart part, const FGameplayTag& itemTag);
 	void UnEquipItem(EEquippablePart part);

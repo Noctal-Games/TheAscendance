@@ -100,7 +100,7 @@ void UActionBarIcon::SetIcon()
 	}
 	else
 	{
-		LOG_ERROR("ACTION BAR ICON] Failed to set icon - Texture was invalid. Using default");
+		LOG_ERROR("[ACTION BAR ICON] Failed to set icon - Texture was invalid. Using default");
 		m_ActionIconImage->SetBrushFromTexture(EmptyActionIcon);
 	}
 }
