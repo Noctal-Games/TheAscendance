@@ -72,3 +72,19 @@ Plugins/**/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# ----------------------------
+# FMOD inside Unreal (Integration + Banks)
+# ----------------------------
+# FMOD cache
+Content/FMOD/.cache/
+
+# FMOD generated banks (local builds only)
+Content/FMOD/Desktop/
+Content/FMOD/Mobile/
+Content/FMOD/HTML5/
+Content/FMOD/Build/
+
+# OS junk
+.DS_Store
+Thumbs.db
