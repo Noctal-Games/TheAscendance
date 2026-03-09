@@ -12,10 +12,32 @@
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
+#include "SpellLoadoutIcon.h"
+#include "TheAscendance/UI/Data/SpellDataEntryObject.h"
 
 bool UGrimoire::NativeOnHandleBackAction()
 {
-	DeactivateWidget();
+	if (m_SelectionOne != nullptr)
+	{
+		m_SelectionOne = nullptr;
+		m_SelectionTwo = nullptr;
+	}
+	else
+	{
+		if (m_PlayerLoadout == nullptr)
+		{
+			LOG_ERROR("[GRIMOIRE] Unable to find reference to Player LoadoutComponent during Construct");
+		}
+		else
+		{
+			TArray<FGameplayTag> spellTags;
+			m_SpellLoadoutDisplay->GetSelectedSpellTags(spellTags);
+			m_PlayerLoadout->SetSpells(spellTags);
+		}
+
+		DeactivateWidget();
+	}
+
 	return true;
 }
 
@@ -65,9 +87,31 @@ void UGrimoire::NativeDestruct()
 }
 
 
-void UGrimoire::UpdateDisplayedSpellInfo(const USpellDataEntryObject* spellDataEntry)
+void UGrimoire::UpdateDisplayedSpellInfo(USpellLoadoutIcon* spellIcon)
 {
-	m_SpellInfoDisplay->Init(spellDataEntry);
+	m_FocussedIcon = spellIcon;
+
+	if (m_FocussedIcon != nullptr)
+	{
+		m_SpellInfoDisplay->Init(m_FocussedIcon->GetSpellDataEntry());
+	}
+}
+
+void UGrimoire::UpdateSelection(USpellLoadoutIcon* spellIcon)
+{
+	if (m_SelectionOne == nullptr)
+	{
+		m_SelectionOne = spellIcon;
+		return;
+	}
+
+	if (m_SelectionOne == spellIcon)
+	{
+		return;
+	}
+
+	m_SelectionTwo = spellIcon;
+	HandleSelection();
 }
 
 void UGrimoire::UpdateGrimoire(const TArray<FGameplayTag>& spellTags)
@@ -98,4 +142,27 @@ void UGrimoire::UpdateGrimoire(const TArray<FGameplayTag>& spellTags)
 	{
 		LOG_ERROR("[GRIMOIRE] Failed to get PlayableGameMode reference in NativeConstruct");
 	}
+}
+
+void UGrimoire::HandleSelection()
+{
+	if (m_SelectionOne == nullptr || m_SelectionTwo == nullptr)
+	{
+		m_SelectionOne = nullptr;
+		m_SelectionTwo = nullptr;
+
+		LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "SELECTION FAILED");
+		return;
+	}
+
+	USpellDataEntryObject* entry = m_SelectionOne->GetSpellDataEntry();
+
+	m_SelectionOne->Init(m_SelectionTwo->GetSpellDataEntry());
+	m_SelectionTwo->Init(entry);
+
+	m_SelectionOne = nullptr;
+	m_SelectionTwo = nullptr;
+
+	m_SpellInventoryGrid->RequestRefresh();
+	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "SELECTION");
 }

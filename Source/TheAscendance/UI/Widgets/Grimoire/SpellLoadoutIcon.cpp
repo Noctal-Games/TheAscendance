@@ -9,6 +9,7 @@
 #include "Grimoire.h"
 
 #include "Components/Image.h"
+#include "Components/Button.h"
 
 void USpellLoadoutIcon::Init(USpellDataEntryObject* spellDataEntry)
 {
@@ -16,7 +17,7 @@ void USpellLoadoutIcon::Init(USpellDataEntryObject* spellDataEntry)
 
 	if (m_SpellDataEntry == nullptr)
 	{
-		LOG_ERROR("[SPELL LOADOUT ICON] Tried to Init, but the SpellDataEntryObject was invalid");
+		m_SpellIcon->SetBrushFromTexture(nullptr);
 		return;
 	}
 
@@ -41,6 +42,8 @@ FReply USpellLoadoutIcon::NativeOnFocusReceived(const FGeometry& geometryEvent, 
 
 void USpellLoadoutIcon::NativeOnMouseEnter(const FGeometry& geometryEvent, const FPointerEvent& pointerEvent)
 {
+	Super::NativeOnMouseEnter(geometryEvent, pointerEvent);
+
 	SetFocus();
 }
 
@@ -57,16 +60,48 @@ void USpellLoadoutIcon::NativePreConstruct()
 
 	if (UUIManagerSubsystem* uiManager = UCoreFunctionLibrary::GetUIManagerSubsystem())
 	{
-		m_Grimoire = uiManager->GetGrimoire();
+		m_Grimoire = uiManager->GetGrimoireRef();
 	}
+}
+
+void USpellLoadoutIcon::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	m_Button->OnHovered.AddDynamic(this, &USpellLoadoutIcon::UpdateGrimoireSpellInfo);
+	m_Button->OnClicked.AddDynamic(this, &USpellLoadoutIcon::HandleGrimoireSpellSelection);
+}
+
+void USpellLoadoutIcon::NativeDestruct()
+{
+	m_Button->OnHovered.RemoveAll(this);
+	m_Button->OnClicked.RemoveAll(this);
+
+	Super::NativeDestruct();
+}
+
+USpellDataEntryObject* USpellLoadoutIcon::GetSpellDataEntry()
+{
+	return m_SpellDataEntry;
 }
 
 void USpellLoadoutIcon::UpdateGrimoireSpellInfo()
 {
-	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "%s", m_SpellDataEntry ? *m_SpellDataEntry->Data.SpellName.ToString() : *FString("EMPTY"));
+	if (m_SpellDataEntry == nullptr)
+	{
+		return;
+	}
 
 	if(m_Grimoire.IsValid())
 	{
-		m_Grimoire->UpdateDisplayedSpellInfo(m_SpellDataEntry);
+		m_Grimoire->UpdateDisplayedSpellInfo(this);
+	}
+}
+
+void USpellLoadoutIcon::HandleGrimoireSpellSelection()
+{
+	if (m_Grimoire.IsValid())
+	{
+		m_Grimoire->UpdateSelection(this);
 	}
 }

@@ -17,9 +17,6 @@ class THEASCENDANCE_API USpellInventoryEntry : public USpellLoadoutIcon, public 
 {
 	GENERATED_BODY()
 	
-public:
-	virtual void Init(USpellDataEntryObject* spellDataEntry) override;
-
 protected:
 	virtual void NativeOnListItemObjectSet(UObject* listItemObject) override;
 };

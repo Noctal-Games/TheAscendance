@@ -45,5 +45,10 @@ void USpellInfoDisplay::DisplaySpellData()
 		return;
 	}
 
-	m_SpellCooldown->SetText(FText::AsNumber(m_SpellData->SpellCooldown));
+	FString cooldownString;
+	cooldownString.Append("Cooldown: ");
+	cooldownString.Append(FString::SanitizeFloat(m_SpellData->SpellCooldown));
+	cooldownString.Append("s");
+
+	m_SpellCooldown->SetText(FText::FromString(cooldownString));
 }

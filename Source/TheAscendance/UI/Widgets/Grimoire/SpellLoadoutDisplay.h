@@ -18,6 +18,8 @@ class THEASCENDANCE_API USpellLoadoutDisplay : public UCommonActivatableWidget
 public:
 	void Init(const TArray<FGameplayTag>& equippedSpellTags, const TArray<TSharedPtr<FSpellTableData>>& equippedSpellTableData);
 
+	void GetSelectedSpellTags(TArray<FGameplayTag>& Tags);
+
 private:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	TObjectPtr<USpellLoadoutIcon> m_SpellOneIcon = nullptr;

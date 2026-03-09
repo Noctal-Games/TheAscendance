@@ -59,19 +59,15 @@ bool UCustomLocalPlayerSubsystem::ShouldCreateSubsystem(UObject* Outer) const
 
 void UCustomLocalPlayerSubsystem::CreateHUD()
 {
-	if(m_PlayerCharacter.IsValid() == false)
+	if(m_Controller.IsValid() == false)
 	{
-		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Attempted to create HUD with invalid PlayerCharacter reference");
+		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Attempted to create HUD with invalid PlayerController reference");
 		return;
 	}
 
 	if(UUIManagerSubsystem* uiManager = UCoreFunctionLibrary::GetUIManagerSubsystem())
 	{
-		//if (m_HUDWidget = uiManager->CreatePlayerHUD())
-		//{
-			//m_HUDWidget->Init(m_PlayerCharacter.Get());
-			//m_HUDWidget->AddToPlayerScreen(1);
-		//}
+		uiManager->CreateGameHUD(m_Controller.Get());
 	}
 	else
 	{

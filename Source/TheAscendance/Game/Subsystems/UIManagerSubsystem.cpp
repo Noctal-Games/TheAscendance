@@ -4,6 +4,8 @@
 #include "UIManagerSubsystem.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/UI/Widgets/HUD/GameHUD.h"
+#include "TheAscendance/Characters/Player/CustomPlayerController.h"
 
 #include "Blueprint/UserWidget.h"
 
@@ -27,9 +29,14 @@ bool UUIManagerSubsystem::ShouldCreateSubsystem(UObject* outer) const
 	return false;
 }
 
-UGrimoire* UUIManagerSubsystem::GetGrimoire()
+UGameHUD* UUIManagerSubsystem::GetGameHUD()
 {
-	if (m_Grimoire.IsValid() == false)
+	return m_GameHUD;
+}
+
+UGrimoire* UUIManagerSubsystem::GetGrimoireRef()
+{
+	if (m_Grimoire == nullptr)
 	{
 		return nullptr;
 	}
@@ -37,61 +44,21 @@ UGrimoire* UUIManagerSubsystem::GetGrimoire()
 	return m_Grimoire.Get();
 }
 
-UPlayerHUD* UUIManagerSubsystem::CreatePlayerHUD()
-{
-	if(m_WidgetDefaults.Contains(EWidgets::PLAYER_HUD) == false)
-	{
-		LOG_ERROR("[UI MANAGER] Tried to Create Player HUD, but no PlayerHUD Default was set");
-		return nullptr;
-	}
-
-	if (TSubclassOf<UUserWidget> widgetClass = m_WidgetDefaults[EWidgets::PLAYER_HUD])
-	{
-		if(UPlayerHUD* playerHUD = CreateWidget<UPlayerHUD>(UCoreFunctionLibrary::GetGameWorld(), widgetClass))
-		{
-			return playerHUD;
-		}
-		else
-		{
-			LOG_ERROR("[UI MANAGER] Failed to create Player HUD widget");
-		}
-	}
-	else
-	{
-		LOG_ERROR("[UI MANAGER] No valid widget class for Player HUD");
-	}
-
-	return nullptr;
-}
-
-UGrimoire* UUIManagerSubsystem::CreateGrimoire()
-{
-	if (m_WidgetDefaults.Contains(EWidgets::GRIMOIRE) == false)
-	{
-		LOG_ERROR("[UI MANAGER] Tried to Create Grimoire, but no Grimoire Default was set");
-		return nullptr;
-	}
-
-	if (TSubclassOf<UUserWidget> widgetClass = m_WidgetDefaults[EWidgets::GRIMOIRE])
-	{
-		if (UGrimoire* grimoire = CreateWidget<UGrimoire>(UCoreFunctionLibrary::GetGameWorld(), widgetClass))
-		{
-			return grimoire;
-		}
-		else
-		{
-			LOG_ERROR("[UI MANAGER] Failed to create Grimoire widget");
-		}
-	}
-	else
-	{
-		LOG_ERROR("[UI MANAGER] No valid widget class for Grimoire");
-	}
-
-	return nullptr;
-}
-
 void UUIManagerSubsystem::SetGrimoireRef(UGrimoire* grimoire)
 {
 	m_Grimoire = grimoire;
+}
+
+void UUIManagerSubsystem::CreateGameHUD(ACustomPlayerController* controller)
+{
+	if (GameHUDDefault == nullptr)
+	{
+		LOG_ERROR("[UI MANAGER] GameHUD Default was invalid");
+		return;
+	}
+
+	m_GameHUD = CreateWidget<UGameHUD>(controller, GameHUDDefault);
+	m_GameHUD->AddToViewport();
+
+	LOG_WARNING("[UI MANAGER] GameHUD Created");
 }

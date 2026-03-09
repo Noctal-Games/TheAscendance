@@ -9,6 +9,7 @@
 class UGrimoire;
 class USpellDataEntryObject;
 class UImage;
+class UButton;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHovered);
 
@@ -26,9 +27,19 @@ public:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& geometryEvent, const FPointerEvent& pointerEvent) override;
 
 	virtual void NativePreConstruct() override;
+	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
+
+protected:
+	friend class UGrimoire;
+	friend class USpellLoadoutDisplay;
+	USpellDataEntryObject* GetSpellDataEntry();
+
 private:
 	UFUNCTION()
 	void UpdateGrimoireSpellInfo();
+	UFUNCTION()
+	void HandleGrimoireSpellSelection();
 
 protected:
 	UPROPERTY()
@@ -39,4 +50,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	TObjectPtr<UImage> m_SpellIcon = nullptr;
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	TObjectPtr<UButton> m_Button = nullptr;
 };

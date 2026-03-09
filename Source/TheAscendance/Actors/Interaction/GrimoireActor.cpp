@@ -1,18 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GameHUD.h"
+#include "GrimoireActor.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Game/Subsystems/UIManagerSubsystem.h"
-#include "TheAscendance/UI/Widgets/Grimoire/Grimoire.h"
+#include "TheAscendance/UI/Widgets/HUD/GameHUD.h"
 
-#include "Widgets\CommonActivatableWidgetContainer.h"
-
-void UGameHUD::PushGrimoireWidget()
+void AGrimoireActor::Interact(APlayerCharacter* player)
 {
 	if (UUIManagerSubsystem* uiManager = UCoreFunctionLibrary::GetUIManagerSubsystem())
 	{
-		HUDStack->AddWidget(GrimoireClassRef);
+		if (UGameHUD* gameHUD = uiManager->GetGameHUD())
+		{
+			gameHUD->PushGrimoireWidget();
+		}
 	}
 }

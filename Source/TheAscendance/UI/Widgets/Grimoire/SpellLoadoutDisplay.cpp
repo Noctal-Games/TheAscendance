@@ -114,6 +114,45 @@ void USpellLoadoutDisplay::Init(const TArray<FGameplayTag>& equippedSpellTags, c
 	}
 }
 
+void USpellLoadoutDisplay::GetSelectedSpellTags(TArray<FGameplayTag>& Tags)
+{
+	if (USpellDataEntryObject* spellData = m_SpellOneIcon->GetSpellDataEntry())
+	{
+		Tags.Add(spellData->Data.SpellTag);
+	}
+	else
+	{
+		Tags.Add(FGameplayTag::EmptyTag);
+	}
+
+	if (USpellDataEntryObject* spellData = m_SpellTwoIcon->GetSpellDataEntry())
+	{
+		Tags.Add(spellData->Data.SpellTag);
+	}
+	else
+	{
+		Tags.Add(FGameplayTag::EmptyTag);
+	}
+
+	if (USpellDataEntryObject* spellData = m_SpellThreeIcon->GetSpellDataEntry())
+	{
+		Tags.Add(spellData->Data.SpellTag);
+	}
+	else
+	{
+		Tags.Add(FGameplayTag::EmptyTag);
+	}
+
+	if (USpellDataEntryObject* spellData = m_SpellFourIcon->GetSpellDataEntry())
+	{
+		Tags.Add(spellData->Data.SpellTag);
+	}
+	else
+	{
+		Tags.Add(FGameplayTag::EmptyTag);
+	}
+}
+
 //for(const auto& spellData : equippedSpellTableData)
 //{
 //	if (spellData == nullptr)

@@ -11,11 +11,6 @@
 
 #include "Components/Image.h"
 
-void USpellInventoryEntry::Init(USpellDataEntryObject* spellDataEntry)
-{
-	LOG_WARNING("[SPELL INVENTORY ENTRY] No need to call Init on this child class");
-}
-
 void USpellInventoryEntry::NativeOnListItemObjectSet(UObject* listItemObject)
 {
 	m_SpellDataEntry = Cast<USpellDataEntryObject>(listItemObject);

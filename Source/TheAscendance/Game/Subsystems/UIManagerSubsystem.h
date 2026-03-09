@@ -6,16 +6,9 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "UIManagerSubsystem.generated.h"
 
-UENUM()
-enum class EWidgets : uint8
-{
-	GAME_HUD,
-	PLAYER_HUD,
-	GRIMOIRE
-};
-
 class UGameHUD;
-class UPlayerHUD;
+class UCommonActivatableWidget;
+class ACustomPlayerController;
 class UGrimoire;
 
 UCLASS(Blueprintable)
@@ -29,20 +22,27 @@ public:
 
 	virtual bool ShouldCreateSubsystem(UObject* outer) const override;
 
-	UGrimoire* GetGrimoire();
+	UGameHUD* GetGameHUD();
 
 protected:
-	friend class UCustomLocalPlayerSubsystem;
+	friend class USpellLoadoutIcon;
 	friend class UGrimoire;
 
-	UPlayerHUD* CreatePlayerHUD();
-	UGrimoire* CreateGrimoire();
-
+	UGrimoire* GetGrimoireRef();
 	void SetGrimoireRef(UGrimoire* grimoire);
+private:
+	friend class UCustomLocalPlayerSubsystem;
+	friend class UGameHUD;
+
+	void CreateGameHUD(ACustomPlayerController* controller);
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameHUD> GameHUDDefault = nullptr;
 
 private:
-	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Widget Defaults"))
-	TMap<EWidgets, TSubclassOf<UUserWidget>> m_WidgetDefaults;
+	UPROPERTY()
+	TObjectPtr<UGameHUD> m_GameHUD = nullptr;
 
 	UPROPERTY()
 	TWeakObjectPtr<UGrimoire> m_Grimoire = nullptr;

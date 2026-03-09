@@ -35,6 +35,11 @@ void USpellCasterComponent::SetSpells(const TArray<FGameplayTag>& spellTags)
 	{
 		if (spellTags[i].IsValid() == false)
 		{
+			if (m_Spells[i] != nullptr)
+			{
+				m_Spells[i] = nullptr;
+			}
+
 			continue;
 		}
 
@@ -48,15 +53,10 @@ void USpellCasterComponent::SetSpells(const TArray<FGameplayTag>& spellTags)
 		{
 			USpellData* spellData = spell->GetSpellData();
 
-			if (spellData == nullptr)
+			if (spellData != nullptr && spellData->SpellTag == spellTags[i])
 			{
-				//GetSpellData() is already logged
-				continue;
-			}
-
-			if (spellData->SpellTag == spellTags[i])
-			{
-				//No change
+				LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "NO CHANGE");
+				//No Change
 				continue;
 			}
 		}

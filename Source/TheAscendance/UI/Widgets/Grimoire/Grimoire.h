@@ -12,6 +12,7 @@ class USpellLoadoutDisplay;
 class USpellInfoDisplay;
 class USpellDataEntryObject;
 class ULoadoutComponent;
+class USpellLoadoutIcon;
 
 UCLASS()
 class THEASCENDANCE_API UGrimoire : public UCommonActivatableWidget
@@ -29,10 +30,12 @@ protected:
 	friend class USpellLoadoutIcon;
 	friend class USpellInventoryEntry;
 
-	void UpdateDisplayedSpellInfo(const USpellDataEntryObject* spellDataEntry);
+	void UpdateDisplayedSpellInfo(USpellLoadoutIcon* spellIcon);
+	void UpdateSelection(USpellLoadoutIcon* spellIcon);
 
 private:
 	void UpdateGrimoire(const TArray<FGameplayTag>& spellTags);
+	void HandleSelection();
 
 private:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
@@ -44,4 +47,11 @@ private:
 
 	UPROPERTY()
 	TWeakObjectPtr<ULoadoutComponent> m_PlayerLoadout = nullptr;
+
+	UPROPERTY()
+	TWeakObjectPtr<USpellLoadoutIcon> m_FocussedIcon = nullptr;
+	UPROPERTY()
+	TWeakObjectPtr<USpellLoadoutIcon> m_SelectionOne = nullptr;
+	UPROPERTY()
+	TWeakObjectPtr<USpellLoadoutIcon> m_SelectionTwo = nullptr;
 };

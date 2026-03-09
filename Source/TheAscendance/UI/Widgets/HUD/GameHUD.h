@@ -7,13 +7,21 @@
 #include "GameHUD.generated.h"
 
 class UCommonActivatableWidgetStack;
+class UGrimoire;
 
 UCLASS()
 class THEASCENDANCE_API UGameHUD : public UCommonUserWidget
 {
 	GENERATED_BODY()
 
+protected:
+	friend class AGrimoireActor;
+	void PushGrimoireWidget();
+
 public:
 	UPROPERTY(BlueprintReadWrite, meta = (DisplayName = "HUD Stack", BindWidget))
 	TObjectPtr<UCommonActivatableWidgetStack> HUDStack = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Grimoire Default"))
+	TSubclassOf<UGrimoire> GrimoireClassRef = nullptr;
 };
