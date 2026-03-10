@@ -7,7 +7,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/Character.h"
 
-void UKnockbackSpellDecorator::OnHit(AActor* hitActor, FVector spellHitLocation)
+void UKnockbackSpellDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation)
 {
 	if (m_ModifierData == nullptr)
 	{
