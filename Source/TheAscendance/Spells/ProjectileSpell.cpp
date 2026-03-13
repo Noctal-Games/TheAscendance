@@ -7,7 +7,6 @@
 #include "Interfaces/SpellCaster.h"
 #include "Structs/SpellData.h"
 #include "TheAscendance/Actors/Projectile/BaseProjectile.h"
-#include "TheAscendance/Characters/Interfaces/Susceptible.h"
 #include "TheAscendance/Actors/Projectile/Interfaces/Projectile.h"
 
 void UProjectileSpell::Init(USpellData* spellData, ISpellCaster* spellOwner)
@@ -63,7 +62,7 @@ bool UProjectileSpell::CastSpell()
 	return true;
 }
 
-void UProjectileSpell::Fire(FVector direction)
+void UProjectileSpell::Fire(const FVector& direction)
 {
 	if (m_DecoratedSelf == nullptr)
 	{
@@ -106,20 +105,9 @@ void UProjectileSpell::ProcessOverlapDamage(int& damage)
 	damage += m_SpellData->HitDamage;
 }
 
-void UProjectileSpell::ProcessHitDamage(int& damage, FVector targetLocation, FVector hitLocation)
+void UProjectileSpell::ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation)
 {
 	damage += m_SpellData->HitDamage;
-}
-
-bool UProjectileSpell::DealDamage(AActor* hitActor, int damage)
-{
-	if (ISusceptible* target = Cast<ISusceptible>(hitActor))
-	{
-		target->Damage(damage, true);
-		return target->IsDead();
-	}
-
-	return true;
 }
 
 void UProjectileSpell::DecorateProjectile(IProjectile* projectile)
