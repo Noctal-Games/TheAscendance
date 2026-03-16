@@ -9,6 +9,8 @@
 class UQuest;
 struct FObjectiveTypeData;
 	
+DECLARE_DELEGATE(FOnObjectiveComplete);
+
 UCLASS()
 class THEASCENDANCE_API UBaseObjectiveNode : public UObject
 {
@@ -21,6 +23,9 @@ public:
 	virtual void Stop();
 
 	virtual bool IsComplete() const;
+
+public:
+	FOnObjectiveComplete OnComplete;
 
 protected:
 	UPROPERTY()
