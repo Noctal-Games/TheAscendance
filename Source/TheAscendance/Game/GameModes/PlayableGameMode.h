@@ -48,10 +48,6 @@ public:
 	virtual void StartToLeaveMap() override;
 
 protected:
-	friend class UGrimoire;
-
-	const TArray<TSharedPtr<FSpellTableData>> GetAllSpellTableDataEntries() const;
-
 	virtual void BeginPlay() override;
 
 private:

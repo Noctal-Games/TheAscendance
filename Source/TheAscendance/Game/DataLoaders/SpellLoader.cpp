@@ -103,26 +103,3 @@ FSpellTableData* USpellLoader::GetSpellTableDataFromTag(const FGameplayTag& spel
 	LOG_ERROR("[SPELL LOADER] Failed to GetSpellTableData for Spell: %s", *spellTag.ToString());
 	return nullptr;
 }
-
-const TArray<TSharedPtr<FSpellTableData>> USpellLoader::GetAllSpellTableDataEntries() const
-{
-	TArray<TSharedPtr<FSpellTableData>> toReturn;
-
-	if (m_SpellTable == nullptr)
-	{
-		LOG_ERROR("[SPELL LOADER] Tried to GetSpellTableData without a valid SpellTable");
-		return toReturn;
-	}
-
-	static const FString contextString(TEXT("Spell Context String"));
-
-	TArray<FSpellTableData*> spellStructs;
-	m_SpellTable->GetAllRows(contextString, spellStructs);
-
-	for (const auto data : spellStructs)
-	{
-		toReturn.Add(MakeShared<FSpellTableData>(*data));
-	}
-
-	return toReturn;
-}
