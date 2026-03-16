@@ -37,9 +37,6 @@ public:
 
 	void SetSpells(const TArray<FGameplayTag>& spellTags);
 protected:
-	friend class UGrimoire;
-	const TArray<FGameplayTag>& GetSpellTags() const;
-
 	// Called when the game starts
 	virtual void BeginPlay() override;
 

@@ -13,7 +13,6 @@ class UInputMappingContext;
 class UInputAction;
 class ACustomPlayerController;
 class UPlayerHUD;
-class UGrimoire;
 
 UCLASS(Blueprintable)
 class THEASCENDANCE_API UCustomLocalPlayerSubsystem : public ULocalPlayerSubsystem
@@ -53,8 +52,6 @@ private:
 
 	void HandleInteract();
 
-	void HandleToggleGrimoire();
-
 	void HandleTestFunction1();
 	void HandleTestFunction2();
 	void HandleTestFunction3();
@@ -62,9 +59,6 @@ private:
 	void BindActions(UEnhancedInputComponent* enhancedInputComponent);
 public:
 	//---- INPUTS ----
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI | Mapping Context")
-	TObjectPtr<UInputMappingContext> UIInputMappingContext = nullptr;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Input | Mapping Context")
 	TObjectPtr<UInputMappingContext> InputMappingContext = nullptr;
 
@@ -118,8 +112,6 @@ public:
 private:
 	UPROPERTY()
 	TObjectPtr<UPlayerHUD> m_HUDWidget = nullptr;
-	UPROPERTY()
-	TObjectPtr<UGrimoire> m_GrimoireWidget = nullptr;
 
 	TWeakObjectPtr<ACustomPlayerController> m_Controller = nullptr;
 	TWeakObjectPtr<APlayerCharacter> m_PlayerCharacter = nullptr;
