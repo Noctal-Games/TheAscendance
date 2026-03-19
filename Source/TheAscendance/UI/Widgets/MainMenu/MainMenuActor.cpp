@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "UI/MainMenu/MainMenuActor.h"
+#include "MainMenuActor.h"
 #include "MainMenu.h"
 
 AMainMenuActor::AMainMenuActor()
