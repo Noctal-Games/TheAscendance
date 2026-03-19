@@ -8,6 +8,7 @@
 #include "ObjectiveFactory.generated.h"
 
 class UBaseObjectiveNode;
+class UQuest;
 struct FObjectiveTypeData;
 
 UCLASS()
@@ -16,5 +17,5 @@ class THEASCENDANCE_API UObjectiveFactory : public UObject
 	GENERATED_BODY()
 	
 public:
-	UBaseObjectiveNode* CreateObjectiveNode(UObject* Outer, const TInstancedStruct<FObjectiveTypeData>& data);
+	UBaseObjectiveNode* CreateObjectiveNode(UQuest* parentQuest, const TInstancedStruct<FObjectiveTypeData>& data);
 };

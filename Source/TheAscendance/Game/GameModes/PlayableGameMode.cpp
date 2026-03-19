@@ -163,6 +163,17 @@ void APlayableGameMode::StartPlay()
 	Super::StartPlay();
 }
 
+const TArray<TSharedPtr<FSpellTableData>> APlayableGameMode::GetAllSpellTableDataEntries() const
+{
+	if (m_SpellLoader == nullptr)
+	{
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
+		return TArray<TSharedPtr<FSpellTableData>>();
+	}
+
+	return m_SpellLoader->GetAllSpellTableDataEntries();
+}
+
 void APlayableGameMode::BeginPlay()
 {
 	Super::BeginPlay();

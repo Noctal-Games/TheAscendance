@@ -24,6 +24,8 @@ public:
 	float SpellCooldown = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int ManaCost = 0;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "Value used for effects such as camera shake"))
+	float SpellIntensity = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "The Niagara for the spell itself. Applied to the projectile for ProjectileSpells and played when casting LocalSpells"))
 	TSoftObjectPtr<UNiagaraSystem> SpellNiagara = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
