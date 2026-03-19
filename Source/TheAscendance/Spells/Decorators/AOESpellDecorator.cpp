@@ -17,7 +17,7 @@ void UAOESpellDecorator::LoadHitNiagara()
 
 	if (m_ModifierData == nullptr)
 	{
-		LOG_ERROR("[AOE SPELL DECORATOR] Modifier data was invalid");
+		LOG_ERROR("AOE Spell Decorator modifier data is invalid");
 		return;
 	}
 
@@ -25,29 +25,26 @@ void UAOESpellDecorator::LoadHitNiagara()
 
 	if (m_AOEHitNiagara.IsNull() == true)
 	{
-		LOG_ERROR("[AOE SPELL DECORATOR] Tried to Load AOEHitNiagara with invalid AOEHitNiagara");
+		LOG_ERROR("Tried to Load AOEHitNiagara for AOESpellDecorated with invalid AOEHitNiagara");
 		return;
 	}
 
 	UCoreFunctionLibrary::RequestAsyncLoad(m_AOEHitNiagara.ToSoftObjectPath());
 }
 
-void UAOESpellDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation)
+void UAOESpellDecorator::OnHit(AActor* hitActor, FVector spellHitLocation)
 {
 	m_DecoratedSpell->OnHit(hitActor, spellHitLocation);
 
 	if (m_ModifierData == nullptr)
 	{
-		LOG_ERROR("[AOE SPELL DECORATOR] Modifier data was invalid")
+		LOG_ERROR("AOE Spell Decorator modifier data is invalid")
 		return;
 	}
 
-	if (hitActor != nullptr)
-	{
-		int damage = 0;
-		m_DecoratedSpell->ProcessHitDamage(damage, hitActor->GetActorLocation(), spellHitLocation);
-		m_DecoratedSpell->DealDamage(hitActor, damage);
-	}
+	int damage = 0;
+	m_DecoratedSpell->ProcessHitDamage(damage, hitActor->GetActorLocation(), spellHitLocation);
+	m_DecoratedSpell->DealDamage(hitActor, damage);
 
 	AActor* owner = GetSpellOwner()->GetActor();
 
@@ -71,7 +68,7 @@ void UAOESpellDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation
 	}
 }
 
-void UAOESpellDecorator::ProcessHit(const FVector& spellHitLocation)
+void UAOESpellDecorator::ProcessHit(FVector spellHitLocation)
 {
 	if (m_ModifierData->DoesKnockback == false)
 	{
@@ -111,7 +108,7 @@ void UAOESpellDecorator::ProcessHit(const FVector& spellHitLocation)
 	m_DecoratedSpell->ProcessHit(spellHitLocation);
 }
 
-void UAOESpellDecorator::ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation)
+void UAOESpellDecorator::ProcessHitDamage(int& damage, FVector targetLocation, FVector hitLocation)
 {
 	if (m_ModifierData->HasDamageFallOff == false)
 	{
@@ -129,7 +126,7 @@ void UAOESpellDecorator::ProcessHitDamage(int& damage, const FVector& targetLoca
 	damage += damageWithFalloff;
 }
 
-void UAOESpellDecorator::SpawnHitNiagara(const FVector& spellHitLocation)
+void UAOESpellDecorator::SpawnHitNiagara(FVector spellHitLocation)
 {
 	m_DecoratedSpell->SpawnHitNiagara(spellHitLocation);
 

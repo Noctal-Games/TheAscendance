@@ -13,9 +13,7 @@ void UBaseObjectiveNode::Start()
 }
 void UBaseObjectiveNode::Stop()
 {
-	OnComplete.Unbind();
 }
-
 bool UBaseObjectiveNode::IsComplete() const
 {
     return false;

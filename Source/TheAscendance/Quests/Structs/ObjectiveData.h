@@ -102,7 +102,7 @@ struct FBranchingObjectiveData : public FObjectiveTypeData
 	TArray<TInstancedStruct<FObjectiveTypeData>> ObjectivesPathTwo;
 };
 
-USTRUCT(BlueprintType, meta = (ToolTip = "Complete all objectives"))
+USTRUCT(BlueprintType, meta = (ToolTip = "Complete objectives A and B"))
 struct FMultiObjectiveData : public FObjectiveTypeData
 {
 	GENERATED_BODY()
@@ -110,7 +110,10 @@ struct FMultiObjectiveData : public FObjectiveTypeData
 	FMultiObjectiveData() : FObjectiveTypeData(EObjectiveType::MULTI) {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
-	TArray<TInstancedStruct<FObjectiveTypeData>> Objectives;
+	TInstancedStruct<FObjectiveTypeData> ObjectiveOne;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
+	TInstancedStruct<FObjectiveTypeData> ObjectiveTwo;
 };
 
 USTRUCT(BlueprintType, meta = (ToolTip = "Optional completion of objective"))
@@ -121,5 +124,5 @@ struct FOptionalObjectiveData : public FObjectiveTypeData
 	FOptionalObjectiveData() : FObjectiveTypeData(EObjectiveType::OPTIONAL) {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
-	TInstancedStruct<FObjectiveTypeData> Objective;
+	TInstancedStruct<FObjectiveGoalData> Goal;
 };

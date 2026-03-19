@@ -6,10 +6,13 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "UIManagerSubsystem.generated.h"
 
-class UGameHUD;
-class UCommonActivatableWidget;
-class ACustomPlayerController;
-class UGrimoire;
+UENUM()
+enum class EWidgets : uint8
+{
+	PLAYER_HUD
+};
+
+class UPlayerHUD;
 
 UCLASS(Blueprintable)
 class THEASCENDANCE_API UUIManagerSubsystem : public UGameInstanceSubsystem
@@ -22,28 +25,11 @@ public:
 
 	virtual bool ShouldCreateSubsystem(UObject* outer) const override;
 
-	UGameHUD* GetGameHUD();
-
 protected:
-	friend class USpellLoadoutIcon;
-	friend class UGrimoire;
-
-	UGrimoire* GetGrimoireRef();
-	void SetGrimoireRef(UGrimoire* grimoire);
-private:
 	friend class UCustomLocalPlayerSubsystem;
-	friend class UGameHUD;
-
-	void CreateGameHUD(ACustomPlayerController* controller);
-
-public:
-	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UGameHUD> GameHUDDefault = nullptr;
+	UPlayerHUD* CreatePlayerHUD();
 
 private:
-	UPROPERTY()
-	TObjectPtr<UGameHUD> m_GameHUD = nullptr;
-
-	UPROPERTY()
-	TWeakObjectPtr<UGrimoire> m_Grimoire = nullptr;
+	UPROPERTY(EditDefaultsOnly, meta = (DisplayName = "Widget Defaults"))
+	TMap<EWidgets, TSubclassOf<UUserWidget>> m_WidgetDefaults;
 };

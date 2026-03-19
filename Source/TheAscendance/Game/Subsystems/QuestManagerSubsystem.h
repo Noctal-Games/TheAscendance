@@ -33,7 +33,7 @@ public:
 	void CompleteQuest(UQuest* quest);
 
 	UFUNCTION(BlueprintCallable)
-	UQuest* GetQuestByTag(const FGameplayTag& tag) const;
+	UQuest* GetQuestByTag(FGameplayTag tag) const;
 
 	UBaseObjectiveNode* CreateObjectiveNode(UQuest* outer, const TInstancedStruct<FObjectiveTypeData>& data);
 	UBaseObjectiveGoal* CreateObjectiveGoal(UBaseObjectiveNode* outer, const TInstancedStruct<FObjectiveGoalData>& data);

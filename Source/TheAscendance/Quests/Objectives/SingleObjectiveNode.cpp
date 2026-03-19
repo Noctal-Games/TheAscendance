@@ -1,4 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
+
+
 #include "SingleObjectiveNode.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
@@ -8,12 +10,6 @@
 
 void USingleObjectiveNode::Init(const FSingleObjectiveData& data)
 {
-	if (m_ParentQuest == nullptr)
-	{
-		LOG_ERROR("[SINGLE OBJECTIVE NODE] Failed to Init, Parent Quest was invalid");
-		return;
-	}
-
 	m_Data = MakeShared<FSingleObjectiveData>(data);
 
 	if (UQuestManagerSubsystem* questManager = UCoreFunctionLibrary::GetQuestManagerSubsystem())
@@ -40,7 +36,6 @@ void USingleObjectiveNode::TriggerQuestCompletionCheck()
 		return;
 	}
 
-	OnComplete.ExecuteIfBound();
 	m_ParentQuest->CheckCompletion();
 }
 
@@ -57,8 +52,6 @@ void USingleObjectiveNode::Start()
 
 void USingleObjectiveNode::Stop()
 {
-	UBaseObjectiveNode::Stop();
-
 	if(m_Goal == nullptr)
 	{
 		LOG_ERROR("[SINGLE OBJECTIVE NODE] Stop called but Goal is invalid");

@@ -6,7 +6,6 @@
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "Interfaces/SpellCaster.h"
 #include "Structs/SpellData.h"
-#include "TheAscendance/Characters/Interfaces/Susceptible.h"
 
 #include "NiagaraFunctionLibrary.h"
 
@@ -14,7 +13,7 @@ void UBaseSpell::Init(USpellData* spellData, ISpellCaster* spellOwner)
 {
 	if (spellData == nullptr || spellOwner == nullptr)
 	{
-		LOG_ERROR("[BASE SPELL] Tried to Init spell with invalid SpellData or SpellOwner");
+		LOG_ERROR("Tried to Init spell with invalid SpellData or SpellOwner");
 		return;
 	}
 
@@ -23,7 +22,7 @@ void UBaseSpell::Init(USpellData* spellData, ISpellCaster* spellOwner)
 
 	if(m_SpellNiagara.IsNull() == true)
 	{
-		LOG_ERROR("[BASE SPELL] Tried to Init spell with invalid SpellNiagara");
+		LOG_ERROR("Tried to Init spell with invalid SpellNiagara");
 		return;
 	}
 
@@ -36,7 +35,7 @@ void UBaseSpell::SetDecoratedSelf(ISpell* decoratedSelf)
 {
 	if (decoratedSelf == nullptr)
 	{
-		LOG_ERROR("[BASE SPELL] Tried to set Spell DecoratedSelf with invalid spell");
+		LOG_ERROR("Tried to set Spell DecoratedSelf with invalid spell");
 		return;
 	}
 
@@ -62,7 +61,8 @@ bool UBaseSpell::CastSpell()
 {
 	if (m_CooldownTimer > 0.0f)
 	{
-		LOG_WARNING("[BASE SPELL] Check CanCast before calling CastSpell");
+		LOG_WARNING("Check CanCast before calling CastSpell");
+		LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Check CanCast before calling CastSpell");
 		return false;
 	}
 	
@@ -80,7 +80,7 @@ void UBaseSpell::Update(float deltaTime)
 	m_CooldownTimer -= deltaTime;
 }
 
-void UBaseSpell::OnOverlap(AActor* overlapActor, const FVector& spellOverlapLocation, int damage)
+void UBaseSpell::OnOverlap(AActor* overlapActor, FVector spellOverlapLocation, int damage)
 {		
 	if (m_DecoratedSelf->DealDamage(overlapActor, damage) == false)
 	{
@@ -88,7 +88,7 @@ void UBaseSpell::OnOverlap(AActor* overlapActor, const FVector& spellOverlapLoca
 	}
 }
 
-void UBaseSpell::OnHit(AActor* hitActor, const FVector& spellHitLocation)
+void UBaseSpell::OnHit(AActor* hitActor, FVector spellHitLocation)
 {
 	if (hitActor != nullptr && m_HitActors.Contains(hitActor) == false)
 	{
@@ -96,7 +96,7 @@ void UBaseSpell::OnHit(AActor* hitActor, const FVector& spellHitLocation)
 	}
 }
 
-void UBaseSpell::ProcessHit(const FVector& spellHitLocation)
+void UBaseSpell::ProcessHit(FVector spellHitLocation)
 {
 	for (auto actor : m_HitActors)
 	{
@@ -114,7 +114,7 @@ void UBaseSpell::ProcessHit(const FVector& spellHitLocation)
 	m_HitActors.Empty();
 }
 
-void UBaseSpell::SpawnHitNiagara(const FVector& spellHitLocation)
+void UBaseSpell::SpawnHitNiagara(FVector spellHitLocation)
 {
 	if (m_HitNiagara.IsValid() == false)
 	{
@@ -127,31 +127,7 @@ void UBaseSpell::SpawnHitNiagara(const FVector& spellHitLocation)
 	}
 }
 
-void UBaseSpell::SpawnSpellNiagara(const FVector& spellLocation)
-{
-	if (m_SpellNiagara.IsValid() == false)
-	{
-		return;
-	}
-
-	if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(worldContext, m_SpellNiagara.Get(), spellLocation);
-	}
-}
-
-bool UBaseSpell::DealDamage(AActor* hitActor, int damage)
-{
-	if (ISusceptible* target = Cast<ISusceptible>(hitActor))
-	{
-		target->Damage(damage, true);
-		return target->IsDead();
-	}
-
-	return true;
-}
-
-void UBaseSpell::Fire(const FVector& direction)
+void UBaseSpell::Fire(FVector direction)
 {
 }
 
@@ -163,7 +139,7 @@ ISpellCaster* UBaseSpell::GetSpellOwner()
 {
 	if (m_SpellOwner == nullptr)
 	{
-		LOG_ERROR("[BASE SPELL] Spell has invalid SpellOwner");
+		LOG_ERROR("Spell has invalid SpellOwner");
 		return nullptr;
 	}
 

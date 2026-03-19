@@ -36,15 +36,15 @@ void UPlayerHUD::Init(APlayerCharacter* ownerCharacter)
 
 void UPlayerHUD::BindStatBar(UStatBoundProgressBar* statBar)
 {
-	if (statBar == nullptr)
-	{
-		LOG_ERROR("[PLAYER HUD] Attempted to bind null stat bar");
-		return;
-	}
-
 	if (m_OwnerCharacter.IsValid() == false)
 	{
 		LOG_ERROR("[PLAYER HUD] Attempted to BindStatbar with invalid owner character reference");
+		return;
+	}
+
+	if(statBar == nullptr)
+	{
+		LOG_ERROR("[PLAYER HUD] Attempted to bind null stat bar");
 		return;
 	}
 
@@ -58,14 +58,14 @@ void UPlayerHUD::BindStatBar(UStatBoundProgressBar* statBar)
 	}
 }
 
-void UPlayerHUD::NativePreConstruct()
+void UPlayerHUD::NativeConstruct()
 {
-	Super::NativePreConstruct();
+	Super::NativeConstruct();
+}
 
-	if (APlayerCharacter* player = UCoreFunctionLibrary::GetPlayerCharacter())
-	{
-		Init(player);
-	}
+void UPlayerHUD::NativeDestruct()
+{
+	Super::NativeDestruct();
 }
 
 void UPlayerHUD::UpdateCrosshair(EInteractType targetType)

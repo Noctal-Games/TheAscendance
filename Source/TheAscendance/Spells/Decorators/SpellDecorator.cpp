@@ -69,7 +69,7 @@ void USpellDecorator::Update(float deltaTime)
 	m_DecoratedSpell->Update(deltaTime);
 }
 
-void USpellDecorator::OnOverlap(AActor* overlapActor, const FVector& spellOverlapLocation, int damage)
+void USpellDecorator::OnOverlap(AActor* overlapActor, FVector spellOverlapLocation, int damage)
 {
 	if (m_DecoratedSpell == nullptr)
 	{
@@ -80,7 +80,7 @@ void USpellDecorator::OnOverlap(AActor* overlapActor, const FVector& spellOverla
 	m_DecoratedSpell->OnOverlap(overlapActor, spellOverlapLocation, damage);
 }
 
-void USpellDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation)
+void USpellDecorator::OnHit(AActor* hitActor, FVector spellHitLocation)
 {
 	if (m_DecoratedSpell == nullptr)
 	{
@@ -91,7 +91,7 @@ void USpellDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation)
 	m_DecoratedSpell->OnHit(hitActor, spellHitLocation);
 }
 
-void USpellDecorator::ProcessHit(const FVector& spellHitLocation)
+void USpellDecorator::ProcessHit(FVector spellHitLocation)
 {
 	if (m_DecoratedSpell == nullptr)
 	{
@@ -102,7 +102,7 @@ void USpellDecorator::ProcessHit(const FVector& spellHitLocation)
 	m_DecoratedSpell->ProcessHit(spellHitLocation);
 }
 
-void USpellDecorator::SpawnHitNiagara(const FVector& spellHitLocation)
+void USpellDecorator::SpawnHitNiagara(FVector spellHitLocation)
 {
 	if (m_DecoratedSpell == nullptr)
 	{
@@ -125,7 +125,7 @@ TArray<TObjectPtr<AActor>> USpellDecorator::GetHitActors()
 }
 
 
-void USpellDecorator::Fire(const FVector& direction)
+void USpellDecorator::Fire(FVector direction)
 {
 	if (m_DecoratedSpell == nullptr)
 	{
@@ -158,7 +158,7 @@ void USpellDecorator::ProcessOverlapDamage(int& damage)
 	m_DecoratedSpell->ProcessOverlapDamage(damage);
 }
 
-void USpellDecorator::ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation)
+void USpellDecorator::ProcessHitDamage(int& damage, FVector targetLocation, FVector hitLocation)
 {
 	if (m_DecoratedSpell == nullptr)
 	{

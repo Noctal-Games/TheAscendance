@@ -41,10 +41,10 @@ public:
 
 	virtual void LoadHitNiagara() override;
 
-	virtual void OnHit(AActor* hitActor, const FVector& spellHitLocation) override;
-	virtual void ProcessHit(const FVector& spellHitLocation) override;
-	virtual void ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation) override;
-	virtual void SpawnHitNiagara(const FVector& spellHitLocation) override;
+	virtual void OnHit(AActor* hitActor, FVector spellHitLocation) override;
+	virtual void ProcessHit(FVector spellHitLocation) override;
+	virtual void ProcessHitDamage(int& damage, FVector targetLocation, FVector hitLocation) override;
+	virtual void SpawnHitNiagara(FVector spellHitLocation) override;
 
 private:
 	TSharedPtr<FAreaOfEffectModifier> m_ModifierData = nullptr;

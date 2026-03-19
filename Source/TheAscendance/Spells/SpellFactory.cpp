@@ -4,7 +4,6 @@
 #include "SpellFactory.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "ProjectileSpell.h"
-#include "LocalSpell.h"
 #include "Structs/SpellData.h"
 #include "Structs/SpellModifierData.h"
 #include "Interfaces/Spell.h"
@@ -23,7 +22,7 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 {
 	if (spellData == nullptr || spellOwner == nullptr)
 	{
-		LOG_ERROR("[SPELL FACTORY] Tried to create spell with invalid SpellData or SpellOwner");
+		LOG_ERROR("Tried to create spell with invalid SpellData or SpellOwner");
 		return nullptr;
 	}
 
@@ -37,21 +36,11 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 			spell = NewObject<UProjectileSpell>();
 			break;
 		}
-		case ESpellType::LOCAL:
-		{
-			spell = NewObject<ULocalSpell>();
-
-			if (spellData->SpellModifiers.IsEmpty() == true)
-			{
-				LOG_ERROR("[SPELL FACTORY] Creating LocalSpell that has no SpellModifiers. The spell will do nothing.");
-			}
-			break;
-		}
 	}
 
 	if (spell == nullptr)
 	{
-		LOG_ERROR("[SPELL FACTORY] Failed to create SpellBase for SpellType: %s", *UEnum::GetValueAsString(spellData->SpellType));
+		LOG_ERROR("Failed to create SpellBase for SpellType: %s", *UEnum::GetValueAsString(spellData->SpellType));
 		return nullptr;
 	}
 
@@ -71,7 +60,7 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 			{
 				if (modifier.GetScriptStruct() != FAreaOfEffectModifier::StaticStruct())
 				{
-					LOG_ERROR("[SPELL FACTORY] A GenericSpellModifierType struct with type AOE isn't of type AreaOfEffectModifier");
+					LOG_ERROR("A GenericSpellModifierType struct with type AOE isn't of type AreaOfEffectModifier");
 					continue;
 				}
 
@@ -85,7 +74,7 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 			{
 				if (modifier.GetScriptStruct() != FApplyCasterEffectModifier::StaticStruct())
 				{
-					LOG_ERROR("[SPELL FACTORY] A GenericSpellModifierType struct with type APPLY_CASTER_EFFECT isn't of type ApplyCasterEffectModifier");
+					LOG_ERROR("A GenericSpellModifierType struct with type APPLY_CASTER_EFFECT isn't of type ApplyCasterEffectModifier");
 					continue;
 				}
 
@@ -99,7 +88,7 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 			{
 				if (modifier.GetScriptStruct() != FApplyEffectModifier::StaticStruct())
 				{
-					LOG_ERROR("[SPELL FACTORY] A GenericSpellModifierType struct with type APPLY_EFFECT isn't of type ApplyEffectModifier");
+					LOG_ERROR("A GenericSpellModifierType struct with type APPLY_EFFECT isn't of type ApplyEffectModifier");
 					continue;
 				}
 
@@ -113,7 +102,7 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 			{
 				if (modifier.GetScriptStruct() != FSpawnEffectModifier::StaticStruct())
 				{
-					LOG_ERROR("[SPELL FACTORY] A GenericSpellModifierType struct with type SPAWN_EFFECT isn't of type SpawnEffectModifier");
+					LOG_ERROR("A GenericSpellModifierType struct with type SPAWN_EFFECT isn't of type SpawnEffectModifier");
 					continue;
 				}
 
@@ -148,7 +137,7 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 					{
 						if (modifier.GetScriptStruct() != FKnockbackSpellModifier::StaticStruct())
 						{
-							LOG_ERROR("[SPELL FACTORY] ARangedSpellModifierType struct with type KNOCKBACK isn't of type KnockbackSpellModifier");
+							LOG_ERROR("ARangedSpellModifierType struct with type KNOCKBACK isn't of type KnockbackSpellModifier");
 							continue;
 						}
 
@@ -181,7 +170,7 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 						{
 							if (modifier.GetScriptStruct() != FTrailSpellModifier::StaticStruct())
 							{
-								LOG_ERROR("[SPELL FACTORY] A ProjectileSpellModifierType struct with type TRAIL isn't of type TrailSpellModifier");
+								LOG_ERROR("A ProjectileSpellModifierType struct with type TRAIL isn't of type TrailSpellModifier");
 								continue;
 							}
 
@@ -194,7 +183,7 @@ ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwne
 						{
 							if (modifier.GetScriptStruct() != FPenetrationSpellModifier::StaticStruct())
 							{
-								LOG_ERROR("[SPELL FACTORY] A ProjectileSpellModifierType struct with type PENETRATION isn't of type PenetrationSpellModifier");
+								LOG_ERROR("A ProjectileSpellModifierType struct with type PENETRATION isn't of type PenetrationSpellModifier");
 								continue;
 							}
 

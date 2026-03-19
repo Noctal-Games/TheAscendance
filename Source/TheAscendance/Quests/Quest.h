@@ -35,6 +35,5 @@ private:
 	UPROPERTY()
 	TArray<TObjectPtr<UBaseObjectiveNode>> m_Objectives;
 
-	UPROPERTY()
 	TWeakObjectPtr<UBaseObjectiveNode> m_ActiveObjective = nullptr;
 };

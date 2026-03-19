@@ -8,7 +8,6 @@
 #include "Structs/QuestData.h"
 #include "Structs/ObjectiveData.h"
 #include "Objectives/BaseObjectiveNode.h"
-#include "Objectives/OptionalObjectiveNode.h"
 
 void UQuest::Init(UQuestData* questData)
 {
@@ -27,6 +26,7 @@ void UQuest::Init(UQuestData* questData)
 		{
 			if (UBaseObjectiveNode* objectiveNode = questManager->CreateObjectiveNode(this, objectiveData))
 			{
+				objectiveNode->SetParentQuest(this);
 				m_Objectives.Add(objectiveNode);
 			}
 			else
@@ -84,7 +84,7 @@ bool UQuest::IsComplete(bool update) const
 	{
 		if (objective == nullptr)
 		{
-			LOG_ERROR("[QUEST] Contains invalid ObjectiveNode")
+			LOG_ERROR("[QUEST] Quest contains invalid ObjectiveNode")
 			continue;
 		}
 
@@ -99,44 +99,25 @@ bool UQuest::IsComplete(bool update) const
 
 void UQuest::UpdateObjective()
 {
-	bool newObjectiveSet = false;
-
 	for (UBaseObjectiveNode* objective : m_Objectives)
 	{
 		if (objective == nullptr)
 		{
-			LOG_ERROR("[QUEST] Contains invalid ObjectiveNode")
+			LOG_ERROR("[QUEST] Quest contains invalid ObjectiveNode")
 			continue;
 		}
 
-		//If the objective is optional, always start it. HasStarted check is within Start()
-		if (UOptionalObjectiveNode* optionalObjective = Cast<UOptionalObjectiveNode>(objective))
+		if (objective->IsComplete() == false)
 		{
-			optionalObjective->Start();
-			continue;
+			if (m_ActiveObjective.IsValid() == true && objective == m_ActiveObjective)
+			{
+				return;
+			}
+
+			m_ActiveObjective = objective;
+			m_ActiveObjective->Start();
+			return;
 		}
-
-		//If a new active objective is set, or objective is already complete, continue
-		if (newObjectiveSet == true || objective->IsComplete() == true)
-		{
-			continue;
-		}
-
-		if (objective == m_ActiveObjective)
-		{
-			newObjectiveSet = true;
-			continue;
-		}
-
-		if (m_ActiveObjective != nullptr)
-		{
-			m_ActiveObjective->Stop();
-		}
-
-		m_ActiveObjective = objective;
-		m_ActiveObjective->Start();
-
-		newObjectiveSet = true;
 	}
 }
 

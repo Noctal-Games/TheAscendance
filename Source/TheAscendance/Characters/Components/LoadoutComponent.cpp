@@ -116,11 +116,6 @@ void ULoadoutComponent::SetSpells(const TArray<FGameplayTag>& spellTags)
 	}
 }
 
-const TArray<FGameplayTag>& ULoadoutComponent::GetSpellTags() const
-{
-	return m_SpellTags;
-}
-
 bool ULoadoutComponent::Contains(EEquippablePart part)
 {
 	for (const auto data : m_Loadout)

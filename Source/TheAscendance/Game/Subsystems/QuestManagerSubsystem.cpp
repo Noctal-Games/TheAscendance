@@ -19,7 +19,7 @@ UQuest* UQuestManagerSubsystem::StartQuest(UQuestData* data)
 		return nullptr;
 	}
 
-	if (GetQuestByTag(data->QuestTag) != nullptr)
+	if (GetQuestByTag(data->QuestTag))
 	{
 		LOG_WARNING("[QUEST MANAGER] Attempted to StartQuest but quest is already active: %s", *data->QuestTag.ToString());
 		return nullptr;
@@ -51,17 +51,11 @@ void UQuestManagerSubsystem::CompleteQuest(UQuest* quest)
 	quest->MarkAsComplete();
 }
 
-UQuest* UQuestManagerSubsystem::GetQuestByTag(const FGameplayTag& tag) const
+UQuest* UQuestManagerSubsystem::GetQuestByTag(FGameplayTag tag) const
 {
 	for (UQuest* quest : m_ActiveQuests)
 	{
-		if (quest == nullptr)
-		{
-			LOG_ERROR("[QUEST MANAGER] ActiveQuests contains an invalid Quest");
-			continue;
-		}
-
-		if (quest->GetQuestTag() == tag)
+		if (quest && quest->GetQuestTag() == tag)
 		{
 			return quest;
 		}

@@ -38,7 +38,7 @@ public:
 		}
 	};
 
-	virtual void OnHit(AActor* hitActor, const FVector& spellHitLocation) override;
+	virtual void OnHit(AActor* hitActor, FVector spellHitLocation) override;
 
 private:
 	TSharedPtr<FKnockbackSpellModifier> m_ModifierData = nullptr;

@@ -19,16 +19,16 @@ public:
 	virtual void LoadHitNiagara() override;
 	
 	virtual bool CastSpell() override;
-	virtual void Fire(const FVector& direction) override;
+	virtual void Fire(FVector direction) override;
 
 	virtual void ProcessOverlapDamage(int& damage) override;
-	virtual void ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation) override;
+	virtual void ProcessHitDamage(int& damage, FVector targetLocation, FVector hitLocation) override;
 
+	virtual bool DealDamage(AActor* hitActor, int damage) override;
 	virtual void DecorateProjectile(IProjectile* projectile) override;
 
 	virtual USpellData* GetSpellData() override;
 
 private:
-	UPROPERTY()
 	TWeakObjectPtr<UProjectileSpellData> m_SpellData = nullptr;
 };

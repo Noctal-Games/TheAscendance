@@ -33,20 +33,19 @@ public:
 
 	virtual void Update(float deltaTime) {};
 
-	virtual void OnOverlap(AActor* overlapActor, const FVector& spellOverlapLocation, int damage) {};
-	virtual void OnHit(AActor* hitActor, const FVector& spellHitLocation) {};
-	virtual void ProcessHit(const FVector& spellHitLocation) {};
-	virtual void SpawnHitNiagara(const FVector& spellHitLocation) {};
-	virtual void SpawnSpellNiagara(const FVector& spellLocation) {};
+	virtual void OnOverlap(AActor* overlapActor, FVector spellOverlapLocation, int damage) {};
+	virtual void OnHit(AActor* hitActor, FVector spellHitLocation) {};
+	virtual void ProcessHit(FVector spellHitLocation) {};
+	virtual void SpawnHitNiagara(FVector spellHitLocation) {};
 
 	virtual TArray<TObjectPtr<AActor>> GetHitActors() { return TArray<TObjectPtr<AActor>>(); };
 
-	virtual void Fire(const FVector& direction) {};
+	virtual void Fire(FVector direction) {};
 
 	virtual ISpellCaster* GetSpellOwner() { return nullptr; };
 
 	virtual void ProcessOverlapDamage(int& damage) {};
-	virtual void ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation) {};
+	virtual void ProcessHitDamage(int& damage, FVector targetLocation, FVector hitLocation) {};
 
 	virtual bool DealDamage(AActor* hitActor, int damage) { return true; };
 	virtual void ApplyEffects(AActor* hitActor) {};

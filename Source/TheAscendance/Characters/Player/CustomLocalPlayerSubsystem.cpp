@@ -8,7 +8,6 @@
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 #include "TheAscendance/Characters/Player/CustomPlayerController.h"
 #include "TheAscendance/UI/Widgets/HUD/PlayerHUD.h"
-#include "TheAscendance/UI/Widgets/Grimoire/Grimoire.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -59,15 +58,19 @@ bool UCustomLocalPlayerSubsystem::ShouldCreateSubsystem(UObject* Outer) const
 
 void UCustomLocalPlayerSubsystem::CreateHUD()
 {
-	if(m_Controller.IsValid() == false)
+	if(m_PlayerCharacter.IsValid() == false)
 	{
-		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Attempted to create HUD with invalid PlayerController reference");
+		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Attempted to create HUD with invalid PlayerCharacter reference");
 		return;
 	}
 
 	if(UUIManagerSubsystem* uiManager = UCoreFunctionLibrary::GetUIManagerSubsystem())
 	{
-		uiManager->CreateGameHUD(m_Controller.Get());
+		if (m_HUDWidget = uiManager->CreatePlayerHUD())
+		{
+			m_HUDWidget->Init(m_PlayerCharacter.Get());
+			m_HUDWidget->AddToViewport();
+		}
 	}
 	else
 	{
@@ -90,15 +93,7 @@ void UCustomLocalPlayerSubsystem::SetupInput(UEnhancedInputComponent* enhancedIn
 
 	if (UEnhancedInputLocalPlayerSubsystem* inputSubsystem = GetLocalPlayer()->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>())
 	{
-		if (InputMappingContext)
-		{
-			inputSubsystem->AddMappingContext(InputMappingContext, 0);
-		}
-
-		if (UIInputMappingContext)
-		{
-			inputSubsystem->AddMappingContext(UIInputMappingContext, 0);
-		}
+		inputSubsystem->AddMappingContext(InputMappingContext, 0);
 	}
 }
 
@@ -239,32 +234,6 @@ void UCustomLocalPlayerSubsystem::HandleInteract()
 	m_PlayerCharacter->Interact();
 }
 
-void UCustomLocalPlayerSubsystem::HandleToggleGrimoire()
-{
-	if (m_GrimoireWidget != nullptr)
-	{
-		if (m_GrimoireWidget->IsActivated() == false)
-		{
-			//m_GrimoireWidget->ActivateWidget();
-		}
-
-		return;
-	}
-
-	if (UUIManagerSubsystem* uiManager = UCoreFunctionLibrary::GetUIManagerSubsystem())
-	{
-		//if (m_GrimoireWidget = uiManager->CreateGrimoire())
-		//{
-			//m_GrimoireWidget->AddToPlayerScreen(50);
-			//m_GrimoireWidget->ActivateWidget();
-		//}
-	}
-	else
-	{
-		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Failed to get UIManager reference");
-	}
-}
-
 void UCustomLocalPlayerSubsystem::HandleTestFunction1()
 {
 	if (m_PlayerCharacter.IsValid() == false)
@@ -278,15 +247,13 @@ void UCustomLocalPlayerSubsystem::HandleTestFunction1()
 
 void UCustomLocalPlayerSubsystem::HandleTestFunction2()
 {
-	HandleToggleGrimoire();
+	if (m_PlayerCharacter.IsValid() == false)
+	{
+		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Invalid PlayerCharacter reference");
+		return;
+	}
 
-	//if (m_PlayerCharacter.IsValid() == false)
-	//{
-	//	LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Invalid PlayerCharacter reference");
-	//	return;
-	//}
-
-	//m_PlayerCharacter->TestFunction2();
+	m_PlayerCharacter->TestFunction2();
 }
 
 void UCustomLocalPlayerSubsystem::HandleTestFunction3()
