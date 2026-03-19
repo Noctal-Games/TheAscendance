@@ -22,7 +22,6 @@ public:
 
 	ISpell* CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const;
 	FSpellTableData* GetSpellTableDataFromTag(const FGameplayTag& spellTag) const;
-	const TArray<TSharedPtr<FSpellTableData>> GetAllSpellTableDataEntries() const;
 
 private:
 	UPROPERTY()
