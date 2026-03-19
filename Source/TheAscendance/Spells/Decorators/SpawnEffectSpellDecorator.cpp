@@ -11,7 +11,7 @@
 #include "TheAscendance/Effects/DeliveryEffects/AOEDeliveryEffect.h"
 #include "TheAscendance/Effects/Structs/EffectData.h"
 
-void USpawnEffectSpellDecorator::OnHit(AActor* hitActor, FVector spellHitLocation)
+void USpawnEffectSpellDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation)
 {
 	m_DecoratedSpell->OnHit(hitActor, spellHitLocation);
 
