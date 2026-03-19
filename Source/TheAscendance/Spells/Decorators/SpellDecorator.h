@@ -27,19 +27,19 @@ public:
 
 	virtual void Update(float deltaTime) override;
 
-	virtual void OnOverlap(AActor* overlapActor, FVector spellOverlapLocation, int damage) override;
-	virtual void OnHit(AActor* hitActor, FVector spellHitLocation) override;
-	virtual void ProcessHit(FVector spellHitLocation) override;
-	virtual void SpawnHitNiagara(FVector spellHitLocation) override;
+	virtual void OnOverlap(AActor* overlapActor, const FVector& spellOverlapLocation, int damage) override;
+	virtual void OnHit(AActor* hitActor, const FVector& spellHitLocation) override;
+	virtual void ProcessHit(const FVector& spellHitLocation) override;
+	virtual void SpawnHitNiagara(const FVector& spellHitLocation) override;
 
 	virtual TArray<TObjectPtr<AActor>> GetHitActors() override;
 
-	virtual void Fire(FVector direction) override;
+	virtual void Fire(const FVector& direction) override;
 
 	virtual ISpellCaster* GetSpellOwner() override;
 
 	virtual void ProcessOverlapDamage(int& damage) override;
-	virtual void ProcessHitDamage(int& damage, FVector targetLocation, FVector hitLocation) override;
+	virtual void ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation) override;
 
 	virtual bool DealDamage(AActor* hitActor, int damage) override;
 	virtual void ApplyEffects(AActor* hitActor) override;
