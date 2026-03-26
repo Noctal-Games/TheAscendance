@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CommonActivatableWidget.h"
 #include "Subsystems/LocalPlayerSubsystem.h"
 #include "CustomLocalPlayerSubsystem.generated.h"
 
@@ -54,6 +55,7 @@ private:
 	void HandleInteract();
 
 	void HandleToggleGrimoire();
+	void HandleTogglePauseMenu();
 
 	void HandleTestFunction1();
 	void HandleTestFunction2();
@@ -120,6 +122,10 @@ private:
 	TObjectPtr<UPlayerHUD> m_HUDWidget = nullptr;
 	UPROPERTY()
 	TObjectPtr<UGrimoire> m_GrimoireWidget = nullptr;
+   UPROPERTY(EditDefaultsOnly, Category = "UI | Pause Menu")
+	TSubclassOf<UCommonActivatableWidget> PauseMenuDefault = nullptr;
+	UPROPERTY()
+	TObjectPtr<UCommonActivatableWidget> m_PauseMenuWidget = nullptr;
 
 	TWeakObjectPtr<ACustomPlayerController> m_Controller = nullptr;
 	TWeakObjectPtr<APlayerCharacter> m_PlayerCharacter = nullptr;

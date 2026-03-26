@@ -13,6 +13,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 void UCustomLocalPlayerSubsystem::ToggleHUDVisibility(bool isVisible)
 {
@@ -23,6 +25,68 @@ void UCustomLocalPlayerSubsystem::ToggleHUDVisibility(bool isVisible)
 	}
 
 	m_HUDWidget->SetVisibility(isVisible ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+}
+
+void UCustomLocalPlayerSubsystem::HandleTogglePauseMenu()
+{
+	if (m_Controller.IsValid() == false)
+	{
+		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Invalid PlayerController reference");
+		return;
+	}
+
+	UWorld* world = UCoreFunctionLibrary::GetGameWorld();
+	if (world == nullptr)
+	{
+		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Invalid world reference");
+		return;
+	}
+
+	const bool isPaused = UGameplayStatics::IsGamePaused(world);
+
+	if (isPaused == false)
+	{
+		if (m_PauseMenuWidget == nullptr)
+		{
+			if (PauseMenuDefault == nullptr)
+			{
+				LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] PauseMenu Default was invalid");
+				return;
+			}
+
+           m_PauseMenuWidget = CreateWidget<UCommonActivatableWidget>(m_Controller.Get(), PauseMenuDefault);
+		}
+
+		if (m_PauseMenuWidget == nullptr)
+		{
+			LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Failed to create PauseMenu widget");
+			return;
+		}
+
+		m_PauseMenuWidget->AddToViewport();
+		m_PauseMenuWidget->ActivateWidget();
+		UGameplayStatics::SetGamePaused(world, true);
+
+		FInputModeGameAndUI inputMode;
+		inputMode.SetWidgetToFocus(m_PauseMenuWidget->TakeWidget());
+		inputMode.SetHideCursorDuringCapture(false);
+		m_Controller->SetInputMode(inputMode);
+		m_Controller->bShowMouseCursor = true;
+	}
+	else
+	{
+		if (m_PauseMenuWidget != nullptr)
+		{
+			m_PauseMenuWidget->DeactivateWidget();
+			m_PauseMenuWidget->RemoveFromParent();
+		}
+
+		UGameplayStatics::SetGamePaused(world, false);
+
+		FInputModeGameOnly inputMode;
+		m_Controller->SetInputMode(inputMode);
+		m_Controller->bShowMouseCursor = false;
+	}
 }
 
 void UCustomLocalPlayerSubsystem::SetPlayer(APlayerCharacter* player)
@@ -331,6 +395,9 @@ void UCustomLocalPlayerSubsystem::BindActions(UEnhancedInputComponent* enhancedI
 
 	checkf(ActionInteract, TEXT("[LOCAL PLAYER SUBSYSTEM] Missing 'Interact' Action"));
 	enhancedInputComponent->BindAction(ActionInteract, ETriggerEvent::Triggered, this, &UCustomLocalPlayerSubsystem::HandleInteract);
+
+	checkf(ActionTogglePauseMenu, TEXT("[LOCAL PLAYER SUBSYSTEM] Missing 'Toggle Pause Menu' Action"));
+	FEnhancedInputActionEventBinding& pauseBinding = enhancedInputComponent->BindAction(ActionTogglePauseMenu, ETriggerEvent::Triggered, this, &UCustomLocalPlayerSubsystem::HandleTogglePauseMenu);
 
 	checkf(ActionTestFunction1, TEXT("[LOCAL PLAYER SUBSYSTEM] Missing 'TestFunction1' Action"));
 	enhancedInputComponent->BindAction(ActionTestFunction1, ETriggerEvent::Triggered, this, &UCustomLocalPlayerSubsystem::HandleTestFunction1);
