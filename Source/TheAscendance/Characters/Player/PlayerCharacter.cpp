@@ -180,6 +180,38 @@ void APlayerCharacter::BeginPlay()
 	m_DefaultCapsuleHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
 	m_CurrentCapsuleHeight = m_DefaultCapsuleHeight;
 	m_CrouchCapsuleHeight = m_DefaultCapsuleHeight / 2;
+
+	TArray<USkeletalMeshComponent*> meshes;
+	GetComponents<USkeletalMeshComponent>(meshes);
+
+	for (USkeletalMeshComponent* mesh : meshes)
+	{
+		if (mesh == GetMesh())
+		{
+			continue;
+		}
+
+		m_HandsMesh = mesh;
+
+		if (m_HandsMesh == nullptr)
+		{
+			continue;
+		}
+
+		if (m_MainHandItem != nullptr)
+		{
+			m_MainHandItem->SetActorLocation(m_HandsMesh->GetSocketLocation("WeaponSocket_r"));
+			m_MainHandItem->K2_AttachToComponent(m_HandsMesh, "WeaponSocket_r", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+		}
+
+		if (m_OffHandItem != nullptr)
+		{
+			m_OffHandItem->SetActorLocation(m_HandsMesh->GetSocketLocation("WeaponSocket_l"));
+			m_OffHandItem->K2_AttachToComponent(m_HandsMesh, "WeaponSocket_l", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+		}
+
+		break;
+	}
 }
 
 void APlayerCharacter::HandleLookAtInteractions()
