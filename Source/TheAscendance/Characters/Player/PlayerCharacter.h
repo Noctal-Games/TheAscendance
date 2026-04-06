@@ -100,4 +100,7 @@ private:
 	//Test
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> m_TestSound = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<USkeletalMeshComponent> m_HandsMesh = nullptr;
 };
