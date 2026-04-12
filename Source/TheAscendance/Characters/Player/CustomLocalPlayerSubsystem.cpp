@@ -191,7 +191,7 @@ void UCustomLocalPlayerSubsystem::HandleMainHandPrimaryAttack()
 		return;
 	}
 
-	m_PlayerCharacter->MainHandPrimaryAttack();
+	m_PlayerCharacter->TestMainHandPrimaryAttack();
 }
 
 void UCustomLocalPlayerSubsystem::HandleMainHandSecondaryAttack()
@@ -202,7 +202,7 @@ void UCustomLocalPlayerSubsystem::HandleMainHandSecondaryAttack()
 		return;
 	}
 
-	m_PlayerCharacter->MainHandSecondaryAttack();
+	m_PlayerCharacter->TestMainHandSecondaryAttack();
 }
 
 void UCustomLocalPlayerSubsystem::HandleOffhandPrimaryAttack()
@@ -213,7 +213,7 @@ void UCustomLocalPlayerSubsystem::HandleOffhandPrimaryAttack()
 		return;
 	}
 
-	m_PlayerCharacter->OffHandPrimaryAttack();
+	m_PlayerCharacter->TestOffHandPrimaryAttack();
 }
 
 void UCustomLocalPlayerSubsystem::HandleOffhandSecondaryAttack()
@@ -224,7 +224,7 @@ void UCustomLocalPlayerSubsystem::HandleOffhandSecondaryAttack()
 		return;
 	}
 
-	m_PlayerCharacter->OffHandSecondaryAttack();
+	m_PlayerCharacter->TestOffHandSecondaryAttack();
 }
 
 void UCustomLocalPlayerSubsystem::HandleInteract()

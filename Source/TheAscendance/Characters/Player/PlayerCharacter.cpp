@@ -17,6 +17,7 @@
 #include "TheAscendance/Spells/Components/SpellCasterComponent.h"
 #include "TheAscendance/Items/ItemGameplayTags.h"
 #include "TheAscendance/Actors/Interaction/Interfaces/Interactable.h"
+#include "TheAscendance/Abilities/Components/AbilityComponent.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -24,6 +25,9 @@
 // Sets default values
 APlayerCharacter::APlayerCharacter() : ABaseCharacter()
 {
+	m_AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("Ability Component"));
+	checkf(m_AbilityComponent, TEXT("Ability Component failed to initialise"));
+
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationPitch = false;
@@ -166,6 +170,32 @@ const FVector APlayerCharacter::GetCastStartForward()
 	return m_Camera->GetForwardVector();
 }
 
+float APlayerCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate, FName startSection)
+{
+	if (montageToPlay == nullptr)
+	{
+		LOG_ERROR("Tried to play invalid animation montage");
+		return 0.0f;
+	}
+
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+
+	if (animInstance == nullptr)
+	{
+		LOG_ERROR("Tried to play animation montage with invalid anim instance");
+		return 0.0f;
+	}
+
+	float duration = animInstance->Montage_Play(montageToPlay, playRate);
+
+	if (startSection.IsNone() == false)
+	{
+		GetMesh()->GetAnimInstance()->Montage_JumpToSection(startSection, montageToPlay);
+	}
+
+	return duration;
+}
+
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
@@ -180,6 +210,11 @@ void APlayerCharacter::BeginPlay()
 	m_DefaultCapsuleHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
 	m_CurrentCapsuleHeight = m_DefaultCapsuleHeight;
 	m_CrouchCapsuleHeight = m_DefaultCapsuleHeight / 2;
+
+	if (m_AbilityComponent != nullptr)
+	{
+		m_AbilityComponent->TestSetAbilities(TestAbilities);
+	}
 }
 
 void APlayerCharacter::HandleLookAtInteractions()
@@ -193,7 +228,7 @@ void APlayerCharacter::HandleLookAtInteractions()
 	if (controller == nullptr)
 	{
 		LOG_ERROR("[PLAYER CHARACTER] Controller was invalid")
-			return;
+		return;
 	}
 
 	controller->GetPlayerViewPoint(loc, rot);
@@ -307,6 +342,60 @@ void APlayerCharacter::TestFunction3()
 	{
 		m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::SHIELD, -10);
 	}
+}
+
+bool APlayerCharacter::TestMainHandPrimaryAttack()
+{
+	if (m_AbilityComponent == nullptr)
+	{
+		return false;
+	}
+
+	m_AbilityComponent->StartAbility(1);
+	return true;
+}
+
+bool APlayerCharacter::TestMainHandSecondaryAttack()
+{
+	if (m_AbilityComponent == nullptr)
+	{
+		return false;
+	}
+
+	m_AbilityComponent->StartAbility(3);
+	return true;
+}
+
+bool APlayerCharacter::TestOffHandPrimaryAttack()
+{
+	if (m_AbilityComponent == nullptr)
+	{
+		return false;
+	}
+
+	m_AbilityComponent->StartAbility(2);
+	return true;
+}
+
+bool APlayerCharacter::TestOffHandSecondaryAttack()
+{
+	if (m_AbilityComponent == nullptr)
+	{
+		return false;
+	}
+
+	m_AbilityComponent->StartAbility(4);
+	return true;
+}
+
+void APlayerCharacter::TestEndAttack()
+{
+	if (m_AbilityComponent == nullptr)
+	{
+		return;
+	}
+
+	m_AbilityComponent->StopAbility();
 }
 
 void APlayerCharacter::TestSetSpells(const TArray<FGameplayTag>& spellTags)

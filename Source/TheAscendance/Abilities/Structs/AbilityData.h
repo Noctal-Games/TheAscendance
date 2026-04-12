@@ -10,7 +10,8 @@
 
 class UAnimMontage;
 
-UCLASS(Abstract, BlueprintType)
+//Make abstract
+UCLASS(BlueprintType)
 class THEASCENDANCE_API UAbilityData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()

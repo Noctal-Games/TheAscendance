@@ -9,6 +9,7 @@
 
 class UAbilityData;
 class UAbilityComponent;
+class UAnimMontage;
 
 UCLASS()
 class THEASCENDANCE_API UBaseAbility : public UObject, public IAbility
@@ -16,13 +17,11 @@ class THEASCENDANCE_API UBaseAbility : public UObject, public IAbility
 	GENERATED_BODY()
 	
 public:
-	virtual void Init(UAbilityComponent* ownerComponent, UAbilityData* abilityData);
+	virtual void Init(UAbilityComponent* ownerComponent, UAbilityData* abilityData) override;
 	
-	virtual void Activate();
-	virtual void End();
-
-	virtual void OnHitWindowStart();
-	virtual void OnHitWindowEnd();
+	virtual void Start() override;
+	virtual void Stop() override;
+	virtual void Execute() override;
 
 	virtual const FGameplayTag& GetAbilityTag() const override;
 
@@ -33,4 +32,7 @@ protected:
 private:
 	UPROPERTY()
 	TWeakObjectPtr<UAbilityComponent> m_OwnerComponent = nullptr;
+
+	UPROPERTY()
+	TSoftObjectPtr<UAnimMontage> m_AbilityAnimation = nullptr;
 };

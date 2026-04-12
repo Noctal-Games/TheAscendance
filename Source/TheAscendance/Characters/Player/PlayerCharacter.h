@@ -13,6 +13,8 @@ class ACustomPlayerController;
 class ISpell;
 class USoundBase;
 class IInteractable;
+class UAbilityComponent;
+class UAbilityData;
 
 DECLARE_DELEGATE_OneParam(FOnInteractTargetChanged, EInteractType);
 
@@ -52,9 +54,17 @@ public:
 
 	const virtual FVector GetCastStartForward() override;
 
+	virtual float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None) override;
+
 	void TestFunction1();
 	void TestFunction2();
 	void TestFunction3();
+
+	bool TestMainHandPrimaryAttack();
+	bool TestMainHandSecondaryAttack();
+	bool TestOffHandPrimaryAttack();
+	bool TestOffHandSecondaryAttack();
+	void TestEndAttack();
 
 	UFUNCTION(BlueprintCallable)
 	void TestSetSpells(const TArray<FGameplayTag>& spellTags);
@@ -78,6 +88,11 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float InteractRange = 500.0f;
 
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FGameplayTag> TestAbilityTags;
+
+	UPROPERTY(EditAnywhere)
+	TArray<TObjectPtr<UAbilityData>> TestAbilities;
 protected:
 	friend class UPlayerHUD;
 
@@ -100,4 +115,10 @@ private:
 	//Test
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> m_TestSound = nullptr;
+
+
+	UPROPERTY()
+	TObjectPtr<UAbilityComponent> m_AbilityComponent = nullptr;
+
+	bool m_IsAttacking = false;
 };

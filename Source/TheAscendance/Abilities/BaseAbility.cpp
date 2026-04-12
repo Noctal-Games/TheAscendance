@@ -14,31 +14,55 @@ void UBaseAbility::Init(UAbilityComponent* ownerComponent, UAbilityData* ability
 	if(m_OwnerComponent == nullptr)
 	{
 		LOG_ERROR("[BASE ABILITY] Failed to Init Ability, OwnerComponent was invalid");
-
+		return;
 	}
 
 	m_AbilityData = abilityData;
 
-	if (m_AbilityData = nullptr)
+	if (m_AbilityData == nullptr)
 	{
 		LOG_ERROR("[BASE ABILITY] Failed to Init Ability, AbilityData was invalid");
 		return;
 	}
+
+	m_AbilityAnimation = m_AbilityData->AbilityAnimation;
+
+	if(m_AbilityAnimation.IsNull() == true)
+	{
+		LOG_ERROR("[BASE ABILITY] Ability - %s: AbilityAnimation was invalid", *GetAbilityTag().ToString());
+		return;
+	}
+
+	UCoreFunctionLibrary::RequestAsyncLoad(m_AbilityAnimation.ToSoftObjectPath());
 }
 
-void UBaseAbility::Activate()
+void UBaseAbility::Start()
 {
-}
-void UBaseAbility::End()
-{
+	if(m_AbilityAnimation.IsNull() == true)
+	{
+		LOG_ERROR("[BASE ABILITY] Start was called but AbilityAnimation is invalid");
+		return;
+	}
+
+	if(m_OwnerComponent.IsValid() == false)
+	{
+		LOG_ERROR("[BASE ABILITY] Start was called but OwnerComponent is invalid");
+		return;
+	}
+
+	//Add timer for testing/failsafe
+	float duration = m_OwnerComponent->PlayAnimMontageOnOwner(m_AbilityAnimation.Get());
+	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: STARTED", *GetAbilityTag().ToString());
 }
 
-void UBaseAbility::OnHitWindowStart()
+void UBaseAbility::Stop()
 {
+	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: STOP", *GetAbilityTag().ToString());
 }
 
-void UBaseAbility::OnHitWindowEnd()
+void UBaseAbility::Execute()
 {
+	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: EXECUTE", *GetAbilityTag().ToString());
 }
 
 const FGameplayTag& UBaseAbility::GetAbilityTag() const

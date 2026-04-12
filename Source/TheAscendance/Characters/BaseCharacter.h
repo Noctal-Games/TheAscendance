@@ -103,7 +103,7 @@ public:
 
 	FVector GetSocketLocation(FName socketName);
 
-	float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None);
+	virtual float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None);
 
 
 	// Called every frame
