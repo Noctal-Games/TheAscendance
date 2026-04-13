@@ -427,6 +427,10 @@ float ABaseCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float pl
 	return duration;
 }
 
+void ABaseCharacter::StopAbility()
+{
+}
+
 bool ABaseCharacter::EquipItem(EEquippablePart part, const FGameplayTag& itemTag)
 {
 	if(itemTag.IsValid() == false)

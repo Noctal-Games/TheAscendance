@@ -17,6 +17,7 @@ class USpellLoader;
 class ISpell;
 class ISpellCaster;
 class UItemLoader;
+class IAbility;
 struct FItemData;
 struct FWeaponData;
 struct FWeaponTypeData;
@@ -38,6 +39,8 @@ public:
 
 	ISpell* CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const;
 	const FSpellTableData* GetSpellTableData(const FGameplayTag& spellTag) const;
+
+	IAbility* CreateAbilityFromTag(const FGameplayTag& abilityTag) const;
 
 	UFUNCTION(BlueprintCallable)
 	ABaseEnemy* CreateEnemyFromID(int enemyID) const;
