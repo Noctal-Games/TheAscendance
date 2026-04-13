@@ -6,9 +6,11 @@
 #include "Engine/DataAsset.h"
 #include "InstancedStruct.h"
 #include "GameplayTagContainer.h"
+#include "TheAscendance/Abilities/Structs/AbilityModifierData.h"
 #include "AbilityData.generated.h"
 
 class UAnimMontage;
+class USpellData;
 
 //Make abstract
 UCLASS(BlueprintType)
@@ -23,4 +25,7 @@ public:
 	float Cooldown = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftObjectPtr<UAnimMontage> AbilityAnimation = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
+	TArray<TInstancedStruct<FAbilityModifier>> AbilityModifiers;
 };

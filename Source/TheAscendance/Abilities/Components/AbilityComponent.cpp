@@ -118,14 +118,6 @@ void UAbilityComponent::TestSetAbilities(const TArray<TObjectPtr<UAbilityData>>&
 		{
 			m_Abilities[i] = ability->_getUObject();
 		}
-
-		//if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
-		//{
-				//if (IAbility* ability = gameMode->CreateAbilityFromTag(abilityTags[i]))
-				//{
-				//	m_Abilities[i] = ability->_getUObject();
-				//}
-		//}
 	}
 }
 
@@ -160,6 +152,14 @@ void UAbilityComponent::StopAbility()
 	}
 }
 
+void UAbilityComponent::OnInputReleased()
+{
+	if (m_ActiveAbility != nullptr)
+	{
+		m_ActiveAbility->OnInputReleased();
+	}
+}
+
 // Called when the game starts
 void UAbilityComponent::BeginPlay()
 {
@@ -179,7 +179,7 @@ float UAbilityComponent::PlayAnimMontageOnOwner(UAnimMontage* animation)
 		return 0.0f;
 	}
 
-	return m_Owner->PlayAnimationMontage(animation /* ADD SLOT NAME */);
+	return m_Owner->PlayAnimationMontage(animation);
 }
 
 // Called every frame

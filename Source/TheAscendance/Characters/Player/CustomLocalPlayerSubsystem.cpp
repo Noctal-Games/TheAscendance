@@ -300,6 +300,17 @@ void UCustomLocalPlayerSubsystem::HandleTestFunction3()
 	m_PlayerCharacter->TestFunction3();
 }
 
+void UCustomLocalPlayerSubsystem::HandleAttackReleased()
+{
+	if (m_PlayerCharacter.IsValid() == false)
+	{
+		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Invalid PlayerCharacter reference");
+		return;
+	}
+
+	m_PlayerCharacter->AttackInputRelease();
+}
+
 void UCustomLocalPlayerSubsystem::BindActions(UEnhancedInputComponent* enhancedInputComponent)
 {
 	checkf(ActionLook, TEXT("[LOCAL PLAYER SUBSYSTEM] Missing 'Look' Action"));
@@ -328,6 +339,9 @@ void UCustomLocalPlayerSubsystem::BindActions(UEnhancedInputComponent* enhancedI
 	enhancedInputComponent->BindAction(ActionOffHandPrimaryAttack, ETriggerEvent::Triggered, this, &UCustomLocalPlayerSubsystem::HandleOffhandPrimaryAttack);
 	checkf(ActionOffHandSecondaryAttack, TEXT("[LOCAL PLAYER SUBSYSTEM] Missing 'Offhand Alt Attack' Action"));
 	enhancedInputComponent->BindAction(ActionOffHandSecondaryAttack, ETriggerEvent::Triggered, this, &UCustomLocalPlayerSubsystem::HandleOffhandSecondaryAttack);
+
+	checkf(ActionAttackInputReleased, TEXT("[LOCAL PLAYER SUBSYSTEM] Missing 'Attack Input Released' Action"));
+	enhancedInputComponent->BindAction(ActionAttackInputReleased, ETriggerEvent::Completed, this, &UCustomLocalPlayerSubsystem::HandleAttackReleased);
 
 	checkf(ActionInteract, TEXT("[LOCAL PLAYER SUBSYSTEM] Missing 'Interact' Action"));
 	enhancedInputComponent->BindAction(ActionInteract, ETriggerEvent::Triggered, this, &UCustomLocalPlayerSubsystem::HandleInteract);

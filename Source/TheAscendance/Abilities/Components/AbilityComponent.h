@@ -24,11 +24,13 @@ public:
 	// Sets default values for this component's properties
 	UAbilityComponent();
 
-	virtual void SetAbilities(const TArray<FGameplayTag>& abilityTags);
+	void SetAbilities(const TArray<FGameplayTag>& abilityTags);
 	void TestSetAbilities(const TArray<TObjectPtr<UAbilityData>>& abilities);
 
-	virtual void StartAbility(int slot);
-	virtual void StopAbility();
+	void StartAbility(int slot);
+	void StopAbility();
+
+	void OnInputReleased();
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

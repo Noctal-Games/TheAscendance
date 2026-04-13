@@ -172,13 +172,19 @@ const FVector APlayerCharacter::GetCastStartForward()
 
 float APlayerCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate, FName startSection)
 {
+	if (m_HandsMesh == nullptr)
+	{
+		LOG_ERROR("[PLAYER CHARACTER] Tried to play AnimationMontage but HandsMesh was invalid");
+		return 0.0f;
+	}
+
 	if (montageToPlay == nullptr)
 	{
 		LOG_ERROR("Tried to play invalid animation montage");
 		return 0.0f;
 	}
 
-	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	UAnimInstance* animInstance = m_HandsMesh->GetAnimInstance();
 
 	if (animInstance == nullptr)
 	{
@@ -190,10 +196,20 @@ float APlayerCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float 
 
 	if (startSection.IsNone() == false)
 	{
-		GetMesh()->GetAnimInstance()->Montage_JumpToSection(startSection, montageToPlay);
+		animInstance->Montage_JumpToSection(startSection, montageToPlay);
 	}
 
 	return duration;
+}
+
+void APlayerCharacter::StopAbility()
+{
+	if (m_AbilityComponent == nullptr)
+	{
+		return;
+	}
+
+	m_AbilityComponent->StopAbility();
 }
 
 // Called when the game starts or when spawned
@@ -210,6 +226,38 @@ void APlayerCharacter::BeginPlay()
 	m_DefaultCapsuleHeight = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
 	m_CurrentCapsuleHeight = m_DefaultCapsuleHeight;
 	m_CrouchCapsuleHeight = m_DefaultCapsuleHeight / 2;
+
+	TArray<USkeletalMeshComponent*> meshes;
+	GetComponents<USkeletalMeshComponent>(meshes);
+
+	for (USkeletalMeshComponent* mesh : meshes)
+	{
+		if (mesh == GetMesh())
+		{
+			continue;
+		}
+
+		m_HandsMesh = mesh;
+
+		if (m_HandsMesh == nullptr)
+		{
+			continue;
+		}
+
+		if (m_MainHandItem != nullptr)
+		{
+			m_MainHandItem->SetActorLocation(m_HandsMesh->GetSocketLocation("WeaponSocket_r"));
+			m_MainHandItem->K2_AttachToComponent(m_HandsMesh, "WeaponSocket_r", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+		}
+
+		if (m_OffHandItem != nullptr)
+		{
+			m_OffHandItem->SetActorLocation(m_HandsMesh->GetSocketLocation("WeaponSocket_l"));
+			m_OffHandItem->K2_AttachToComponent(m_HandsMesh, "WeaponSocket_l", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+		}
+
+		break;
+	}
 
 	if (m_AbilityComponent != nullptr)
 	{
@@ -396,6 +444,16 @@ void APlayerCharacter::TestEndAttack()
 	}
 
 	m_AbilityComponent->StopAbility();
+}
+
+void APlayerCharacter::AttackInputRelease()
+{
+	if (m_AbilityComponent == nullptr)
+	{
+		return;
+	}
+
+	m_AbilityComponent->OnInputReleased();
 }
 
 void APlayerCharacter::TestSetSpells(const TArray<FGameplayTag>& spellTags)

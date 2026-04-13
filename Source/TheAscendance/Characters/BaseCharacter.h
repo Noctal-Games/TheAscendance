@@ -105,6 +105,8 @@ public:
 
 	virtual float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None);
 
+	UFUNCTION(BlueprintCallable)
+	virtual void StopAbility();
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

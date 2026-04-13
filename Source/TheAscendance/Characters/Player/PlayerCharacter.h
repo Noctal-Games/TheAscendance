@@ -56,6 +56,8 @@ public:
 
 	virtual float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None) override;
 
+	virtual void StopAbility() override;
+
 	void TestFunction1();
 	void TestFunction2();
 	void TestFunction3();
@@ -65,6 +67,8 @@ public:
 	bool TestOffHandPrimaryAttack();
 	bool TestOffHandSecondaryAttack();
 	void TestEndAttack();
+
+	void AttackInputRelease();
 
 	UFUNCTION(BlueprintCallable)
 	void TestSetSpells(const TArray<FGameplayTag>& spellTags);
@@ -106,6 +110,9 @@ private:
 	TObjectPtr<UPlayerMovementComponent> m_MovementComponent = nullptr;
 	UPROPERTY()
 	TObjectPtr<ACustomPlayerController> m_PlayerController = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<USkeletalMeshComponent> m_HandsMesh = nullptr;
 
 	float m_CrouchCapsuleHeight = 0.0f;
 	float m_CurrentCapsuleHeight = 0.0f;

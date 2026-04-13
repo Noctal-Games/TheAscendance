@@ -9,11 +9,11 @@
 #include "TheAscendance/Game/Subsystems/QuestManagerSubsystem.h"
 #include "TheAscendance/Game/Subsystems/UIManagerSubsystem.h"
 #include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
-#include "TheAscendance/Core/CoreMacros.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Engine/StreamableManager.h"
 #include "Engine/AssetManager.h"
+#include "TimerManager.h"
 
 UWorld* UCoreFunctionLibrary::GetGameWorld()
 {
@@ -211,4 +211,13 @@ void UCoreFunctionLibrary::RequestAsyncLoad(const TArray<FSoftObjectPath>& targe
 			}
 		}
 	));
+}
+
+void UCoreFunctionLibrary::ClearTimerHandle(FTimerHandle& inHandle, const FString handleName)
+{
+	if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
+	{
+		LOG_INFO("[CORE] Clearing TimerHandle: %s(%s)", *handleName, *inHandle.ToString());
+		world->GetTimerManager().ClearTimer(inHandle);
+	}
 }

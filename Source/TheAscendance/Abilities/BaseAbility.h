@@ -23,7 +23,11 @@ public:
 	virtual void Stop() override;
 	virtual void Execute() override;
 
+	virtual void OnInputReleased() override;
+
 	virtual const FGameplayTag& GetAbilityTag() const override;
+
+	virtual float PlayAnimMontageOnOwner(UAnimMontage* animation) override;
 
 protected:
 	UPROPERTY()
@@ -35,4 +39,6 @@ private:
 
 	UPROPERTY()
 	TSoftObjectPtr<UAnimMontage> m_AbilityAnimation = nullptr;
+
+	FTimerHandle m_AbilityDurationHandle;
 };

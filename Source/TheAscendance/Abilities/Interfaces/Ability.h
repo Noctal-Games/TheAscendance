@@ -24,10 +24,15 @@ class THEASCENDANCE_API IAbility
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	virtual void Init(UAbilityComponent* ownerComponent, UAbilityData* abilityData) {};
+	virtual void SetDecoratedSelf(IAbility* decoratedSelf) {};
 
 	virtual void Start() {};
 	virtual void Stop() {};
 	virtual void Execute() {};
+
+	virtual void OnInputReleased() {};
+
+	virtual float PlayAnimMontageOnOwner(UAnimMontage* animation) { return 0.0f; };
 
 	virtual const FGameplayTag& GetAbilityTag() const { return FGameplayTag::EmptyTag; }
 	virtual bool CanStart() const { return true; }

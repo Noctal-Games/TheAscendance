@@ -38,31 +38,38 @@ void UBaseAbility::Init(UAbilityComponent* ownerComponent, UAbilityData* ability
 
 void UBaseAbility::Start()
 {
-	if(m_AbilityAnimation.IsNull() == true)
-	{
-		LOG_ERROR("[BASE ABILITY] Start was called but AbilityAnimation is invalid");
-		return;
-	}
-
-	if(m_OwnerComponent.IsValid() == false)
-	{
-		LOG_ERROR("[BASE ABILITY] Start was called but OwnerComponent is invalid");
-		return;
-	}
-
-	//Add timer for testing/failsafe
-	float duration = m_OwnerComponent->PlayAnimMontageOnOwner(m_AbilityAnimation.Get());
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: STARTED", *GetAbilityTag().ToString());
+	Execute();
 }
 
 void UBaseAbility::Stop()
 {
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: STOP", *GetAbilityTag().ToString());
+
+	if (m_AbilityDurationHandle.IsValid())
+	{
+		UCoreFunctionLibrary::ClearTimerHandle(m_AbilityDurationHandle, FString("Stop Ability"));
+	}
 }
 
 void UBaseAbility::Execute()
 {
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: EXECUTE", *GetAbilityTag().ToString());
+
+	if (m_AbilityAnimation.IsNull() == true)
+	{
+		LOG_ERROR("[BASE ABILITY] Start was called but AbilityAnimation is invalid");
+		return;
+	}
+
+	//Timer to prevent animation locking up attacks. If an animation fails to notify, the ability and character attack state will be reset by default. 
+	float duration = PlayAnimMontageOnOwner(m_AbilityAnimation.Get());
+	UCoreFunctionLibrary::SetTimer(m_AbilityDurationHandle, this, &UBaseAbility::Stop, duration);
+}
+
+void UBaseAbility::OnInputReleased()
+{
+	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: RELEASED", *GetAbilityTag().ToString());
 }
 
 const FGameplayTag& UBaseAbility::GetAbilityTag() const
@@ -74,4 +81,15 @@ const FGameplayTag& UBaseAbility::GetAbilityTag() const
 	}
 
 	return m_AbilityData->AbilityTag;
+}
+
+float UBaseAbility::PlayAnimMontageOnOwner(UAnimMontage* animation)
+{
+	if (m_OwnerComponent.IsValid() == false)
+	{
+		LOG_ERROR("[BASE ABILITY] Start was called but OwnerComponent is invalid");
+		return 0.0f;
+	}
+
+	return m_OwnerComponent->PlayAnimMontageOnOwner(animation);
 }
