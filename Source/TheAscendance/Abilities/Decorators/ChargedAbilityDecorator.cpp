@@ -14,6 +14,8 @@ void UChargedAbilityDecorator::Start()
 		return;
 	}
 
+	m_IsCharging = true;
+
 	//If animation is looped, just use the max charge time. If not, use the animation duration as the charge time.
 	float animationDuration = m_DecoratedAbility->PlayAnimMontageOnOwner(m_ChargingAnimation.Get());
 	float duration = m_ModifierData->IsAnimationLooped ? m_ModifierData->MaxChargeTime : animationDuration;
@@ -34,6 +36,12 @@ void UChargedAbilityDecorator::Stop()
 
 void UChargedAbilityDecorator::OnInputReleased()
 {
+	if (m_IsCharging == false)
+	{
+		return;
+	}
+
+	m_IsCharging = false;
 	m_DecoratedAbility->OnInputReleased();
 
 	if (m_IsCharged == false)
@@ -41,6 +49,8 @@ void UChargedAbilityDecorator::OnInputReleased()
 		LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: CANCELLED", *GetAbilityTag().ToString());
 		return;
 	}
+
+	m_IsCharged = false;
 
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: CHARGED", *GetAbilityTag().ToString());
 	m_DecoratedAbility->Execute();
@@ -69,6 +79,11 @@ void UChargedAbilityDecorator::SetToCharged()
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: CHARGED TRUE", *GetAbilityTag().ToString());
 
 	m_IsCharged = true;
+
+	if (m_ModifierData->DoesChargeCompleteForceAbility == true)
+	{
+		OnInputReleased();
+	}
 
 	if (m_ChargeDurationHandle.IsValid())
 	{

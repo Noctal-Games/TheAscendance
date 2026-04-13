@@ -60,6 +60,7 @@ private:
 
 	FTimerHandle m_ChargeDurationHandle;
 
+	bool m_IsCharging = false;
 	bool m_IsCharged = false;
 };
 

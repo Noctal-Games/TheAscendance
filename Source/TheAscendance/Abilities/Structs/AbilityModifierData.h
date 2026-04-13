@@ -27,7 +27,8 @@ struct FChargedAbilityModifier : public FAbilityModifier
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftObjectPtr<UAnimMontage> ChargingAnimation = nullptr;
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool DoesChargeCompleteForceAbility = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool IsAnimationLooped = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (EditCondition = "IsAnimationLooped", EditConditionHides = true))
