@@ -59,6 +59,8 @@ private:
 	void HandleTestFunction2();
 	void HandleTestFunction3();
 	
+	void HandleAttackReleased();
+
 	void BindActions(UEnhancedInputComponent* enhancedInputComponent);
 public:
 	//---- INPUTS ----
@@ -106,6 +108,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Input | Global | Character Actions")
 	TObjectPtr<UInputAction> ActionInteract = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Input | Global | Character Actions")
+	TObjectPtr<UInputAction> ActionAttackInputReleased = nullptr;
 
 	//Test
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Player Input | Global | Test Actions")

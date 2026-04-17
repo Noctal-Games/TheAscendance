@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "TheAscendance/Core/CoreMacros.h"
 #include "CoreFunctionLibrary.generated.h"
 
 class APlayableGameMode;
@@ -53,4 +54,22 @@ public:
 
 	static void RequestAsyncLoad(const FSoftObjectPath& targetToStream, TFunction<void()> delegate = nullptr);
 	static void RequestAsyncLoad(const TArray<FSoftObjectPath>& targetsToStream, TFunction<void()> delegate = nullptr);
+
+	template<class UserClass>
+	static void SetTimer(FTimerHandle& outHandle, UserClass* inObj, typename FTimerDelegate::TMethodPtr<UserClass> inTimerMethod, float inRate, bool inbLoop = false, float inFirstDelay = -1.0f)
+	{
+		if (inObj == nullptr)
+		{
+			LOG_ERROR("[CORE] Tried to SetTimer, but the target object was invalid");
+			return;
+		}
+
+		if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
+		{
+			LOG_INFO("[CORE] Setting %f second Timer. Created for Class: %s", inRate, *inObj->GetClass()->GetName());
+			world->GetTimerManager().SetTimer(outHandle, inObj, inTimerMethod, inRate, inbLoop, inFirstDelay);
+		}
+	}
+
+	static void ClearTimerHandle(FTimerHandle& inHandle, const FString handleName = "");
 };

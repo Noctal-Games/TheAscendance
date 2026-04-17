@@ -13,6 +13,8 @@ class ACustomPlayerController;
 class ISpell;
 class USoundBase;
 class IInteractable;
+class UAbilityComponent;
+class UAbilityData;
 
 DECLARE_DELEGATE_OneParam(FOnInteractTargetChanged, EInteractType);
 
@@ -52,9 +54,21 @@ public:
 
 	const virtual FVector GetCastStartForward() override;
 
+	virtual float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None) override;
+
+	virtual void StopAbility() override;
+
 	void TestFunction1();
 	void TestFunction2();
 	void TestFunction3();
+
+	bool TestMainHandPrimaryAttack();
+	bool TestMainHandSecondaryAttack();
+	bool TestOffHandPrimaryAttack();
+	bool TestOffHandSecondaryAttack();
+	void TestEndAttack();
+
+	void AttackInputRelease();
 
 	UFUNCTION(BlueprintCallable)
 	void TestSetSpells(const TArray<FGameplayTag>& spellTags);
@@ -78,6 +92,11 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float InteractRange = 500.0f;
 
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FGameplayTag> TestAbilityTags;
+
+	UPROPERTY(EditAnywhere)
+	TArray<TObjectPtr<UAbilityData>> TestAbilities;
 protected:
 	friend class UPlayerHUD;
 
@@ -92,6 +111,9 @@ private:
 	UPROPERTY()
 	TObjectPtr<ACustomPlayerController> m_PlayerController = nullptr;
 
+	UPROPERTY()
+	TObjectPtr<USkeletalMeshComponent> m_HandsMesh = nullptr;
+
 	float m_CrouchCapsuleHeight = 0.0f;
 	float m_CurrentCapsuleHeight = 0.0f;
 	float m_DefaultCapsuleHeight = 0.0f;
@@ -101,6 +123,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> m_TestSound = nullptr;
 
+
 	UPROPERTY()
-	TObjectPtr<USkeletalMeshComponent> m_HandsMesh = nullptr;
+	TObjectPtr<UAbilityComponent> m_AbilityComponent = nullptr;
+
+	bool m_IsAttacking = false;
 };

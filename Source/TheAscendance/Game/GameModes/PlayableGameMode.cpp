@@ -97,6 +97,17 @@ const FSpellTableData* APlayableGameMode::GetSpellTableData(const FGameplayTag& 
 	return m_SpellLoader->GetSpellTableDataFromTag(spellTag);
 }
 
+IAbility* APlayableGameMode::CreateAbilityFromTag(const FGameplayTag& abilityTag) const
+{
+	if (m_SpellLoader == nullptr)
+	{
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid AbilityLoader");
+		return nullptr;
+	}
+
+	return nullptr;
+}
+
 ABaseEnemy* APlayableGameMode::CreateEnemyFromID(int enemyID) const
 {
 	if (m_EnemyLoader == nullptr)
