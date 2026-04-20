@@ -4,7 +4,6 @@
 #include "LocalSpell.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
-#include "Interfaces/SpellCaster.h"
 #include "Structs/SpellData.h"
 
 //void ULocalSpell::Init(USpellData* spellData, ISpellCaster* spellOwner)
@@ -31,7 +30,7 @@ void ULocalSpell::Execute()
 		return;
 	}
 
-	if (AActor* owner = m_SpellOwner->GetActor())
+	if (AActor* owner = GetAbilityOwner())
 	{
 		FVector ownerLocation = owner->GetActorLocation();
 
@@ -45,17 +44,11 @@ void ULocalSpell::Execute()
 
 void ULocalSpell::ProcessHit(const FVector& spellHitLocation)
 {
-	if (m_SpellOwner == nullptr)
-	{
-		UBaseSpell::ProcessHit(spellHitLocation);
-		return;
-	}
-
-	if (AActor* owner = m_SpellOwner->GetActor())
+	if (AActor* owner = GetAbilityOwner())
 	{
 		if (m_HitActors.Contains(owner) == true)
 		{
-			m_HitActors.Remove(m_SpellOwner->GetActor());
+			m_HitActors.Remove(owner);
 		}
 	}
 

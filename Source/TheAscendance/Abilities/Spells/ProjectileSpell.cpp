@@ -4,7 +4,6 @@
 #include "ProjectileSpell.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
-#include "Interfaces/SpellCaster.h"
 #include "Structs/SpellData.h"
 #include "TheAscendance/Actors/Projectile/Interfaces/Projectile.h"
 #include "TheAscendance/Core/AbilityHelpers.h"

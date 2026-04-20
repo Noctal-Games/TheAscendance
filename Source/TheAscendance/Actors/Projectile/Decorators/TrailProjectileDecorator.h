@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ProjectileDecorator.h"
-#include "TheAscendance/Spells/Structs/SpellModifierData.h"
+#include "TheAscendance/Abilities/Spells/Structs/SpellModifierData.h"
 #include "TheAscendance/Actors/Projectile/Structs/ProjectileModifierData.h"
 #include "GameplayTags.h"
 #include "TrailProjectileDecorator.generated.h"

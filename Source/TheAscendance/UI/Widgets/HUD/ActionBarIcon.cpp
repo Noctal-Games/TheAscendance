@@ -6,7 +6,7 @@
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Items/Structs/ItemData.h"
-#include "TheAscendance/Spells//Structs/SpellData.h"
+#include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
 
 #include "Components/Image.h"
 

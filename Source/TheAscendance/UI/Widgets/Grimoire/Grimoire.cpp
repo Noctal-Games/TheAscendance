@@ -8,7 +8,7 @@
 #include "SpellInventoryGrid.h"
 #include "SpellLoadoutDisplay.h"
 #include "SpellInfoDisplay.h"
-#include "TheAscendance/Spells/Structs/SpellData.h"
+#include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"

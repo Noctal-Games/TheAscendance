@@ -5,7 +5,6 @@
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
-#include "TheAscendance/Spells/Structs/SpellModifierData.h"
 #include "TheAscendance/Effects/CoreEffect.h"
 #include "TheAscendance/Effects/DeliveryEffects/AOEDeliveryEffect.h"
 #include "TheAscendance/Effects/Structs/EffectData.h"

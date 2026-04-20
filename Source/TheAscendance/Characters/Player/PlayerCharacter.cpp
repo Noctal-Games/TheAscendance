@@ -8,12 +8,11 @@
 #include "TheAscendance/Characters/Components/CharacterStatsComponent.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Items/HeldItem.h"
-#include "TheAscendance/Spells/Interfaces/Spell.h"
 #include "TheAscendance/Characters/CharacterGameplayTags.h"
 #include "TheAscendance/Game/Subsystems/AudioManagerSubsystem.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
 #include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
-#include "TheAscendance/Spells/SpellGameplayTags.h"
+#include "TheAscendance/Abilities/Spells/SpellGameplayTags.h"
 #include "TheAscendance/Items/ItemGameplayTags.h"
 #include "TheAscendance/Actors/Interaction/Interfaces/Interactable.h"
 #include "TheAscendance/Abilities/Components/AbilityComponent.h"
@@ -162,11 +161,6 @@ void APlayerCharacter::OnMovementModeChanged(EMovementMode prevMovementMode, uin
 UCameraComponent* APlayerCharacter::GetCamera()
 {
 	return m_Camera;
-}
-
-const FVector APlayerCharacter::GetCastStartForward()
-{
-	return m_Camera->GetForwardVector();
 }
 
 float APlayerCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate, FName startSection)

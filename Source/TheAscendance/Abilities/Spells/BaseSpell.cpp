@@ -5,7 +5,6 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Abilities/Interfaces/Ability.h"
-#include "Interfaces/SpellCaster.h"
 #include "Structs/SpellData.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
 

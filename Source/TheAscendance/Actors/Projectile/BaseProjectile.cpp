@@ -2,7 +2,7 @@
 
 #include "BaseProjectile.h"
 #include "TheAscendance/Core/CoreMacros.h"
-#include "TheAscendance/Spells/Structs/SpellData.h"
+#include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
 #include "TheAscendance/Abilities/Interfaces/Ability.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"

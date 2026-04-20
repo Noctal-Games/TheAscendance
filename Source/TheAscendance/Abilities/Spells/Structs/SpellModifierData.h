@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TheAscendance/Spells/Enums/SpellModifierType.h"
+#include "TheAscendance/Abilities/Spells/Enums/SpellModifierType.h"
 #include "GameplayTagContainer.h"
 #include "NiagaraSystem.h"
 #include "SpellModifierData.generated.h"

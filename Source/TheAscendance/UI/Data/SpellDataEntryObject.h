@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "TheAscendance/Spells/Structs/SpellData.h"
+#include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
 #include "SpellDataEntryObject.generated.h"
 
 UCLASS()

@@ -198,7 +198,7 @@ FVector UAbilityComponent::GetCastLocation()
 		return FVector::ForwardVector;
 	}
 
-	return m_Owner->GetCastStartLocation();
+	return m_Owner->GetActorLocation();//m_Owner->GetCastStartLocation();
 }
 
 FVector UAbilityComponent::GetCastForward()
@@ -209,7 +209,7 @@ FVector UAbilityComponent::GetCastForward()
 		return FVector::ForwardVector;
 	}
 
-	return m_Owner->GetCastStartForward();
+	return m_Owner->GetActorForwardVector();//m_Owner->GetCastStartForward();
 }
 
 // Called every frame

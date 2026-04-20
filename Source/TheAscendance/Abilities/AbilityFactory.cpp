@@ -14,9 +14,9 @@
 #include "Decorators/ApplyUserEffectAbilityDecorator.h"
 #include "Decorators/ApplyEffectAbilityDecorator.h"
 #include "Decorators/SpawnEffectAbilityDecorator.h"
-#include "TheAscendance/Spells/Structs/SpellData.h"
-#include "TheAscendance/Spells/ProjectileSpell.h"
-#include "TheAscendance/Spells/LocalSpell.h"
+#include "Spells/Structs/SpellData.h"
+#include "Spells/ProjectileSpell.h"
+#include "Spells/LocalSpell.h"
 
 
 #include "InstancedStruct.h"

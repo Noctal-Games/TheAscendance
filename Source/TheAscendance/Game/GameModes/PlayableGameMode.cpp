@@ -75,16 +75,16 @@ const FWeaponTypeData* APlayableGameMode::GetWeaponTypeData(EWeaponType type) co
 	return m_ItemLoader->GetWeaponTypeData(type);
 }
 
-ISpell* APlayableGameMode::CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const
-{
-	if (m_SpellLoader == nullptr)
-	{
-		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
-		return nullptr;
-	}
-
-	return m_SpellLoader->CreateSpellFromTag(spellTag, spellOwner);
-}
+//ISpell* APlayableGameMode::CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const
+//{
+//	if (m_SpellLoader == nullptr)
+//	{
+//		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
+//		return nullptr;
+//	}
+//
+//	return m_SpellLoader->CreateSpellFromTag(spellTag, spellOwner);
+//}
 
 const FSpellTableData* APlayableGameMode::GetSpellTableData(const FGameplayTag& spellTag) const
 {

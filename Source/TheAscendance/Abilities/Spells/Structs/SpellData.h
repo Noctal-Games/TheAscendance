@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TheAscendance/Spells/Enums/SpellType.h"
+#include "TheAscendance/Abilities/Spells/Enums/SpellType.h"
 #include "TheAscendance/Abilities/Structs/AbilityData.h"
 #include "TheAscendance/Actors/Projectile/Structs/ProjectileModifierData.h"
 #include "SpellModifierData.h"

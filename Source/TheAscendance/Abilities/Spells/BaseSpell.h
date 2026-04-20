@@ -7,7 +7,6 @@
 #include "TheAscendance/Abilities/BaseAbility.h"
 #include "BaseSpell.generated.h"
 
-class ISpellCaster;
 class USpellData;
 class UNiagaraSystem;
 
@@ -30,8 +29,6 @@ public:
 	virtual void ApplyEffects(AActor* hitActor) override;
 
 protected:
-	UPROPERTY()
-	TScriptInterface<ISpellCaster> m_SpellOwner = nullptr;
 
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> m_HitActors;

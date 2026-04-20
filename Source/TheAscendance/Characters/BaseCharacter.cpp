@@ -307,41 +307,6 @@ void ABaseCharacter::EndOffHandAttack()
 	return m_OffHandItem->EndAttack();
 }
 
-AActor* ABaseCharacter::GetActor()
-{
-	return this;
-}
-
-const FVector ABaseCharacter::GetSpellOwnerLocation()
-{
-	return GetActorLocation();
-}
-
-const FVector ABaseCharacter::GetSpellOwnerForward()
-{
-	return GetActorForwardVector();
-}
-
-const FVector ABaseCharacter::GetCastStartLocation()
-{
-	if (GetCastStartFunc.IsBound() == false)
-	{
-		return GetSpellOwnerLocation();
-	}
-
-	return GetCastStartFunc.Execute();
-}
-
-const FVector ABaseCharacter::GetCastStartForward()
-{
-	if (GetCastForwardFunc.IsBound() == false)
-	{
-		return GetSpellOwnerForward();
-	}
-
-	return GetCastForwardFunc.Execute();
-}
-
 void ABaseCharacter::GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const
 {
 	tagContainer.AppendTags(OwnedTags);

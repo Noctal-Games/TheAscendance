@@ -9,7 +9,6 @@
 #include "Interfaces/Susceptible.h"
 #include "Enums/CharacterStat.h"
 #include "TheAscendance/Items/Enums/WeaponType.h"
-#include "TheAscendance/Spells/Interfaces/SpellCaster.h"
 #include "Enums/EquippablePart.h"
 #include "BaseCharacter.generated.h"
 
@@ -27,7 +26,7 @@ DECLARE_DELEGATE_RetVal(const FVector, FGetCastStart);
 DECLARE_DELEGATE_RetVal(const FVector, FGetCastForward);
 
 UCLASS()
-class THEASCENDANCE_API ABaseCharacter : public ACharacter, public ISusceptible, public ISpellCaster, public IGameplayTagAssetInterface
+class THEASCENDANCE_API ABaseCharacter : public ACharacter, public ISusceptible, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 
@@ -80,12 +79,6 @@ public:
 	void EndMainHandAttack();
 	UFUNCTION(BlueprintCallable)
 	void EndOffHandAttack();
-
-	virtual AActor* GetActor() override;
-	const virtual FVector GetSpellOwnerLocation() override;
-	const virtual FVector GetSpellOwnerForward() override;
-	const virtual FVector GetCastStartLocation() override;
-	const virtual FVector GetCastStartForward() override;
 
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const override;
 	virtual bool HasMatchingGameplayTag(FGameplayTag tagToCheck) const override;

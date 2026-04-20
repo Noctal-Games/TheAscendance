@@ -14,8 +14,6 @@ class UBaseEffect;
 class UEnemyLoader;
 class ABaseEnemy;
 class USpellLoader;
-class ISpell;
-class ISpellCaster;
 class UItemLoader;
 class IAbility;
 struct FItemData;
@@ -37,7 +35,7 @@ public:
 	FWeaponData* GetWeaponData(const FGameplayTag& itemTag) const;
 	const FWeaponTypeData* GetWeaponTypeData(EWeaponType type) const;
 
-	ISpell* CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const;
+	//ISpell* CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const;
 	const FSpellTableData* GetSpellTableData(const FGameplayTag& spellTag) const;
 
 	IAbility* CreateAbilityFromTag(const FGameplayTag& abilityTag) const;
