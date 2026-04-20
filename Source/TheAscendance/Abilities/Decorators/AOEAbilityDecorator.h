@@ -3,43 +3,42 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SpellDecorator.h"
-#include "TheAscendance/Spells/Structs/SpellModifierData.h"
-#include "AOESpellDecorator.generated.h"
+#include "AbilityDecorator.h"
+#include "TheAscendance/Abilities/Structs/AbilityModifierData.h"
+#include "AOEAbilityDecorator.generated.h"
 
 class UNiagaraSystem;
 
 UCLASS()
-class THEASCENDANCE_API UAOESpellDecorator : public USpellDecorator
+class THEASCENDANCE_API UAOEAbilityDecorator : public UAbilityDecorator
 {
 	GENERATED_BODY()
 	
 public:
 	class THEASCENDANCE_API Builder
 	{
-		TWeakObjectPtr<UAOESpellDecorator> m_Decorator = nullptr;
+		UPROPERTY()
+		TWeakObjectPtr<UAOEAbilityDecorator> m_Decorator = nullptr;
 
 	public:
-		Builder(ISpell* decorator, const FAreaOfEffectModifier& modifierData)
+		Builder(IAbility* decorator, const FAreaOfEffectModifier& modifierData)
 		{
-			m_Decorator = NewObject<UAOESpellDecorator>();
+			m_Decorator = NewObject<UAOEAbilityDecorator>();
 			m_Decorator->Decorate(decorator);
 
 			m_Decorator->m_ModifierData = MakeShared<FAreaOfEffectModifier>(modifierData);
 		}
-		ISpell* Build()
+		IAbility* Build()
 		{
 			if (m_Decorator.IsValid() == false)
 			{
-				LOG_ERROR("Tried to build AOESpellDecorator without initialising it.")
+				LOG_ERROR("[AOE ABILITY DECORATOR BUILDER] Tried to build without initialising.")
 				return nullptr;
 			}
 
 			return m_Decorator.Get();
 		}
 	};
-
-	virtual void LoadHitNiagara() override;
 
 	virtual void OnHit(AActor* hitActor, const FVector& spellHitLocation) override;
 	virtual void ProcessHit(const FVector& spellHitLocation) override;

@@ -9,7 +9,6 @@
 #include "TheAscendance/Effects/Components/EffectHandlerComponent.h"
 #include "TheAscendance/Items/HeldItem.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
-#include "TheAscendance/Spells/Components/SpellCasterComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -29,8 +28,6 @@ ABaseCharacter::ABaseCharacter()
 	checkf(m_CharacterTrajectoryComponent, TEXT("Character Trajectory Component failed to initialise"));
 	m_LoadoutComponent = CreateDefaultSubobject<ULoadoutComponent>(TEXT("Loadout Component"));
 	checkf(m_LoadoutComponent, TEXT("Loadout Component failed to initialise"));
-	m_SpellCasterComponent = CreateDefaultSubobject<USpellCasterComponent>(TEXT("SpellCaster Component"));
-	checkf(m_SpellCasterComponent, TEXT("SpellCaster Component failed to initialise"));
 
 	SetRootComponent(GetCapsuleComponent());
 
@@ -367,13 +364,6 @@ bool ABaseCharacter::HasAnyMatchingGameplayTags(const FGameplayTagContainer& tag
 
 void ABaseCharacter::CastSpell(int slot)
 {
-	if (m_SpellCasterComponent == nullptr)
-	{
-		LOG_ERROR("[BASE CHARACTER] Tried to cast spell but SpellCasterComponent was invalid");
-		return;
-	}
-
-	m_SpellCasterComponent->CastSpell(slot);
 }
 
 bool ABaseCharacter::IsSprinting()
@@ -425,6 +415,9 @@ float ABaseCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float pl
 	}
 
 	return duration;
+}
+void ABaseCharacter::TriggerAbility()
+{
 }
 
 void ABaseCharacter::StopAbility()
@@ -639,13 +632,6 @@ void ABaseCharacter::BeginPlay()
 
 	m_OnSpellsUpdatedHandle = m_LoadoutComponent->OnSpellsUpdated.AddLambda([this](const TArray<FGameplayTag>& spellTags)
 		{
-			if (m_SpellCasterComponent == nullptr)
-			{
-				LOG_ERROR("[BASE CHARACTER] Tried to UpdateSpells but SpellCasterComponent is invalid")
-				return;
-			}
-
-			m_SpellCasterComponent->SetSpells(spellTags);
 		}
 	);
 

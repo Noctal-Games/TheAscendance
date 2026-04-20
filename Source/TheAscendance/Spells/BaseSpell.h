@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "TheAscendance/Spells/Interfaces/Spell.h"
+#include "TheAscendance/Abilities/BaseAbility.h"
 #include "BaseSpell.generated.h"
 
 class ISpellCaster;
@@ -12,36 +12,22 @@ class USpellData;
 class UNiagaraSystem;
 
 UCLASS(Abstract)
-class THEASCENDANCE_API UBaseSpell : public UObject, public ISpell
+class THEASCENDANCE_API UBaseSpell : public UBaseAbility
 {
 	GENERATED_BODY()
 	
 public:
-	virtual void Init(USpellData* spellData, ISpellCaster* spellOwner) override;
-	virtual void SetDecoratedSelf(ISpell* decoratedSelf) override;
-	virtual void LoadHitNiagara() override;
-
-	virtual bool CanCast() override;
-	virtual bool CastSpell() override;
-
-	virtual void Update(float deltaTime) override;
-
 	virtual void OnOverlap(AActor* overlapActor, const FVector& spellOverlapLocation, int damage) override;
 	virtual void OnHit(AActor* hitActor, const FVector& spellHitLocation) override;
 	virtual void ProcessHit(const FVector& spellHitLocation) override;
 
 	virtual void SpawnHitNiagara(const FVector& spellHitLocation) override;
-	virtual void SpawnSpellNiagara(const FVector& spellLocation) override;
 
 	virtual bool DealDamage(AActor* hitActor, int damage) override;
 
 	virtual TArray<TObjectPtr<AActor>> GetHitActors() override;
 
-	virtual void Fire(const FVector& direction) override;
-
 	virtual void ApplyEffects(AActor* hitActor) override;
-
-	virtual ISpellCaster* GetSpellOwner() override;
 
 protected:
 	UPROPERTY()
@@ -50,11 +36,6 @@ protected:
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> m_HitActors;
 
-	UPROPERTY()
-	TScriptInterface<ISpell> m_DecoratedSelf = nullptr;
-
-	UPROPERTY()
-	TSoftObjectPtr<UNiagaraSystem> m_SpellNiagara = nullptr;
 	UPROPERTY()
 	TSoftObjectPtr<UNiagaraSystem> m_HitNiagara = nullptr;
 

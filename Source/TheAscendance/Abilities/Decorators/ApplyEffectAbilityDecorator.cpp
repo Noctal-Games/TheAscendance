@@ -1,23 +1,22 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ApplyEffectSpellDecorator.h"
+#include "ApplyEffectAbilityDecorator.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
-#include "TheAscendance/Spells/Structs/SpellModifierData.h"
 #include "TheAscendance/Effects/CoreEffect.h"
 #include "TheAscendance/Effects/DeliveryEffects/ChainDeliveryEffect.h"
 #include "TheAscendance/Effects/Structs/EffectData.h"
 
-void UApplyEffectSpellDecorator::ApplyEffects(AActor* hitActor)
+void UApplyEffectAbilityDecorator::ApplyEffects(AActor* hitActor)
 {
-	m_DecoratedSpell->ApplyEffects(hitActor);
+	m_DecoratedAbility->ApplyEffects(hitActor);
 
 	if (m_ModifierData == nullptr)
 	{
-		LOG_ERROR("ApplyEffectSpellDecorator is missing ModifierData");
+		LOG_ERROR("[APPLY EFFECT ABILITY DECORATOR] Missing ModifierData");
 		return;
 	}
 
@@ -25,7 +24,7 @@ void UApplyEffectSpellDecorator::ApplyEffects(AActor* hitActor)
 
 	if (subType == "AOE")
 	{
-		LOG_WARNING("Tried to Apply an invalid Effect, use a SpawnEffectSpellModifier instead");
+		LOG_WARNING("[APPLY EFFECT ABILITY DECORATOR] Tried to Apply an invalid Effect, use a SpawnEffectAbilityModifier instead");
 		return;
 	}
 
@@ -38,7 +37,7 @@ void UApplyEffectSpellDecorator::ApplyEffects(AActor* hitActor)
 
 	if (target == nullptr)
 	{
-		LOG_ERROR("Tried to apply Effect to invalid Target");
+		LOG_ERROR("[APPLY EFFECT ABILITY DECORATOR] Tried to apply Effect to invalid Target");
 		return;
 	}
 
@@ -50,7 +49,7 @@ void UApplyEffectSpellDecorator::ApplyEffects(AActor* hitActor)
 	}
 	else
 	{
-		LOG_ERROR("Tried to apply Effect in invalid Gamemode");
+		LOG_ERROR("[APPLY EFFECT ABILITY DECORATOR] Tried to apply Effect in invalid Gamemode");
 		return;
 	}
 
@@ -77,12 +76,12 @@ void UApplyEffectSpellDecorator::ApplyEffects(AActor* hitActor)
 			}
 			else
 			{
-				LOG_ERROR("Tried to apply an Effect with no subtype but failed to Cast to CoreEffect");
+				LOG_ERROR("[APPLY EFFECT ABILITY DECORATOR] Tried to apply an Effect with no subtype but failed to Cast to CoreEffect");
 			}
 		}
 	}
 	else
 	{
-		LOG_ERROR("Tried to apply Effect but failed to get the EffectData");
+		LOG_ERROR("[APPLY EFFECT ABILITY DECORATOR] Tried to apply Effect but failed to get the EffectData");
 	}
 }

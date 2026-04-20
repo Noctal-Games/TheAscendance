@@ -144,6 +144,14 @@ void UAbilityComponent::StartAbility(int slot)
 	m_ActiveAbility->Start();
 }
 
+void UAbilityComponent::TriggerAbility()
+{
+	if (m_ActiveAbility != nullptr)
+	{
+		m_ActiveAbility->TriggerAbility();
+	}
+}
+
 void UAbilityComponent::StopAbility()
 {
 	if (m_ActiveAbility != nullptr)
@@ -180,6 +188,28 @@ float UAbilityComponent::PlayAnimMontageOnOwner(UAnimMontage* animation)
 	}
 
 	return m_Owner->PlayAnimationMontage(animation);
+}
+
+FVector UAbilityComponent::GetCastLocation()
+{
+	if (m_Owner == nullptr)
+	{
+		LOG_ERROR("[ABILITY COMPONENT] GetCastLocation was called but Owner is invalid");
+		return FVector::ForwardVector;
+	}
+
+	return m_Owner->GetCastStartLocation();
+}
+
+FVector UAbilityComponent::GetCastForward()
+{
+	if (m_Owner == nullptr)
+	{
+		LOG_ERROR("[ABILITY COMPONENT] GetCastLocation was called but Owner is invalid");
+		return FVector::ForwardVector;
+	}
+
+	return m_Owner->GetCastStartForward();
 }
 
 // Called every frame

@@ -13,7 +13,7 @@ class UNiagaraComponent;
 class UNiagaraSystem;
 class UProjectileMovementComponent;
 class UProjectileSpellData;
-class ISpell;
+class IAbility;
 
 UCLASS()
 class THEASCENDANCE_API ABaseProjectile : public AActor, public IProjectile
@@ -24,21 +24,22 @@ public:
 	// Sets default values for this actor's properties
 	ABaseProjectile();
 
-	void Init(ISpell* spell, UProjectileSpellData* spellData);
-	void AddIgnoreActor(AActor* toIgnore);
-	void SetIsActive(bool isActive);
-	void ApplyForce(FVector unitDirection);
 	void SetNiagara(UNiagaraSystem* niagaraSystem);
 
+	virtual void Init(IAbility* ability, UProjectileSpellData* spellData) override;
 	virtual void SetDecoratedSelf(IProjectile* decoratedSelf) override;
+
+	virtual void SetIsActive(bool isActive) override;
+	virtual void ApplyForce(const FVector& unitDirection) override;
 
 	virtual void HandleOnHit(UPrimitiveComponent* hitComp, AActor* otherActor, UPrimitiveComponent* otherComp, FVector normalImpulse, const FHitResult& hit) override;
 	virtual void HandleOnOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) override;
 	virtual void HandleOnUpdate(float deltaTime) override;
 
 	virtual void ProcessOverlapDamage(int& damage) override;
+	virtual void AddIgnoreActor(AActor* toIgnore) override;
 
-	virtual ISpell* GetSpell() override;
+	virtual IAbility* GetAbility() override;
 
 	virtual AActor* GetProjectileActor() override;
 	virtual FVector GetProjectileLocation() override;
@@ -68,7 +69,7 @@ private:
 	TScriptInterface<IProjectile> m_DecoratedSelf = nullptr;
 
 	UPROPERTY()
-	TScriptInterface<ISpell> m_Spell = nullptr;
+	TScriptInterface<IAbility> m_Ability = nullptr;
 
 	TWeakObjectPtr<UProjectileSpellData> m_SpellData = nullptr;
 

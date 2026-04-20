@@ -7,6 +7,7 @@
 #include "InstancedStruct.h"
 #include "GameplayTagContainer.h"
 #include "TheAscendance/Abilities/Structs/AbilityModifierData.h"
+#include "TheAscendance/Abilities/Enums/AbilityType.h"
 #include "AbilityData.generated.h"
 
 class UAnimMontage;
@@ -28,4 +29,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
 	TArray<TInstancedStruct<FAbilityModifier>> AbilityModifiers;
+
+	EAbilityType AbilityType = EAbilityType::NONE;
 };

@@ -18,7 +18,6 @@ class UEffectHandlerComponent;
 class AHeldItem;
 class UCharacterTrajectoryComponent;
 class ULoadoutComponent;
-class USpellCasterComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterDeath, ABaseCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTakeDamage);
@@ -106,6 +105,8 @@ public:
 	virtual float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None);
 
 	UFUNCTION(BlueprintCallable)
+	virtual void TriggerAbility();
+	UFUNCTION(BlueprintCallable)
 	virtual void StopAbility();
 
 	// Called every frame
@@ -150,8 +151,6 @@ protected:
 	TObjectPtr<UCharacterTrajectoryComponent> m_CharacterTrajectoryComponent = nullptr;
 	UPROPERTY()
 	TObjectPtr<ULoadoutComponent> m_LoadoutComponent = nullptr;
-	UPROPERTY()
-	TObjectPtr<USpellCasterComponent> m_SpellCasterComponent = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<AHeldItem> m_MainHandItem = nullptr;

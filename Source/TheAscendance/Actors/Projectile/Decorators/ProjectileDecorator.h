@@ -17,15 +17,20 @@ class THEASCENDANCE_API UProjectileDecorator : public UObject, public IProjectil
 	
 public:
 	void Decorate(IProjectile* decorator);
+	virtual void Init(IAbility* ability, UProjectileSpellData* spellData) override;
 	virtual void SetDecoratedSelf(IProjectile* decoratedSelf) override;
+
+	virtual void SetIsActive(bool isActive) override;
+	virtual void ApplyForce(const FVector& unitDirection) override;
 
 	virtual void HandleOnHit(UPrimitiveComponent* hitComp, AActor* otherActor, UPrimitiveComponent* otherComp, FVector normalImpulse, const FHitResult& hit) override;
 	virtual void HandleOnOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) override;
 	virtual void HandleOnUpdate(float deltaTime) override;
 
 	virtual void ProcessOverlapDamage(int& damage) override;
+	virtual void AddIgnoreActor(AActor* toIgnore) override;
 
-	virtual ISpell* GetSpell() override;
+	virtual IAbility* GetAbility() override;
 
 	virtual AActor* GetProjectileActor() override;
 	virtual FVector GetProjectileLocation() override;

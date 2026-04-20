@@ -1,39 +1,34 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ApplyCasterEffectSpellDecorator.h"
+#include "ApplyUserEffectAbilityDecorator.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
-#include "TheAscendance/Spells/Interfaces/SpellCaster.h"
-#include "TheAscendance/Spells/Structs/SpellModifierData.h"
 #include "TheAscendance/Effects/CoreEffect.h"
 
-bool UApplyCasterEffectSpellDecorator::CastSpell()
+void UApplyUserEffectAbilityDecorator::TriggerAbility()
 {
-	if (m_DecoratedSpell->CastSpell() == false)
-	{
-		return false;
-	}
+	m_DecoratedAbility->TriggerAbility();
 
 	if (m_ModifierData == nullptr || m_ModifierData->EffectTag.IsValid() == false)
 	{
-		LOG_ERROR("ApplyCasterEffectModiferData was invalid or the EffectTag was invalid");
-		return true;
+		LOG_ERROR("[APPLY USER EFFECT ABILITY DECORATOR] ApplyUserEffectAbilityModifierData was invalid or the EffectTag was invalid");
+		return;
 	}
 
 	ISusceptible* target = nullptr;
 
-	if (ISpellCaster* caster = GetSpellOwner())
+	if (AActor* owner = GetAbilityOwner())
 	{
-		target = Cast<ISusceptible>(caster->GetActor());
+		target = Cast<ISusceptible>(owner);
 	}
 
 	if (target == nullptr)
 	{
-		LOG_ERROR("Tried to apply CasterEffect to invalid Caster");
-		return true;
+		LOG_ERROR("[APPLY USER EFFECT ABILITY DECORATOR] Tried to apply UserEffect to invalid Owner");
+		return;
 	}
 
 	if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
@@ -42,7 +37,7 @@ bool UApplyCasterEffectSpellDecorator::CastSpell()
 
 		if (casterEffect == nullptr)
 		{
-			return true;
+			return;
 		}
 
 		if (UCoreEffect* coreEffect = Cast<UCoreEffect>(casterEffect))
@@ -50,6 +45,4 @@ bool UApplyCasterEffectSpellDecorator::CastSpell()
 			target->AddEffect(coreEffect);
 		}
 	}
-
-	return true;
 }

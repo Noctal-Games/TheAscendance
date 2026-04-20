@@ -1,17 +1,16 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "KnockbackSpellDecorator.h"
-#include "TheAscendance/Spells/Interfaces/SpellCaster.h"
+#include "KnockbackAbilityDecorator.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/Character.h"
 
-void UKnockbackSpellDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation)
+void UKnockbackAbilityDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation)
 {
 	if (m_ModifierData == nullptr)
 	{
-		LOG_ERROR("Knockback Spell Decorator modifier data is invalid")
+		LOG_ERROR("[KNOCKBACK ABILITY DECORATOR] Modifier data is invalid")
 		return;
 	}
 

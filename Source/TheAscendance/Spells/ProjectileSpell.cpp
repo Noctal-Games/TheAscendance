@@ -6,19 +6,20 @@
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "Interfaces/SpellCaster.h"
 #include "Structs/SpellData.h"
-#include "TheAscendance/Actors/Projectile/BaseProjectile.h"
 #include "TheAscendance/Actors/Projectile/Interfaces/Projectile.h"
+#include "TheAscendance/Core/AbilityHelpers.h"
+#include "TheAscendance/Abilities/Components/AbilityComponent.h"
 
-void UProjectileSpell::Init(USpellData* spellData, ISpellCaster* spellOwner)
+void UProjectileSpell::Init(UAbilityComponent* ownerComponent, UAbilityData* abilityData)
 {
-	UBaseSpell::Init(spellData, spellOwner);
+	UBaseSpell::Init(ownerComponent, abilityData);
 
-	if (spellData == nullptr || spellOwner == nullptr)
+	if (m_AbilityData == nullptr || m_OwnerComponent == nullptr)
 	{
 		return;
 	}
 
-	if (UProjectileSpellData* data = Cast<UProjectileSpellData>(spellData))
+	if (UProjectileSpellData* data = Cast<UProjectileSpellData>(m_AbilityData))
 	{
 		m_SpellData = data;
 	}
@@ -28,76 +29,43 @@ void UProjectileSpell::Init(USpellData* spellData, ISpellCaster* spellOwner)
 	}
 }
 
-void UProjectileSpell::LoadHitNiagara()
+void UProjectileSpell::TriggerAbility()
 {
-	if(m_SpellData.IsValid() == false)
-	{
-		LOG_ERROR("[PROJECTILE SPELL] Tried to Load HitNiagara for ProjectileSpell with invalid SpellData");
-		return;
-	}
+	UBaseSpell::TriggerAbility();
 
-	m_HitNiagara = m_SpellData->SpellHitNiagara;
-
-	if (m_HitNiagara.IsNull() == true)
-	{
-		LOG_WARNING("[PROJECTILE SPELL] Tried to Load HitNiagara for ProjectileSpell with invalid SpellHitNiagara");
-		return;
-	}
-
-	UCoreFunctionLibrary::RequestAsyncLoad(m_HitNiagara.ToSoftObjectPath());
-}
-
-bool UProjectileSpell::CastSpell()
-{
-	if (UBaseSpell::CastSpell() == false)
-	{
-		return false;
-	}
-
-	FVector unitDirection = GetSpellOwner()->GetCastStartForward();
-	unitDirection.Normalize();
-
-	Fire(unitDirection);
-
-	return true;
-}
-
-void UProjectileSpell::Fire(const FVector& direction)
-{
-	if (m_DecoratedSelf == nullptr)
-	{
-		LOG_ERROR("[PROJECTILE SPELL] Tried to Fire Projectile with invalid DecoratedSelf");
-		return;
-	}
-
-	if (m_HitNiagara.IsValid() == false)
-	{
-		m_DecoratedSelf->LoadHitNiagara();
-	}
-
-	AActor* owner = m_SpellOwner->GetActor();
-
-	FActorSpawnParameters spawnParams;
-	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	ABaseProjectile* projectile = owner->GetWorld()->SpawnActor<ABaseProjectile>(ABaseProjectile::StaticClass(), m_SpellOwner->GetCastStartLocation(), FRotator::ZeroRotator, spawnParams);
-
-	if (projectile == nullptr)
+	if (UBaseSpell::CanStart() == false)
 	{
 		return;
 	}
 
-	projectile->Init(m_DecoratedSelf.GetInterface(), m_SpellData.Get());
-	projectile->AddIgnoreActor(owner);
-	m_DecoratedSelf->DecorateProjectile(projectile);
-
-	if (m_SpellNiagara.IsValid() == true)
+	if(m_SpellData == nullptr)
 	{
-		projectile->SetNiagara(m_SpellNiagara.Get());
+		LOG_ERROR("[PROJECTILE SPELL] Tried to Execute ProjectileSpell with invalid SpellData");
+		return;
 	}
 
-	projectile->SetIsActive(true);
-	projectile->ApplyForce(direction);
+	if (m_OwnerComponent == nullptr)
+	{
+		LOG_ERROR("[PROJECTILE SPELL] Tried to Execute ProjectileSpell with invalid Owner");
+		return;
+	}
+
+	if(m_DecoratedSelf == nullptr)
+	{
+		LOG_ERROR("[PROJECTILE SPELL] Tried to Execute ProjectileSpell with invalid DecoratedSelf");
+		return;
+	}
+
+	if (IProjectile* projectile = UAbilityHelpers::SpawnProjectile(m_DecoratedSelf.GetInterface(), m_OwnerComponent->GetCastLocation(), &m_SpellData->ProjectileModifiers))
+	{
+		projectile->AddIgnoreActor(GetAbilityOwner());
+		projectile->SetIsActive(true);
+		projectile->ApplyForce(m_OwnerComponent->GetCastForward());
+	}
+	else
+	{
+		LOG_ERROR("[PROJECTILE SPELL] Failed to spawn Projectile");
+	}
 }
 
 void UProjectileSpell::ProcessOverlapDamage(int& damage)
@@ -110,18 +78,75 @@ void UProjectileSpell::ProcessHitDamage(int& damage, const FVector& targetLocati
 	damage += m_SpellData->HitDamage;
 }
 
-void UProjectileSpell::DecorateProjectile(IProjectile* projectile)
-{
-	projectile->SetDecoratedSelf(projectile);
-}
+//void UProjectileSpell::LoadHitNiagara()
+//{
+//	if(m_SpellData.IsValid() == false)
+//	{
+//		LOG_ERROR("[PROJECTILE SPELL] Tried to Load HitNiagara for ProjectileSpell with invalid SpellData");
+//		return;
+//	}
+//
+//	m_HitNiagara = m_SpellData->SpellHitNiagara;
+//
+//	if (m_HitNiagara.IsNull() == true)
+//	{
+//		LOG_WARNING("[PROJECTILE SPELL] Tried to Load HitNiagara for ProjectileSpell with invalid SpellHitNiagara");
+//		return;
+//	}
+//
+//	UCoreFunctionLibrary::RequestAsyncLoad(m_HitNiagara.ToSoftObjectPath());
+//}
 
-USpellData* UProjectileSpell::GetSpellData()
-{
-	if (m_SpellData.IsValid() == false)
-	{
-		LOG_ERROR("[PROJECTILE SPELL] Tried to GetSpellData for ProjectileSpell but SpellData is invalid");
-		return nullptr;
-	}
+//void UProjectileSpell::Fire(const FVector& direction)
+//{
+//	if (m_DecoratedSelf == nullptr)
+//	{
+//		LOG_ERROR("[PROJECTILE SPELL] Tried to Fire Projectile with invalid DecoratedSelf");
+//		return;
+//	}
+//
+//	if (m_HitNiagara.IsValid() == false)
+//	{
+//		m_DecoratedSelf->LoadHitNiagara();
+//	}
+//
+//	AActor* owner = m_SpellOwner->GetActor();
+//
+//	FActorSpawnParameters spawnParams;
+//	spawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+//
+//	ABaseProjectile* projectile = owner->GetWorld()->SpawnActor<ABaseProjectile>(ABaseProjectile::StaticClass(), m_SpellOwner->GetCastStartLocation(), FRotator::ZeroRotator, spawnParams);
+//
+//	if (projectile == nullptr)
+//	{
+//		return;
+//	}
+//
+//	projectile->Init(m_DecoratedSelf.GetInterface(), m_SpellData.Get());
+//	projectile->AddIgnoreActor(owner);
+//	m_DecoratedSelf->DecorateProjectile(projectile);
+//
+//	if (m_SpellNiagara.IsValid() == true)
+//	{
+//		projectile->SetNiagara(m_SpellNiagara.Get());
+//	}
+//
+//	projectile->SetIsActive(true);
+//	projectile->ApplyForce(direction);
+//}
 
-	return m_SpellData.Get();
-}
+//void UProjectileSpell::DecorateProjectile(IProjectile* projectile)
+//{
+//	projectile->SetDecoratedSelf(projectile);
+//}
+
+//USpellData* UProjectileSpell::GetSpellData()
+//{
+//	if (m_SpellData.IsValid() == false)
+//	{
+//		LOG_ERROR("[PROJECTILE SPELL] Tried to GetSpellData for ProjectileSpell but SpellData is invalid");
+//		return nullptr;
+//	}
+//
+//	return m_SpellData.Get();
+//}

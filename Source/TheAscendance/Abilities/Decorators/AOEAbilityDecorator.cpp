@@ -1,55 +1,38 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AOESpellDecorator.h"
+#include "AOEAbilityDecorator.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
-#include "TheAscendance/Spells/Interfaces/SpellCaster.h"
-#include "TheAscendance/Characters/Interfaces/Susceptible.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/Character.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
 
-void UAOESpellDecorator::LoadHitNiagara()
+void UAOEAbilityDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation)
 {
-	m_DecoratedSpell->LoadHitNiagara();
+	m_DecoratedAbility->OnHit(hitActor, spellHitLocation);
 
 	if (m_ModifierData == nullptr)
 	{
-		LOG_ERROR("[AOE SPELL DECORATOR] Modifier data was invalid");
-		return;
-	}
-
-	m_AOEHitNiagara = m_ModifierData->AOEHitNiagara;
-
-	if (m_AOEHitNiagara.IsNull() == true)
-	{
-		LOG_ERROR("[AOE SPELL DECORATOR] Tried to Load AOEHitNiagara with invalid AOEHitNiagara");
-		return;
-	}
-
-	UCoreFunctionLibrary::RequestAsyncLoad(m_AOEHitNiagara.ToSoftObjectPath());
-}
-
-void UAOESpellDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation)
-{
-	m_DecoratedSpell->OnHit(hitActor, spellHitLocation);
-
-	if (m_ModifierData == nullptr)
-	{
-		LOG_ERROR("[AOE SPELL DECORATOR] Modifier data was invalid")
+		LOG_ERROR("[AOE ABILITY DECORATOR] Modifier data was invalid")
 		return;
 	}
 
 	if (hitActor != nullptr)
 	{
 		int damage = 0;
-		m_DecoratedSpell->ProcessHitDamage(damage, hitActor->GetActorLocation(), spellHitLocation);
-		m_DecoratedSpell->DealDamage(hitActor, damage);
+		m_DecoratedAbility->ProcessHitDamage(damage, hitActor->GetActorLocation(), spellHitLocation);
+		m_DecoratedAbility->DealDamage(hitActor, damage);
 	}
 
-	AActor* owner = GetSpellOwner()->GetActor();
+	AActor* owner = GetAbilityOwner();
+
+	if (owner == nullptr)
+	{
+		LOG_ERROR("[AOE ABILITY DECORATOR] AbilityOwner was invalid")
+		return;
+	}
 
 	TArray<TEnumAsByte<EObjectTypeQuery>> types;
 	types.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_PhysicsBody));
@@ -66,16 +49,16 @@ void UAOESpellDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation
 	{
 		for (TObjectPtr<AActor> a : targets)
 		{
-			m_DecoratedSpell->OnHit(a, spellHitLocation);
+			m_DecoratedAbility->OnHit(a, spellHitLocation);
 		}
 	}
 }
 
-void UAOESpellDecorator::ProcessHit(const FVector& spellHitLocation)
+void UAOEAbilityDecorator::ProcessHit(const FVector& spellHitLocation)
 {
 	if (m_ModifierData->DoesKnockback == false)
 	{
-		m_DecoratedSpell->ProcessHit(spellHitLocation);
+		m_DecoratedAbility->ProcessHit(spellHitLocation);
 		return;
 	}
 
@@ -108,10 +91,10 @@ void UAOESpellDecorator::ProcessHit(const FVector& spellHitLocation)
 		}
 	}
 
-	m_DecoratedSpell->ProcessHit(spellHitLocation);
+	m_DecoratedAbility->ProcessHit(spellHitLocation);
 }
 
-void UAOESpellDecorator::ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation)
+void UAOEAbilityDecorator::ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation)
 {
 	if (m_ModifierData->HasDamageFallOff == false)
 	{
@@ -129,9 +112,9 @@ void UAOESpellDecorator::ProcessHitDamage(int& damage, const FVector& targetLoca
 	damage += damageWithFalloff;
 }
 
-void UAOESpellDecorator::SpawnHitNiagara(const FVector& spellHitLocation)
+void UAOEAbilityDecorator::SpawnHitNiagara(const FVector& spellHitLocation)
 {
-	m_DecoratedSpell->SpawnHitNiagara(spellHitLocation);
+	m_DecoratedAbility->SpawnHitNiagara(spellHitLocation);
 
 	if (m_AOEHitNiagara.IsValid() == false)
 	{
@@ -144,3 +127,24 @@ void UAOESpellDecorator::SpawnHitNiagara(const FVector& spellHitLocation)
 		vfx->SetVariableFloat(FName("VFX_ShapeScale"), m_ModifierData->Range);
 	}
 }
+
+//void UAOESpellDecorator::LoadHitNiagara()
+//{
+//	m_DecoratedAbility->LoadHitNiagara();
+//
+//	if (m_ModifierData == nullptr)
+//	{
+//		LOG_ERROR("[AOE SPELL DECORATOR] Modifier data was invalid");
+//		return;
+//	}
+//
+//	m_AOEHitNiagara = m_ModifierData->AOEHitNiagara;
+//
+//	if (m_AOEHitNiagara.IsNull() == true)
+//	{
+//		LOG_ERROR("[AOE SPELL DECORATOR] Tried to Load AOEHitNiagara with invalid AOEHitNiagara");
+//		return;
+//	}
+//
+//	UCoreFunctionLibrary::RequestAsyncLoad(m_AOEHitNiagara.ToSoftObjectPath());
+//}

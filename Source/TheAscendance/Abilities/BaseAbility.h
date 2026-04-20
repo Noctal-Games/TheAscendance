@@ -18,25 +18,34 @@ class THEASCENDANCE_API UBaseAbility : public UObject, public IAbility
 	
 public:
 	virtual void Init(UAbilityComponent* ownerComponent, UAbilityData* abilityData) override;
-	
+	virtual void SetDecoratedSelf(IAbility* decoratedSelf) override;
+
+	//Checks whether or not the ability has to be charged or can execute immediately.
 	virtual void Start() override;
+	//Stops the ability. Clears up all timer handles, etc.
 	virtual void Stop() override;
+	//Starts the ability animation
 	virtual void Execute() override;
+
+	//Triggered by animations, this is the actual ability start event. So when a spell is cast, a melee collision is activated, etc.
+	virtual void TriggerAbility() override;
 
 	virtual void OnInputReleased() override;
 
 	virtual const FGameplayTag& GetAbilityTag() const override;
 
 	virtual float PlayAnimMontageOnOwner(UAnimMontage* animation) override;
+	virtual UAbilityData* GetAbilityData() override;
+	virtual AActor* GetAbilityOwner() override;
 
 protected:
 	UPROPERTY()
 	TObjectPtr<UAbilityData> m_AbilityData = nullptr;
-
-private:
+	UPROPERTY()
+	TScriptInterface<IAbility> m_DecoratedSelf = nullptr;
 	UPROPERTY()
 	TWeakObjectPtr<UAbilityComponent> m_OwnerComponent = nullptr;
-
+private:
 	UPROPERTY()
 	TSoftObjectPtr<UAnimMontage> m_AbilityAnimation = nullptr;
 

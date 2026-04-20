@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ProjectileDecorator.h"
 #include "TheAscendance/Spells/Structs/SpellModifierData.h"
+#include "TheAscendance/Actors/Projectile/Structs/ProjectileModifierData.h"
 #include "GameplayTags.h"
 #include "TrailProjectileDecorator.generated.h"
 
@@ -18,10 +19,11 @@ class THEASCENDANCE_API UTrailProjectileDecorator : public UProjectileDecorator
 public:
 	class THEASCENDANCE_API Builder
 	{
+		UPROPERTY()
 		TWeakObjectPtr<UTrailProjectileDecorator> m_Decorator = nullptr;
 
 	public:
-		Builder(IProjectile* decorator, const FTrailSpellModifier& modifierData)
+		Builder(IProjectile* decorator, const FTrailProjectileModifier& modifierData)
 		{
 			m_Decorator = NewObject<UTrailProjectileDecorator>();
 			m_Decorator->Decorate(decorator);
@@ -36,16 +38,12 @@ public:
 				return nullptr;
 			}
 
-			m_Decorator->Init();
-
 			return m_Decorator.Get();
 		}
 	};
 
+	virtual void Init(IAbility* ability, UProjectileSpellData* spellData) override;
 	virtual void HandleOnUpdate(float deltaTime) override;
-
-private: 
-	void Init();
 
 private:
 	TWeakObjectPtr<UAreaOfEffectDeliveryEffectData> m_TrailEffectData = nullptr;

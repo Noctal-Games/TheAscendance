@@ -29,6 +29,7 @@ public:
 	virtual void Start() {};
 	virtual void Stop() {};
 	virtual void Execute() {};
+	virtual void TriggerAbility() {};
 
 	virtual void OnInputReleased() {};
 
@@ -36,4 +37,23 @@ public:
 
 	virtual const FGameplayTag& GetAbilityTag() const { return FGameplayTag::EmptyTag; }
 	virtual bool CanStart() const { return true; }
+
+	virtual void Update(float deltaTime) {};
+
+	virtual void OnOverlap(AActor* overlapActor, const FVector& spellOverlapLocation, int damage) {};
+	virtual void OnHit(AActor* hitActor, const FVector& spellHitLocation) {};
+	virtual void ProcessHit(const FVector& spellHitLocation) {};
+
+	virtual void SpawnHitNiagara(const FVector& spellHitLocation) {};
+
+	virtual TArray<TObjectPtr<AActor>> GetHitActors() { return TArray<TObjectPtr<AActor>>(); };
+
+	virtual void ProcessOverlapDamage(int& damage) {};
+	virtual void ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation) {};
+
+	virtual bool DealDamage(AActor* hitActor, int damage) { return true; };
+	virtual void ApplyEffects(AActor* hitActor) {};
+
+	virtual UAbilityData* GetAbilityData() { return nullptr; };
+	virtual AActor* GetAbilityOwner() { return nullptr; };
 };

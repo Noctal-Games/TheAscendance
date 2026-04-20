@@ -36,6 +36,17 @@ void UBaseAbility::Init(UAbilityComponent* ownerComponent, UAbilityData* ability
 	UCoreFunctionLibrary::RequestAsyncLoad(m_AbilityAnimation.ToSoftObjectPath());
 }
 
+void UBaseAbility::SetDecoratedSelf(IAbility* decoratedSelf)
+{	
+	if (decoratedSelf == nullptr)
+	{
+		LOG_ERROR("[BASE ABILITY] Tried to set Ability DecoratedSelf with invalid ability");
+		return;
+	}
+
+	m_DecoratedSelf = decoratedSelf->_getUObject();
+}
+
 void UBaseAbility::Start()
 {
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: STARTED", *GetAbilityTag().ToString());
@@ -67,6 +78,11 @@ void UBaseAbility::Execute()
 	UCoreFunctionLibrary::SetTimer(m_AbilityDurationHandle, this, &UBaseAbility::Stop, duration);
 }
 
+void UBaseAbility::TriggerAbility()
+{
+	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: TRIGGER", *GetAbilityTag().ToString());
+}
+
 void UBaseAbility::OnInputReleased()
 {
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: RELEASED", *GetAbilityTag().ToString());
@@ -87,9 +103,25 @@ float UBaseAbility::PlayAnimMontageOnOwner(UAnimMontage* animation)
 {
 	if (m_OwnerComponent.IsValid() == false)
 	{
-		LOG_ERROR("[BASE ABILITY] Start was called but OwnerComponent is invalid");
+		LOG_ERROR("[BASE ABILITY] PlayAnimMontageOnOwner was called but OwnerComponent is invalid");
 		return 0.0f;
 	}
 
 	return m_OwnerComponent->PlayAnimMontageOnOwner(animation);
+}
+
+UAbilityData* UBaseAbility::GetAbilityData()
+{
+	return m_AbilityData;
+}
+
+AActor* UBaseAbility::GetAbilityOwner()
+{
+	if (m_OwnerComponent.IsValid() == false)
+	{
+		LOG_ERROR("[BASE ABILITY] GetOwner was called but OwnerComponent is invalid");
+		return nullptr;
+	}
+
+	return m_OwnerComponent->GetOwner();
 }

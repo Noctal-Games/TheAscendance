@@ -14,7 +14,6 @@
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
 #include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
 #include "TheAscendance/Spells/SpellGameplayTags.h"
-#include "TheAscendance/Spells/Components/SpellCasterComponent.h"
 #include "TheAscendance/Items/ItemGameplayTags.h"
 #include "TheAscendance/Actors/Interaction/Interfaces/Interactable.h"
 #include "TheAscendance/Abilities/Components/AbilityComponent.h"
@@ -200,6 +199,16 @@ float APlayerCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float 
 	}
 
 	return duration;
+}
+
+void APlayerCharacter::TriggerAbility()
+{
+	if (m_AbilityComponent == nullptr)
+	{
+		return;
+	}
+
+	m_AbilityComponent->TriggerAbility();
 }
 
 void APlayerCharacter::StopAbility()

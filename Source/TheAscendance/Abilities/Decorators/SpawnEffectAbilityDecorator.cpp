@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SpawnEffectSpellDecorator.h"
+#include "SpawnEffectAbilityDecorator.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
@@ -11,9 +11,9 @@
 #include "TheAscendance/Effects/DeliveryEffects/AOEDeliveryEffect.h"
 #include "TheAscendance/Effects/Structs/EffectData.h"
 
-void USpawnEffectSpellDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation)
+void USpawnEffectAbilityDecorator::OnHit(AActor* hitActor, const FVector& spellHitLocation)
 {
-	m_DecoratedSpell->OnHit(hitActor, spellHitLocation);
+	m_DecoratedAbility->OnHit(hitActor, spellHitLocation);
 
 	if (m_ModifierData == nullptr)
 	{
@@ -24,7 +24,7 @@ void USpawnEffectSpellDecorator::OnHit(AActor* hitActor, const FVector& spellHit
 
 	if (subType != "AOE")
 	{
-		LOG_WARNING("Tried to Spawn an invalid Effect, use an ApplyEffectSpellModifier or ApplyCasterEffectSpellModifier instead");
+		LOG_WARNING("[SPAWN EFFECT ABILITY DECORATOR] Tried to Spawn an invalid Effect, use an ApplyEffectAbilityModifier or ApplyCasterEffectAbilityModifier instead");
 		return;
 	}
 
@@ -36,7 +36,7 @@ void USpawnEffectSpellDecorator::OnHit(AActor* hitActor, const FVector& spellHit
 	}
 	else
 	{
-		LOG_ERROR("Tried to apply Effect in invalid Gamemode");
+		LOG_ERROR("[SPAWN EFFECT ABILITY DECORATOR] Tried to apply Effect in invalid Gamemode");
 		return;
 	}
 
@@ -57,6 +57,6 @@ void USpawnEffectSpellDecorator::OnHit(AActor* hitActor, const FVector& spellHit
 	}
 	else
 	{
-		LOG_ERROR("Tried to apply Effect but failed to get the EffectData");
+		LOG_ERROR("[SPAWN EFFECT ABILITY DECORATOR] Tried to apply Effect but failed to get the EffectData");
 	}
 }

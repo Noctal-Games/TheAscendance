@@ -4,16 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Spells/Enums/SpellType.h"
+#include "TheAscendance/Abilities/Structs/AbilityData.h"
+#include "TheAscendance/Actors/Projectile/Structs/ProjectileModifierData.h"
 #include "SpellModifierData.h"
-#include "Engine/DataAsset.h"
-#include "InstancedStruct.h"
-#include "GameplayTagContainer.h"
 #include "SpellData.generated.h"
 
 class UNiagaraSystem;
 
 UCLASS(Abstract, BlueprintType)
-class THEASCENDANCE_API USpellData : public UPrimaryDataAsset
+class THEASCENDANCE_API USpellData : public UAbilityData
 {
 	GENERATED_BODY()
 
@@ -24,14 +23,8 @@ public:
 	float SpellCooldown = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int ManaCost = 0;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "Value used for effects such as camera shake"))
-	float SpellIntensity = 0.0f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "The Niagara for the spell itself. Applied to the projectile for ProjectileSpells and played when casting LocalSpells"))
-	TSoftObjectPtr<UNiagaraSystem> SpellNiagara = nullptr;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
-	TArray<TInstancedStruct<FGenericSpellModifier>> SpellModifiers;
-
-	ESpellType SpellType = ESpellType::PROJECTILE;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
+	//TArray<TInstancedStruct<FGenericSpellModifier>> SpellModifiers;
 };
 
 UCLASS(BlueprintType)
@@ -42,7 +35,7 @@ class THEASCENDANCE_API ULocalSpellData : public USpellData
 public:
 	ULocalSpellData()
 	{
-		SpellType = ESpellType::LOCAL;
+		AbilityType = EAbilityType::LOCAL_SPELL;
 	}
 };
 
@@ -58,8 +51,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Range = 0.0f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
-	TArray<TInstancedStruct<FRangedSpellModifier>> RangedSpellModifiers;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
+	//TArray<TInstancedStruct<FRangedSpellModifier>> RangedSpellModifiers;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftObjectPtr<UNiagaraSystem> SpellHitNiagara = nullptr;
@@ -73,7 +66,7 @@ class THEASCENDANCE_API UProjectileSpellData : public URangedSpellData
 public:
 	UProjectileSpellData()
 	{
-		SpellType = ESpellType::PROJECTILE;
+		AbilityType = EAbilityType::PROJECTILE_SPELL;
 	}
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -85,7 +78,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", ClampMax = "1.0", ToolTip = "The projectiles gravity scale. 0 is no gravity, 1 is default.", EditCondition = "IsAffectedByGravity == true", EditConditionHides))
 	float GravityScale = 1.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
-	TArray<TInstancedStruct<FProjectileSpellModifier>> ProjectileSpellModifiers;
+	TArray<TInstancedStruct<FProjectileModifier>> ProjectileModifiers;
 };
 
 UCLASS(BlueprintType)
@@ -96,7 +89,7 @@ class THEASCENDANCE_API UHitscanSpellData : public URangedSpellData
 public:
 	UHitscanSpellData()
 	{
-		SpellType = ESpellType::HITSCAN;
+		AbilityType = EAbilityType::HITSCAN_SPELL;
 	}
 };
 // RANGED SPELL TYPE DATA ASSETS

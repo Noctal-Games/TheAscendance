@@ -15,18 +15,11 @@ class THEASCENDANCE_API UProjectileSpell : public UBaseSpell
 	GENERATED_BODY()
 	
 public:
-	virtual void Init(USpellData* spellData, ISpellCaster* spellOwner) final;
-	virtual void LoadHitNiagara() override;
-	
-	virtual bool CastSpell() override;
-	virtual void Fire(const FVector& direction) override;
+	virtual void Init(UAbilityComponent* ownerComponent, UAbilityData* abilityData) override;
+	virtual void TriggerAbility() override;
 
 	virtual void ProcessOverlapDamage(int& damage) override;
 	virtual void ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation) override;
-
-	virtual void DecorateProjectile(IProjectile* projectile) override;
-
-	virtual USpellData* GetSpellData() override;
 
 private:
 	UPROPERTY()

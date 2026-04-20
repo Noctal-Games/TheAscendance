@@ -14,6 +14,17 @@ void UProjectileDecorator::Decorate(IProjectile* decorator)
 	m_DecoratedProjectile = decorator->_getUObject();
 }
 
+void UProjectileDecorator::Init(IAbility* ability, UProjectileSpellData* spellData)
+{
+	if (m_DecoratedProjectile == nullptr)
+	{
+		LOG_ERROR("Projectile decorator has invalid DecoratedProjectile pointer");
+		return;
+	}
+
+	return m_DecoratedProjectile->Init(ability, spellData);
+}
+
 void UProjectileDecorator::SetDecoratedSelf(IProjectile* decoratedSelf)
 {
 	if (m_DecoratedProjectile == nullptr)
@@ -23,6 +34,28 @@ void UProjectileDecorator::SetDecoratedSelf(IProjectile* decoratedSelf)
 	}
 
 	return m_DecoratedProjectile->SetDecoratedSelf(decoratedSelf);
+}
+
+void UProjectileDecorator::SetIsActive(bool isActive)
+{
+	if (m_DecoratedProjectile == nullptr)
+	{
+		LOG_ERROR("Projectile decorator has invalid DecoratedProjectile pointer");
+		return;
+	}
+
+	return m_DecoratedProjectile->SetIsActive(isActive);
+}
+
+void UProjectileDecorator::ApplyForce(const FVector& unitDirection)
+{
+	if (m_DecoratedProjectile == nullptr)
+	{
+		LOG_ERROR("Projectile decorator has invalid DecoratedProjectile pointer");
+		return;
+	}
+
+	return m_DecoratedProjectile->ApplyForce(unitDirection);
 }
 
 void UProjectileDecorator::HandleOnHit(UPrimitiveComponent* hitComp, AActor* otherActor, UPrimitiveComponent* otherComp, FVector normalImpulse, const FHitResult& hit)
@@ -69,7 +102,18 @@ void UProjectileDecorator::ProcessOverlapDamage(int& damage)
 	return m_DecoratedProjectile->ProcessOverlapDamage(damage);
 }
 
-ISpell* UProjectileDecorator::GetSpell()
+void UProjectileDecorator::AddIgnoreActor(AActor* toIgnore)
+{
+	if (m_DecoratedProjectile == nullptr)
+	{
+		LOG_ERROR("Projectile decorator has invalid DecoratedProjectile pointer");
+		return;
+	}
+
+	return m_DecoratedProjectile->AddIgnoreActor(toIgnore);
+}
+
+IAbility* UProjectileDecorator::GetAbility()
 {
 	if (m_DecoratedProjectile == nullptr)
 	{
@@ -77,7 +121,7 @@ ISpell* UProjectileDecorator::GetSpell()
 		return nullptr;
 	}
 
-	return m_DecoratedProjectile->GetSpell();
+	return m_DecoratedProjectile->GetAbility();
 }
 
 AActor* UProjectileDecorator::GetProjectileActor()

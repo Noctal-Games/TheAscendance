@@ -9,206 +9,186 @@
 #include "Structs/SpellModifierData.h"
 #include "Interfaces/Spell.h"
 #include "Interfaces/SpellCaster.h"
-#include "Decorators/AOESpellDecorator.h"
-#include "Decorators/KnockbackSpellDecorator.h"
-#include "Decorators/PenetrationSpellDecorator.h"
-#include "Decorators/TrailSpellDecorator.h"
-#include "Decorators/ApplyCasterEffectSpellDecorator.h"
-#include "Decorators/ApplyEffectSpellDecorator.h"
-#include "Decorators/SpawnEffectSpellDecorator.h"
 
 #include "InstancedStruct.h"
 
 ISpell* SpellFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwner)
 {
-	if (spellData == nullptr || spellOwner == nullptr)
-	{
-		LOG_ERROR("[SPELL FACTORY] Tried to create spell with invalid SpellData or SpellOwner");
-		return nullptr;
-	}
+	return nullptr;
+	//if (spellData == nullptr || spellOwner == nullptr)
+	//{
+	//	LOG_ERROR("[SPELL FACTORY] Tried to create spell with invalid SpellData or SpellOwner");
+	//	return nullptr;
+	//}
 
-	TScriptInterface<ISpell> spell = nullptr;
-	
-	//Create SpellBase for relevant type
-	switch (spellData->SpellType)
-	{
-		case ESpellType::PROJECTILE:
-		{
-			spell = NewObject<UProjectileSpell>();
-			break;
-		}
-		case ESpellType::LOCAL:
-		{
-			spell = NewObject<ULocalSpell>();
+	//TScriptInterface<ISpell> spell = nullptr;
+	//
+	////Create SpellBase for relevant type
+	//switch (spellData->SpellType)
+	//{
+	//	case ESpellType::PROJECTILE:
+	//	{
+	//		spell = NewObject<UProjectileSpell>();
+	//		break;
+	//	}
+	//	case ESpellType::LOCAL:
+	//	{
+	//		spell = NewObject<ULocalSpell>();
 
-			if (spellData->SpellModifiers.IsEmpty() == true)
-			{
-				LOG_ERROR("[SPELL FACTORY] Creating LocalSpell that has no SpellModifiers. The spell will do nothing.");
-			}
-			break;
-		}
-	}
+	//		if (spellData->SpellModifiers.IsEmpty() == true)
+	//		{
+	//			LOG_ERROR("[SPELL FACTORY] Creating LocalSpell that has no SpellModifiers. The spell will do nothing.");
+	//		}
+	//		break;
+	//	}
+	//}
 
-	if (spell == nullptr)
-	{
-		LOG_ERROR("[SPELL FACTORY] Failed to create SpellBase for SpellType: %s", *UEnum::GetValueAsString(spellData->SpellType));
-		return nullptr;
-	}
+	//if (spell == nullptr)
+	//{
+	//	LOG_ERROR("[SPELL FACTORY] Failed to create SpellBase for SpellType: %s", *UEnum::GetValueAsString(spellData->SpellType));
+	//	return nullptr;
+	//}
 
-	spell->Init(spellData, spellOwner);
+	//spell->Init(spellData, spellOwner);
 
-	//Create Decorators relevant to generic spell modifiers
-	for (const auto modifier : spellData->SpellModifiers)
-	{
-		if (modifier.IsValid() == false)
-		{
-			continue;
-		}
+	////Create Decorators relevant to generic spell modifiers
+	//for (const auto modifier : spellData->SpellModifiers)
+	//{
+	//	if (modifier.IsValid() == false)
+	//	{
+	//		continue;
+	//	}
 
-		switch (modifier.Get().ModifierType)
-		{
-			case EGenericSpellModifierType::AOE:
-			{
-				if (modifier.GetScriptStruct() != FAreaOfEffectModifier::StaticStruct())
-				{
-					LOG_ERROR("[SPELL FACTORY] A GenericSpellModifierType struct with type AOE isn't of type AreaOfEffectModifier");
-					continue;
-				}
+	//	switch (modifier.Get().ModifierType)
+	//	{
+	//		case EGenericSpellModifierType::APPLY_CASTER_EFFECT:
+	//		{
+	//			if (modifier.GetScriptStruct() != FApplyCasterEffectModifier::StaticStruct())
+	//			{
+	//				LOG_ERROR("[SPELL FACTORY] A GenericSpellModifierType struct with type APPLY_CASTER_EFFECT isn't of type ApplyCasterEffectModifier");
+	//				continue;
+	//			}
 
-				const FAreaOfEffectModifier& modifierData = modifier.Get<FAreaOfEffectModifier>();
-				spell = UAOESpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
+	//			const FApplyCasterEffectModifier& modifierData = modifier.Get<FApplyCasterEffectModifier>();
+	//			spell = UApplyCasterEffectSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
 
-				break;
-			}
+	//			break;
+	//		}
 
-			case EGenericSpellModifierType::APPLY_CASTER_EFFECT:
-			{
-				if (modifier.GetScriptStruct() != FApplyCasterEffectModifier::StaticStruct())
-				{
-					LOG_ERROR("[SPELL FACTORY] A GenericSpellModifierType struct with type APPLY_CASTER_EFFECT isn't of type ApplyCasterEffectModifier");
-					continue;
-				}
+	//		case EGenericSpellModifierType::APPLY_EFFECT:
+	//		{
+	//			if (modifier.GetScriptStruct() != FApplyEffectModifier::StaticStruct())
+	//			{
+	//				LOG_ERROR("[SPELL FACTORY] A GenericSpellModifierType struct with type APPLY_EFFECT isn't of type ApplyEffectModifier");
+	//				continue;
+	//			}
 
-				const FApplyCasterEffectModifier& modifierData = modifier.Get<FApplyCasterEffectModifier>();
-				spell = UApplyCasterEffectSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
+	//			const FApplyEffectModifier& modifierData = modifier.Get<FApplyEffectModifier>();
+	//			spell = UApplyEffectSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
 
-				break;
-			}
+	//			break;
+	//		}
 
-			case EGenericSpellModifierType::APPLY_EFFECT:
-			{
-				if (modifier.GetScriptStruct() != FApplyEffectModifier::StaticStruct())
-				{
-					LOG_ERROR("[SPELL FACTORY] A GenericSpellModifierType struct with type APPLY_EFFECT isn't of type ApplyEffectModifier");
-					continue;
-				}
+	//		case EGenericSpellModifierType::SPAWN_EFFECT:
+	//		{
+	//			if (modifier.GetScriptStruct() != FSpawnEffectModifier::StaticStruct())
+	//			{
+	//				LOG_ERROR("[SPELL FACTORY] A GenericSpellModifierType struct with type SPAWN_EFFECT isn't of type SpawnEffectModifier");
+	//				continue;
+	//			}
 
-				const FApplyEffectModifier& modifierData = modifier.Get<FApplyEffectModifier>();
-				spell = UApplyEffectSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
+	//			const FSpawnEffectModifier& modifierData = modifier.Get<FSpawnEffectModifier>();
+	//			spell = USpawnEffectSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
 
-				break;
-			}
+	//			break;
+	//		}
+	//	}
+	//}
 
-			case EGenericSpellModifierType::SPAWN_EFFECT:
-			{
-				if (modifier.GetScriptStruct() != FSpawnEffectModifier::StaticStruct())
-				{
-					LOG_ERROR("[SPELL FACTORY] A GenericSpellModifierType struct with type SPAWN_EFFECT isn't of type SpawnEffectModifier");
-					continue;
-				}
+	////Create Decorators relevant to ranged spell modifiers if ranged
+	//if (spellData->SpellType == ESpellType::PROJECTILE || spellData->SpellType == ESpellType::HITSCAN)
+	//{
+	//	if (URangedSpellData* rangedData = Cast<URangedSpellData>(spellData))
+	//	{
+	//		for (const auto modifier : rangedData->RangedSpellModifiers)
+	//		{
+	//			if (modifier.IsValid() == false)
+	//			{
+	//				continue;
+	//			}
 
-				const FSpawnEffectModifier& modifierData = modifier.Get<FSpawnEffectModifier>();
-				spell = USpawnEffectSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
+	//			switch (modifier.Get().ModifierType)
+	//			{
+	//				case ERangedSpellModifierType::SCATTER:
+	//				{
+	//					break;
+	//				}
 
-				break;
-			}
-		}
-	}
+	//				case ERangedSpellModifierType::KNOCKBACK:
+	//				{
+	//					if (modifier.GetScriptStruct() != FKnockbackSpellModifier::StaticStruct())
+	//					{
+	//						LOG_ERROR("[SPELL FACTORY] ARangedSpellModifierType struct with type KNOCKBACK isn't of type KnockbackSpellModifier");
+	//						continue;
+	//					}
 
-	//Create Decorators relevant to ranged spell modifiers if ranged
-	if (spellData->SpellType == ESpellType::PROJECTILE || spellData->SpellType == ESpellType::HITSCAN)
-	{
-		if (URangedSpellData* rangedData = Cast<URangedSpellData>(spellData))
-		{
-			for (const auto modifier : rangedData->RangedSpellModifiers)
-			{
-				if (modifier.IsValid() == false)
-				{
-					continue;
-				}
+	//					const FKnockbackSpellModifier& modifierData = modifier.Get<FKnockbackSpellModifier>();
+	//					spell = UKnockbackSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
+	//					break;
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
-				switch (modifier.Get().ModifierType)
-				{
-					case ERangedSpellModifierType::SCATTER:
-					{
-						break;
-					}
+	////Create Decorators relevant to specific spell type
+	//switch (spellData->SpellType)
+	//{
+	//	case ESpellType::PROJECTILE:
+	//	{
+	//		if (UProjectileSpellData* projectileData = Cast<UProjectileSpellData>(spellData))
+	//		{
+	//			/*for (const auto modifier : projectileData->ProjectileSpellModifiers)
+	//			{
+	//				if (modifier.IsValid() == false)
+	//				{
+	//					continue;
+	//				}
 
-					case ERangedSpellModifierType::KNOCKBACK:
-					{
-						if (modifier.GetScriptStruct() != FKnockbackSpellModifier::StaticStruct())
-						{
-							LOG_ERROR("[SPELL FACTORY] ARangedSpellModifierType struct with type KNOCKBACK isn't of type KnockbackSpellModifier");
-							continue;
-						}
+	//				switch (modifier.Get().ModifierType)
+	//				{
+	//					case EProjectileSpellModifierType::TRAIL:
+	//					{
+	//						if (modifier.GetScriptStruct() != FTrailSpellModifier::StaticStruct())
+	//						{
+	//							LOG_ERROR("[SPELL FACTORY] A ProjectileSpellModifierType struct with type TRAIL isn't of type TrailSpellModifier");
+	//							continue;
+	//						}
 
-						const FKnockbackSpellModifier& modifierData = modifier.Get<FKnockbackSpellModifier>();
-						spell = UKnockbackSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
-						break;
-					}
-				}
-			}
-		}
-	}
+	//						const FTrailSpellModifier& modifierData = modifier.Get<FTrailSpellModifier>();
+	//						spell = UTrailSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
+	//						break;
+	//					}
 
-	//Create Decorators relevant to specific spell type
-	switch (spellData->SpellType)
-	{
-		case ESpellType::PROJECTILE:
-		{
-			if (UProjectileSpellData* projectileData = Cast<UProjectileSpellData>(spellData))
-			{
-				for (const auto modifier : projectileData->ProjectileSpellModifiers)
-				{
-					if (modifier.IsValid() == false)
-					{
-						continue;
-					}
+	//					case EProjectileSpellModifierType::PENETRATION:
+	//					{
+	//						if (modifier.GetScriptStruct() != FPenetrationSpellModifier::StaticStruct())
+	//						{
+	//							LOG_ERROR("[SPELL FACTORY] A ProjectileSpellModifierType struct with type PENETRATION isn't of type PenetrationSpellModifier");
+	//							continue;
+	//						}
 
-					switch (modifier.Get().ModifierType)
-					{
-						case EProjectileSpellModifierType::TRAIL:
-						{
-							if (modifier.GetScriptStruct() != FTrailSpellModifier::StaticStruct())
-							{
-								LOG_ERROR("[SPELL FACTORY] A ProjectileSpellModifierType struct with type TRAIL isn't of type TrailSpellModifier");
-								continue;
-							}
+	//						const FPenetrationSpellModifier& modifierData = modifier.Get<FPenetrationSpellModifier>();
+	//						spell = UPenetrationSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
+	//						break;
+	//					}
+	//				}
+	//			}*/
+	//		}
+	//		break;
+	//	}
+	//}
 
-							const FTrailSpellModifier& modifierData = modifier.Get<FTrailSpellModifier>();
-							spell = UTrailSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
-							break;
-						}
-
-						case EProjectileSpellModifierType::PENETRATION:
-						{
-							if (modifier.GetScriptStruct() != FPenetrationSpellModifier::StaticStruct())
-							{
-								LOG_ERROR("[SPELL FACTORY] A ProjectileSpellModifierType struct with type PENETRATION isn't of type PenetrationSpellModifier");
-								continue;
-							}
-
-							const FPenetrationSpellModifier& modifierData = modifier.Get<FPenetrationSpellModifier>();
-							spell = UPenetrationSpellDecorator::Builder(spell.GetInterface(), modifierData).Build()->_getUObject();
-							break;
-						}
-					}
-				}
-			}
-			break;
-		}
-	}
-
-	spell->SetDecoratedSelf(spell.GetInterface());
-	return spell.GetInterface();
+	//spell->SetDecoratedSelf(spell.GetInterface());
+	//return spell.GetInterface();
 }

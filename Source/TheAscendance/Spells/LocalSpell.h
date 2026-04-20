@@ -14,12 +14,9 @@ class THEASCENDANCE_API ULocalSpell : public UBaseSpell
 	GENERATED_BODY()
 	
 public:
-	virtual void Init(USpellData* spellData, ISpellCaster* spellOwner) final;
+	virtual void Execute() override;
 
-	virtual bool CastSpell() override;
 	virtual void ProcessHit(const FVector& spellHitLocation) override;
-
-	virtual USpellData* GetSpellData() override;
 
 private:
 	UPROPERTY()
