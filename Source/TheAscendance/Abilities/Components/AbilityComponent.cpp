@@ -62,7 +62,7 @@ void UAbilityComponent::SetAbilities(const TArray<FGameplayTag>& abilityTags)
 		//Below failure checks are already logged internally
 		if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
 		{
-			if (IAbility* ability = gameMode->CreateAbilityFromTag(abilityTags[i]))
+			if (IAbility* ability = gameMode->CreateAbilityFromTag(abilityTags[i], this))
 			{
 				m_Abilities[i] = ability->_getUObject();
 			}
@@ -212,10 +212,45 @@ FVector UAbilityComponent::GetCastForward()
 	return m_Owner->GetActorForwardVector();//m_Owner->GetCastStartForward();
 }
 
+void UAbilityComponent::AffectOwnerStat(ECharacterStat stat, int amount)
+{
+	if(m_Owner == nullptr)
+	{
+		LOG_ERROR("[ABILITY COMPONENT] AffectOwnerStat was called but Owner is invalid");
+		return;
+	}
+
+	m_Owner->AdjustStat(stat, -amount);
+}
+
+float UAbilityComponent::GetOwnerStat(ECharacterStat stat)
+{
+	if (m_Owner == nullptr)
+	{
+		LOG_ERROR("[ABILITY COMPONENT] AffectOwnerStat was called but Owner is invalid");
+		return -1.0f;
+	}
+
+	return m_Owner->GetStat(stat);
+}
+
 // Called every frame
 void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	if(m_Abilities.Num() == 0)
+	{
+		return;
+	}
+
+	for(const auto& ability : m_Abilities)
+	{
+		if (ability == nullptr)
+		{
+			continue;
+		}
+
+		ability->Update(DeltaTime);
+	}
 }

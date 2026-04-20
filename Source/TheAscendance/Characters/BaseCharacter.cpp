@@ -597,6 +597,7 @@ void ABaseCharacter::BeginPlay()
 
 	m_OnSpellsUpdatedHandle = m_LoadoutComponent->OnSpellsUpdated.AddLambda([this](const TArray<FGameplayTag>& spellTags)
 		{
+			//Update AbilityComponent
 		}
 	);
 

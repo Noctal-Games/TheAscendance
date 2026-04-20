@@ -13,9 +13,10 @@ class UEffectData;
 class UBaseEffect;
 class UEnemyLoader;
 class ABaseEnemy;
-class USpellLoader;
+class UAbilityLoader;
 class UItemLoader;
 class IAbility;
+class UAbilityComponent;
 struct FItemData;
 struct FWeaponData;
 struct FWeaponTypeData;
@@ -35,10 +36,9 @@ public:
 	FWeaponData* GetWeaponData(const FGameplayTag& itemTag) const;
 	const FWeaponTypeData* GetWeaponTypeData(EWeaponType type) const;
 
-	//ISpell* CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const;
 	const FSpellTableData* GetSpellTableData(const FGameplayTag& spellTag) const;
 
-	IAbility* CreateAbilityFromTag(const FGameplayTag& abilityTag) const;
+	IAbility* CreateAbilityFromTag(const FGameplayTag& abilityTag, UAbilityComponent* owner) const;
 
 	UFUNCTION(BlueprintCallable)
 	ABaseEnemy* CreateEnemyFromID(int enemyID) const;
@@ -59,7 +59,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<UItemLoader> m_ItemLoader = nullptr;
 	UPROPERTY()
-	TObjectPtr<USpellLoader> m_SpellLoader = nullptr;
+	TObjectPtr<UAbilityLoader> m_AbilityLoader = nullptr;
 	UPROPERTY()
 	TObjectPtr<UEnemyLoader> m_EnemyLoader = nullptr;
 	UPROPERTY()

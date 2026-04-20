@@ -25,6 +25,8 @@ public:
 	virtual void Init(IAbility* ability, UProjectileSpellData* spellData) {};
 	virtual void SetDecoratedSelf(IProjectile* decoratedSelf) {};
 
+	virtual void SetNiagara(UNiagaraSystem* niagaraSystem) {};
+
 	virtual void SetIsActive(bool isActive) {};
 	virtual void ApplyForce(const FVector& unitDirection) {};
 

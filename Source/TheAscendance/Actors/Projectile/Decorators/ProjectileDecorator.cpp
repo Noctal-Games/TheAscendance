@@ -36,6 +36,17 @@ void UProjectileDecorator::SetDecoratedSelf(IProjectile* decoratedSelf)
 	return m_DecoratedProjectile->SetDecoratedSelf(decoratedSelf);
 }
 
+void UProjectileDecorator::SetNiagara(UNiagaraSystem* niagaraSystem)
+{
+	if (m_DecoratedProjectile == nullptr)
+	{
+		LOG_ERROR("Projectile decorator has invalid DecoratedProjectile pointer");
+		return;
+	}
+
+	return m_DecoratedProjectile->SetNiagara(niagaraSystem);
+}
+
 void UProjectileDecorator::SetIsActive(bool isActive)
 {
 	if (m_DecoratedProjectile == nullptr)

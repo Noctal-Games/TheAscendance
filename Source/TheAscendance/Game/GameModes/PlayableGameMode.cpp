@@ -75,37 +75,26 @@ const FWeaponTypeData* APlayableGameMode::GetWeaponTypeData(EWeaponType type) co
 	return m_ItemLoader->GetWeaponTypeData(type);
 }
 
-//ISpell* APlayableGameMode::CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const
-//{
-//	if (m_SpellLoader == nullptr)
-//	{
-//		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
-//		return nullptr;
-//	}
-//
-//	return m_SpellLoader->CreateSpellFromTag(spellTag, spellOwner);
-//}
-
 const FSpellTableData* APlayableGameMode::GetSpellTableData(const FGameplayTag& spellTag) const
 {
-	if (m_SpellLoader == nullptr)
-	{
-		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
-		return nullptr;
-	}
-
-	return m_SpellLoader->GetSpellTableDataFromTag(spellTag);
-}
-
-IAbility* APlayableGameMode::CreateAbilityFromTag(const FGameplayTag& abilityTag) const
-{
-	if (m_SpellLoader == nullptr)
+	if (m_AbilityLoader == nullptr)
 	{
 		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid AbilityLoader");
 		return nullptr;
 	}
 
-	return nullptr;
+	return m_AbilityLoader->GetSpellTableDataFromTag(spellTag);
+}
+
+IAbility* APlayableGameMode::CreateAbilityFromTag(const FGameplayTag& abilityTag, UAbilityComponent* owner) const
+{
+	if (m_AbilityLoader == nullptr)
+	{
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid AbilityLoader");
+		return nullptr;
+	}
+
+	return m_AbilityLoader->CreateAbilityFromTag(abilityTag, owner);
 }
 
 ABaseEnemy* APlayableGameMode::CreateEnemyFromID(int enemyID) const
@@ -140,13 +129,13 @@ void APlayableGameMode::InitGameState()
 		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create ItemLoader");
 	}
 
-	if (m_SpellLoader = NewObject<USpellLoader>())
+	if (m_AbilityLoader = NewObject<UAbilityLoader>())
 	{
-		m_SpellLoader->Init();
+		m_AbilityLoader->Init();
 	}
 	else
 	{
-		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create SpellLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create AbilityLoader");
 	}
 
 	if (m_EnemyLoader = NewObject<UEnemyLoader>())
@@ -176,13 +165,13 @@ void APlayableGameMode::StartPlay()
 
 const TArray<TSharedPtr<FSpellTableData>> APlayableGameMode::GetAllSpellTableDataEntries() const
 {
-	if (m_SpellLoader == nullptr)
+	if (m_AbilityLoader == nullptr)
 	{
-		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid AbilityLoader");
 		return TArray<TSharedPtr<FSpellTableData>>();
 	}
 
-	return m_SpellLoader->GetAllSpellTableDataEntries();
+	return m_AbilityLoader->GetAllSpellTableDataEntries();
 }
 
 void APlayableGameMode::BeginPlay()

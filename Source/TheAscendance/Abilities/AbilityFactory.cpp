@@ -151,10 +151,10 @@ IAbility* AbilityFactory::CreateAbility(UAbilityData* abilityData, UAbilityCompo
 		}
 	}
 
-	if (USpellData* spellData = Cast<USpellData>(abilityData))
-	{
-		ProcessSpellAbility(*spellData, *ability);
-	}
+	//if (USpellData* spellData = Cast<USpellData>(abilityData))
+	//{
+	//	ProcessSpellAbility(*spellData, *ability);
+	//}
 
 	ability->SetDecoratedSelf(ability.GetInterface());
 	ability->Init(ownerComponent, abilityData);
@@ -162,25 +162,25 @@ IAbility* AbilityFactory::CreateAbility(UAbilityData* abilityData, UAbilityCompo
 }
 
 //Might not be needed if any spell-specific decorators (if any) can be handled through spell classes
-void AbilityFactory::ProcessSpellAbility(const USpellData& spellData, const IAbility& ability)
-{
-	switch (spellData.AbilityType)
-	{
-		case EAbilityType::PROJECTILE_SPELL:
-		{
-			break;
-		}
-		case EAbilityType::LOCAL_SPELL:
-		{
-			break;
-		}
-		default:
-		{
-			LOG_ERROR("[ABILITY FACTORY] Tried to process Ability as Spell, but the AbilityType was not a SpellType");
-			return;
-		}
-	}
-}
+//void AbilityFactory::ProcessSpellAbility(const USpellData& spellData, const IAbility& ability)
+//{
+//	switch (spellData.AbilityType)
+//	{
+//		case EAbilityType::PROJECTILE_SPELL:
+//		{
+//			break;
+//		}
+//		case EAbilityType::LOCAL_SPELL:
+//		{
+//			break;
+//		}
+//		default:
+//		{
+//			LOG_ERROR("[ABILITY FACTORY] Tried to process Ability as Spell, but the AbilityType was not a SpellType");
+//			return;
+//		}
+//	}
+//}
 
 //ISpell* AbilityFactory::CreateSpell(USpellData* spellData, ISpellCaster* spellOwner)
 //{

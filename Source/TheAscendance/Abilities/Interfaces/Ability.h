@@ -45,6 +45,7 @@ public:
 	virtual void ProcessHit(const FVector& spellHitLocation) {};
 
 	virtual void SpawnHitNiagara(const FVector& spellHitLocation) {};
+	virtual void LoadHitNiagara() {};
 
 	virtual TArray<TObjectPtr<AActor>> GetHitActors() { return TArray<TObjectPtr<AActor>>(); };
 

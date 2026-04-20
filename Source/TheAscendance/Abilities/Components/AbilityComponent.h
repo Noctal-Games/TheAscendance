@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "TheAscendance/Characters/Enums/CharacterStat.h"
 #include "GameplayTagContainer.h"
 // Test
 #include "TheAscendance/Abilities/AbilityFactory.h"
@@ -40,6 +41,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	FVector GetCastLocation();
 	FVector GetCastForward();
+
+	void AffectOwnerStat(ECharacterStat stat, int amount);
+	float GetOwnerStat(ECharacterStat stat);
 
 protected:
 	friend class UBaseAbility;

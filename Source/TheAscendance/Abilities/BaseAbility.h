@@ -10,6 +10,7 @@
 class UAbilityData;
 class UAbilityComponent;
 class UAnimMontage;
+class UNiagaraSystem;
 
 UCLASS()
 class THEASCENDANCE_API UBaseAbility : public UObject, public IAbility
@@ -32,11 +33,20 @@ public:
 
 	virtual void OnInputReleased() override;
 
+	virtual void SpawnHitNiagara(const FVector& hitLocation) override;
+	virtual void LoadHitNiagara() override;
+
 	virtual const FGameplayTag& GetAbilityTag() const override;
 
 	virtual float PlayAnimMontageOnOwner(UAnimMontage* animation) override;
 	virtual UAbilityData* GetAbilityData() override;
 	virtual AActor* GetAbilityOwner() override;
+
+	virtual bool CanStart() const override;
+	virtual void Update(float deltaTime) override;
+
+protected:
+	virtual void AffectOwnerStat();
 
 protected:
 	UPROPERTY()
@@ -50,4 +60,10 @@ private:
 	TSoftObjectPtr<UAnimMontage> m_AbilityAnimation = nullptr;
 
 	FTimerHandle m_AbilityDurationHandle;
+
+	UPROPERTY()
+	TSoftObjectPtr<UNiagaraSystem> m_HitNiagara = nullptr;
+
+	float m_Cooldown = 0.0f;
+	float m_CooldownTimer = 0.0f;
 };

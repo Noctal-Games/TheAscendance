@@ -38,7 +38,9 @@ public:
 	virtual void OnOverlap(AActor* overlapActor, const FVector& spellOverlapLocation, int damage) override;
 	virtual void OnHit(AActor* hitActor, const FVector& spellHitLocation) override;
 	virtual void ProcessHit(const FVector& spellHitLocation) override;
+
 	virtual void SpawnHitNiagara(const FVector& spellHitLocation) override;
+	virtual void LoadHitNiagara() override;
 
 	virtual TArray<TObjectPtr<AActor>> GetHitActors() override;
 

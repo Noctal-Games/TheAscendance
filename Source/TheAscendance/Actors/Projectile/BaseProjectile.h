@@ -24,10 +24,10 @@ public:
 	// Sets default values for this actor's properties
 	ABaseProjectile();
 
-	void SetNiagara(UNiagaraSystem* niagaraSystem);
-
 	virtual void Init(IAbility* ability, UProjectileSpellData* spellData) override;
 	virtual void SetDecoratedSelf(IProjectile* decoratedSelf) override;
+
+	virtual void SetNiagara(UNiagaraSystem* niagaraSystem) override;
 
 	virtual void SetIsActive(bool isActive) override;
 	virtual void ApplyForce(const FVector& unitDirection) override;

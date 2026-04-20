@@ -7,6 +7,8 @@
 #include "Structs/AbilityData.h"
 #include "Components/AbilityComponent.h"
 
+#include "NiagaraFunctionLibrary.h"
+
 void UBaseAbility::Init(UAbilityComponent* ownerComponent, UAbilityData* abilityData)
 {
 	m_OwnerComponent = ownerComponent;
@@ -33,7 +35,14 @@ void UBaseAbility::Init(UAbilityComponent* ownerComponent, UAbilityData* ability
 		return;
 	}
 
+	m_Cooldown = abilityData->Cooldown;
+
 	UCoreFunctionLibrary::RequestAsyncLoad(m_AbilityAnimation.ToSoftObjectPath());
+
+	if (m_DecoratedSelf != nullptr)
+	{
+		m_DecoratedSelf->LoadHitNiagara();
+	}
 }
 
 void UBaseAbility::SetDecoratedSelf(IAbility* decoratedSelf)
@@ -81,11 +90,52 @@ void UBaseAbility::Execute()
 void UBaseAbility::TriggerAbility()
 {
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: TRIGGER", *GetAbilityTag().ToString());
+
+	if (m_CooldownTimer > 0.0f)
+	{
+		LOG_WARNING("[BASE ABILITY] Check CanStart before activating ability");
+		return;
+	}
+	
+	m_CooldownTimer = m_Cooldown;
+	AffectOwnerStat();
 }
 
 void UBaseAbility::OnInputReleased()
 {
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: RELEASED", *GetAbilityTag().ToString());
+}
+
+void UBaseAbility::SpawnHitNiagara(const FVector& hitLocation)
+{
+	if (m_HitNiagara.IsValid() == false)
+	{
+		return;
+	}
+
+	if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(worldContext, m_HitNiagara.Get(), hitLocation);
+	}
+}
+
+void UBaseAbility::LoadHitNiagara()
+{ 
+	if(m_AbilityData == nullptr)
+	{
+		LOG_ERROR("[BASE ABILITY] Tried to Load HitNiagara with invalid AbilityData");
+		return;
+	}
+
+	m_HitNiagara = m_AbilityData->HitNiagara;
+
+	if (m_HitNiagara.IsNull() == true)
+	{
+		LOG_WARNING("[BASE ABILITY] Tried to Load HitNiagara with invalid HitNiagara");
+		return;
+	}
+
+	UCoreFunctionLibrary::RequestAsyncLoad(m_HitNiagara.ToSoftObjectPath());
 }
 
 const FGameplayTag& UBaseAbility::GetAbilityTag() const
@@ -124,4 +174,28 @@ AActor* UBaseAbility::GetAbilityOwner()
 	}
 
 	return m_OwnerComponent->GetOwner();
+}
+
+bool UBaseAbility::CanStart() const
+{
+	if (m_CooldownTimer > 0.0f)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void UBaseAbility::Update(float deltaTime)
+{   
+	if (m_Cooldown < 0)
+	{
+		return;
+	}
+
+	m_CooldownTimer -= deltaTime;
+}
+
+void UBaseAbility::AffectOwnerStat()
+{
 }

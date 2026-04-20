@@ -19,6 +19,6 @@ public:
 
 	IAbility* CreateAbility(UAbilityData* abilityData, UAbilityComponent* ownerComponent);
 
-private:
-	void ProcessSpellAbility(const USpellData& spellData, const IAbility& ability);
+//private:
+//	void ProcessSpellAbility(const USpellData& spellData, const IAbility& ability);
 };

@@ -264,7 +264,8 @@ void APlayerCharacter::BeginPlay()
 
 	if (m_AbilityComponent != nullptr)
 	{
-		m_AbilityComponent->TestSetAbilities(TestAbilities);
+		//m_AbilityComponent->TestSetAbilities(TestAbilities);
+		m_AbilityComponent->SetAbilities(TestAbilityTags);
 	}
 }
 

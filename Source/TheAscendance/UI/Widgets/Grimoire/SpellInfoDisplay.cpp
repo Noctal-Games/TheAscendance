@@ -47,7 +47,7 @@ void USpellInfoDisplay::DisplaySpellData()
 
 	FString cooldownString;
 	cooldownString.Append("Cooldown: ");
-	cooldownString.Append(FString::SanitizeFloat(m_SpellData->SpellCooldown));
+	cooldownString.Append(FString::SanitizeFloat(m_SpellData->Cooldown));
 	cooldownString.Append("s");
 
 	m_SpellCooldown->SetText(FText::FromString(cooldownString));

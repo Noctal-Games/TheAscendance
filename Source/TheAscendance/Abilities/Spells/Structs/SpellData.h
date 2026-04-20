@@ -16,13 +16,6 @@ class THEASCENDANCE_API USpellData : public UAbilityData
 {
 	GENERATED_BODY()
 
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Spell"))
-	FGameplayTag SpellTag;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	float SpellCooldown = 0.0f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int ManaCost = 0;
 	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
 	//TArray<TInstancedStruct<FGenericSpellModifier>> SpellModifiers;
 };
@@ -52,10 +45,7 @@ public:
 	float Range = 0.0f;
 
 	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
-	//TArray<TInstancedStruct<FRangedSpellModifier>> RangedSpellModifiers;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSoftObjectPtr<UNiagaraSystem> SpellHitNiagara = nullptr;
+	//TArray<TInstancedStruct<FRangedSpellModifier>> RangedSpellModifiers
 };
 
 UCLASS(BlueprintType)
@@ -77,6 +67,8 @@ public:
 	bool IsAffectedByGravity = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ClampMin = "0.0", ClampMax = "1.0", ToolTip = "The projectiles gravity scale. 0 is no gravity, 1 is default.", EditCondition = "IsAffectedByGravity == true", EditConditionHides))
 	float GravityScale = 1.0f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UNiagaraSystem> ProjectileNiagara = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
 	TArray<TInstancedStruct<FProjectileModifier>> ProjectileModifiers;
 };
@@ -99,7 +91,7 @@ struct FSpellTableData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Spell"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Ability"))
 	FGameplayTag SpellTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

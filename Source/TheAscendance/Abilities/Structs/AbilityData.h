@@ -12,6 +12,7 @@
 
 class UAnimMontage;
 class USpellData;
+class UNiagaraSystem;
 
 //Make abstract
 UCLASS(BlueprintType)
@@ -20,8 +21,10 @@ class THEASCENDANCE_API UAbilityData : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Ability"))
 	FGameplayTag AbilityTag;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "Mana cost for spells. Stamina cost for non-spells"))
+	int StatCost = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Cooldown = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -29,6 +32,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))
 	TArray<TInstancedStruct<FAbilityModifier>> AbilityModifiers;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "Unneccessary if the abilty does not hit a target, or only an alternative hit niagara (such as an AOE) is wanted"))
+	TSoftObjectPtr<UNiagaraSystem> HitNiagara = nullptr;
 
 	EAbilityType AbilityType = EAbilityType::NONE;
 };

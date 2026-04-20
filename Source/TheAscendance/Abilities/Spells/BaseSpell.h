@@ -20,23 +20,18 @@ public:
 	virtual void OnHit(AActor* hitActor, const FVector& spellHitLocation) override;
 	virtual void ProcessHit(const FVector& spellHitLocation) override;
 
-	virtual void SpawnHitNiagara(const FVector& spellHitLocation) override;
-
 	virtual bool DealDamage(AActor* hitActor, int damage) override;
 
 	virtual TArray<TObjectPtr<AActor>> GetHitActors() override;
 
 	virtual void ApplyEffects(AActor* hitActor) override;
 
-protected:
+	virtual bool CanStart() const override;
 
+protected:
+	virtual void AffectOwnerStat() override;
+
+protected:
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> m_HitActors;
-
-	UPROPERTY()
-	TSoftObjectPtr<UNiagaraSystem> m_HitNiagara = nullptr;
-
-private:
-	float m_Cooldown = 0.0f;
-	float m_CooldownTimer = 0.0f;
 };

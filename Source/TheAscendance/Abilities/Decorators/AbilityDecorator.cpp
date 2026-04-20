@@ -180,6 +180,17 @@ void UAbilityDecorator::SpawnHitNiagara(const FVector& spellHitLocation)
 	return m_DecoratedAbility->SpawnHitNiagara(spellHitLocation);
 }
 
+void UAbilityDecorator::LoadHitNiagara()
+{
+	if (m_DecoratedAbility == nullptr)
+	{
+		LOG_ERROR("[ABILITY DECORATOR] Invalid DecoratedAbility");
+		return;
+	}
+
+	return m_DecoratedAbility->LoadHitNiagara();
+}
+
 TArray<TObjectPtr<AActor>> UAbilityDecorator::GetHitActors()
 {
 	if (m_DecoratedAbility == nullptr)

@@ -8,6 +8,7 @@
 
 class UProjectileSpellData;
 class IProjectile;
+class UNiagaraSystem;
 
 UCLASS()
 class THEASCENDANCE_API UProjectileSpell : public UBaseSpell
@@ -24,4 +25,7 @@ public:
 private:
 	UPROPERTY()
 	TWeakObjectPtr<UProjectileSpellData> m_SpellData = nullptr;
+
+	UPROPERTY()
+	TSoftObjectPtr<UNiagaraSystem> m_ProjectileNiagara = nullptr;
 };

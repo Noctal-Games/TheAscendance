@@ -6,9 +6,9 @@
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Abilities/Interfaces/Ability.h"
 #include "Structs/SpellData.h"
+#include "TheAscendance/Characters/Enums/CharacterStat.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
-
-#include "NiagaraFunctionLibrary.h"
+#include "TheAscendance/Abilities/Components/AbilityComponent.h"
 
 void UBaseSpell::OnOverlap(AActor* overlapActor, const FVector& spellOverlapLocation, int damage)
 {		
@@ -40,21 +40,7 @@ void UBaseSpell::ProcessHit(const FVector& spellHitLocation)
 	}
 
 	m_DecoratedSelf->SpawnHitNiagara(spellHitLocation);
-
 	m_HitActors.Empty();
-}
-
-void UBaseSpell::SpawnHitNiagara(const FVector& spellHitLocation)
-{
-	if (m_HitNiagara.IsValid() == false)
-	{
-		return;
-	}
-
-	if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(worldContext, m_HitNiagara.Get(), spellHitLocation);
-	}
 }
 
 bool UBaseSpell::DealDamage(AActor* hitActor, int damage)
@@ -70,6 +56,46 @@ bool UBaseSpell::DealDamage(AActor* hitActor, int damage)
 
 void UBaseSpell::ApplyEffects(AActor* hitActor)
 {
+}
+
+bool UBaseSpell::CanStart() const
+{
+	if (m_OwnerComponent == nullptr)
+	{
+		LOG_ERROR("[BASE SPELL] CanStart was called but OwnerComponent is invalid");
+		return false;
+	}
+
+	if (m_AbilityData == nullptr)
+	{
+		LOG_ERROR("[BASE SPELL] CanStart was called but AbilityData is invalid");
+		return false;
+	}
+
+	if (UBaseAbility::CanStart() == false)
+	{
+		return false;
+	}
+
+	float mana = m_OwnerComponent->GetOwnerStat(ECharacterStat::MANA);
+	return mana >= m_AbilityData->StatCost;
+}
+
+void UBaseSpell::AffectOwnerStat()
+{
+	if(m_OwnerComponent == nullptr)
+	{
+		LOG_ERROR("[BASE SPELL] AffectOwnerStat was called but OwnerComponent is invalid");
+		return;
+	}
+
+	if (m_AbilityData == nullptr)
+	{
+		LOG_ERROR("[BASE SPELL] AffectOwnerStat was called but AbilityData is invalid");
+		return;
+	}
+
+	m_OwnerComponent->AffectOwnerStat(ECharacterStat::MANA, m_AbilityData->StatCost);
 }
 
 TArray<TObjectPtr<AActor>> UBaseSpell::GetHitActors()

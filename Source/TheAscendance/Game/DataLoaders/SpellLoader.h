@@ -5,23 +5,31 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "GameplayTagContainer.h"
+#include "TheAscendance/Abilities/AbilityFactory.h"
 #include "SpellLoader.generated.h"
 
+class IAbility;
+class UAbilityComponent;
 struct FSpellTableData;
 
 UCLASS()
-class THEASCENDANCE_API USpellLoader : public UObject
+class THEASCENDANCE_API UAbilityLoader : public UObject
 {
 	GENERATED_BODY()
 	
 public:
 	void Init();
 
-	//ISpell* CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const;
+	IAbility* CreateAbilityFromTag(const FGameplayTag& spellTag, UAbilityComponent* abilityOwner);
 	FSpellTableData* GetSpellTableDataFromTag(const FGameplayTag& spellTag) const;
 	const TArray<TSharedPtr<FSpellTableData>> GetAllSpellTableDataEntries() const;
 
 private:
+	USpellData* GetSpellAbilityDataFromTag(const FGameplayTag& spellTag) const;
+
+private:
 	UPROPERTY()
 	TObjectPtr<UDataTable> m_SpellTable = nullptr;
+
+	TUniquePtr<AbilityFactory> m_AbilityFactory = nullptr;
 };

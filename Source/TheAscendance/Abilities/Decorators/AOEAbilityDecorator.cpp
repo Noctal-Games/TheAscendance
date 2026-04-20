@@ -112,9 +112,9 @@ void UAOEAbilityDecorator::ProcessHitDamage(int& damage, const FVector& targetLo
 	damage += damageWithFalloff;
 }
 
-void UAOEAbilityDecorator::SpawnHitNiagara(const FVector& spellHitLocation)
+void UAOEAbilityDecorator::SpawnHitNiagara(const FVector& hitLocation)
 {
-	m_DecoratedAbility->SpawnHitNiagara(spellHitLocation);
+	m_DecoratedAbility->SpawnHitNiagara(hitLocation);
 
 	if (m_AOEHitNiagara.IsValid() == false)
 	{
@@ -123,28 +123,28 @@ void UAOEAbilityDecorator::SpawnHitNiagara(const FVector& spellHitLocation)
 
 	if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
 	{
-		UNiagaraComponent* vfx = UNiagaraFunctionLibrary::SpawnSystemAtLocation(worldContext, m_AOEHitNiagara.Get(), spellHitLocation);
+		UNiagaraComponent* vfx = UNiagaraFunctionLibrary::SpawnSystemAtLocation(worldContext, m_AOEHitNiagara.Get(), hitLocation);
 		vfx->SetVariableFloat(FName("VFX_ShapeScale"), m_ModifierData->Range);
 	}
 }
 
-//void UAOESpellDecorator::LoadHitNiagara()
-//{
-//	m_DecoratedAbility->LoadHitNiagara();
-//
-//	if (m_ModifierData == nullptr)
-//	{
-//		LOG_ERROR("[AOE SPELL DECORATOR] Modifier data was invalid");
-//		return;
-//	}
-//
-//	m_AOEHitNiagara = m_ModifierData->AOEHitNiagara;
-//
-//	if (m_AOEHitNiagara.IsNull() == true)
-//	{
-//		LOG_ERROR("[AOE SPELL DECORATOR] Tried to Load AOEHitNiagara with invalid AOEHitNiagara");
-//		return;
-//	}
-//
-//	UCoreFunctionLibrary::RequestAsyncLoad(m_AOEHitNiagara.ToSoftObjectPath());
-//}
+void UAOEAbilityDecorator::LoadHitNiagara()
+{
+	m_DecoratedAbility->LoadHitNiagara();
+
+	if (m_ModifierData == nullptr)
+	{
+		LOG_ERROR("[AOE ABILITY DECORATOR] Modifier data was invalid");
+		return;
+	}
+
+	m_AOEHitNiagara = m_ModifierData->AOEHitNiagara;
+
+	if (m_AOEHitNiagara.IsNull() == true)
+	{
+		LOG_ERROR("[AOE ABILITY DECORATOR] Tried to Load AOEHitNiagara with invalid AOEHitNiagara");
+		return;
+	}
+
+	UCoreFunctionLibrary::RequestAsyncLoad(m_AOEHitNiagara.ToSoftObjectPath());
+}

@@ -21,6 +21,16 @@ void UProjectileSpell::Init(UAbilityComponent* ownerComponent, UAbilityData* abi
 	if (UProjectileSpellData* data = Cast<UProjectileSpellData>(m_AbilityData))
 	{
 		m_SpellData = data;
+
+		m_ProjectileNiagara = m_SpellData->ProjectileNiagara;
+
+		if (m_ProjectileNiagara.IsNull() == true)
+		{
+			LOG_ERROR("[PROJECTILE SPELL] Projectile Niagara is invalid");
+			return;
+		}
+
+		UCoreFunctionLibrary::RequestAsyncLoad(m_ProjectileNiagara.ToSoftObjectPath());
 	}
 	else
 	{
@@ -30,8 +40,6 @@ void UProjectileSpell::Init(UAbilityComponent* ownerComponent, UAbilityData* abi
 
 void UProjectileSpell::TriggerAbility()
 {
-	UBaseSpell::TriggerAbility();
-
 	if (UBaseSpell::CanStart() == false)
 	{
 		return;
@@ -59,12 +67,20 @@ void UProjectileSpell::TriggerAbility()
 	{
 		projectile->AddIgnoreActor(GetAbilityOwner());
 		projectile->SetIsActive(true);
+
+		if (m_ProjectileNiagara.IsValid() == true)
+		{
+			projectile->SetNiagara(m_ProjectileNiagara.Get());
+		}
+
 		projectile->ApplyForce(m_OwnerComponent->GetCastForward());
 	}
 	else
 	{
 		LOG_ERROR("[PROJECTILE SPELL] Failed to spawn Projectile");
 	}
+
+	UBaseSpell::TriggerAbility();
 }
 
 void UProjectileSpell::ProcessOverlapDamage(int& damage)
