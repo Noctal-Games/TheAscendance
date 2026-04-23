@@ -14,3 +14,5 @@ enum class EEquippablePart : uint8
 
 	MAX UMETA(Hidden)
 };
+
+ENUM_RANGE_BY_COUNT(EEquippablePart, EEquippablePart::MAX)

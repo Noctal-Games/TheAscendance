@@ -65,7 +65,6 @@ void ABaseCharacter::Damage(int amount, bool triggerOnHit)
 
 	if (m_CharacterStatsComponent->GetStatAsValue(ECharacterStat::HEALTH) <= 0.0f)
 	{
-		m_LoadoutComponent->OnSpellsUpdated.Remove(m_OnSpellsUpdatedHandle);
 		OnDeath.Broadcast(this);
 	}
 }
@@ -350,17 +349,46 @@ FVector ABaseCharacter::GetSocketLocation(FName socketName)
 {
 	if (GetMesh()->DoesSocketExist(socketName) == false)
 	{
+		LOG_ERROR("[BASE CHARACTER] Tried to get socket location for socket that doesn't exist: %s", *socketName.ToString());
 		return FVector::Zero();
 	}
 
 	return GetMesh()->GetSocketLocation(socketName);
 }
 
+FVector ABaseCharacter::GetSocketLocationFromPart(EEquippablePart part)
+{
+	return GetSocketLocation(GetSocketNameFromPart(part));
+}
+
+FName ABaseCharacter::GetSocketNameFromPart(EEquippablePart part)
+{
+	switch (part)
+	{
+	case EEquippablePart::NONE:
+		break;
+	case EEquippablePart::RIGHT_HAND:
+		return "WeaponSocket_r";
+	case EEquippablePart::LEFT_HAND:
+		return "WeaponSocket_l";
+	default:
+		break;
+	}
+
+	LOG_ERROR("[BASE CHARACTER] Tried to get socket name for part but socket doesn't exist: %s", *UEnum::GetValueAsString(part));
+	return FName();
+}
+
+USkeletalMeshComponent* ABaseCharacter::GetEquipmentMesh()
+{
+	return GetMesh();
+}
+
 float ABaseCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate, FName startSection)
 {
-	if (montageToPlay == nullptr)
+	if (montageToPlay == nullptr) 
 	{
-		LOG_ERROR("Tried to play invalid animation montage");
+		LOG_ERROR("[BASE CHARACTER] Tried to play invalid animation montage");
 		return 0.0f;
 	}
 
@@ -368,7 +396,7 @@ float ABaseCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float pl
 
 	if(animInstance == nullptr)
 	{
-		LOG_ERROR("Tried to play animation montage with invalid anim instance");
+		LOG_ERROR("[BASE CHARACTER] Tried to play animation montage with invalid anim instance");
 		return 0.0f;
 	}
 
@@ -391,106 +419,29 @@ void ABaseCharacter::StopAbility()
 
 bool ABaseCharacter::EquipItem(EEquippablePart part, const FGameplayTag& itemTag)
 {
-	if(itemTag.IsValid() == false)
+	if(m_LoadoutComponent == nullptr)
 	{
-		UnEquipItem(part);
-		return true;
+		LOG_ERROR("[BASE CHARACTER] Tried to Equip item but LoadoutComponent was null");
+		return false;
 	}
 
-	//Remove from inventory logic
+	//Remove from Inventory
 
-	switch (part)
-	{
-		case EEquippablePart::RIGHT_HAND:
-		{
-			if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
-			{
-				if (m_MainHandItem == nullptr)
-				{
-					LOG_ERROR("Main Hand Item is null");
-					return false;
-				}
-
-				FItemData* itemData = gameMode->GetItemData(itemTag);
-
-				if (itemData == nullptr)
-				{
-					return false;
-				}
-
-				m_MainHandItem->Init(itemData);
-				return true;
-			}
-			break;
-		}
-
-		case EEquippablePart::LEFT_HAND:
-		{
-			if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
-			{
-				if (m_OffHandItem == nullptr)
-				{
-					LOG_ERROR("OffHand Item is null");
-					return false;
-				}
-
-				FItemData* itemData = gameMode->GetItemData(itemTag);
-
-				if (itemData == nullptr)
-				{
-					return false;
-				}
-
-				m_OffHandItem->Init(itemData);
-				return true;
-			}
-			break;
-		}
-
-		default:
-		{
-			LOG_WARNING("EquipItem called with invalid EEquippablePart");
-		}
-	}
-
-	return false;
+	m_LoadoutComponent->EquipItem(part, itemTag);
+	return true;
 }
 
 void ABaseCharacter::UnEquipItem(EEquippablePart part)
-{			
+{
+	if (m_LoadoutComponent == nullptr)
+	{
+		LOG_ERROR("[BASE CHARACTER] Tried to UnEquip item but LoadoutComponent was null");
+		return;
+	}
+
 	//Add to inventory logic
 
-	switch (part)
-	{
-		case EEquippablePart::RIGHT_HAND:
-		{
-			if (m_MainHandItem == nullptr)
-			{
-				LOG_ERROR("Main Hand Item is null");
-				return;
-			}
-
-			m_MainHandItem->UnEquip();
-			break;
-		}
-
-		case EEquippablePart::LEFT_HAND:
-		{
-			if (m_OffHandItem == nullptr)
-			{
-				LOG_ERROR("OffHand Item is null");
-				return;
-			}
-
-			m_OffHandItem->UnEquip();
-			break;
-		}
-
-		default:
-		{
-			LOG_WARNING("UnEquip called on invalid EquippablePart");
-		}
-	}
+	m_LoadoutComponent->UnEquipItem(part);
 }
 
 UCharacterStatsComponent* ABaseCharacter::GetCharacterStatsComponent()
@@ -557,30 +508,30 @@ void ABaseCharacter::BeginPlay()
 
 	m_EffectHandlerComponent->Init(this);
 
-	if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
-	{
-		if (m_MainHandItem = world->SpawnActor<AHeldItem>(AHeldItem::StaticClass()))
-		{
-			m_MainHandItem->SetItemOwner(this);
-			m_MainHandItem->UnEquip();
+	//if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
+	//{
+	//	if (m_MainHandItem = world->SpawnActor<AHeldItem>(AHeldItem::StaticClass()))
+	//	{
+	//		m_MainHandItem->SetItemOwner(this);
+	//		m_MainHandItem->UnEquip();
 
-			m_MainHandItem->SetActorLocation(GetMesh()->GetSocketLocation("WeaponSocket_r"));
-			m_MainHandItem->K2_AttachToComponent(GetMesh(), "WeaponSocket_r", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+	//		m_MainHandItem->SetActorLocation(GetMesh()->GetSocketLocation("WeaponSocket_r"));
+	//		m_MainHandItem->K2_AttachToComponent(GetMesh(), "WeaponSocket_r", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
 
-			m_MainHandItem->m_IsOffHand = false;
-		}
+	//		m_MainHandItem->m_IsOffHand = false;
+	//	}
 
-		if (m_OffHandItem = world->SpawnActor<AHeldItem>(AHeldItem::StaticClass()))
-		{
-			m_OffHandItem->SetItemOwner(this);
-			m_OffHandItem->UnEquip();
+	//	if (m_OffHandItem = world->SpawnActor<AHeldItem>(AHeldItem::StaticClass()))
+	//	{
+	//		m_OffHandItem->SetItemOwner(this);
+	//		m_OffHandItem->UnEquip();
 
-			m_OffHandItem->SetActorLocation(GetMesh()->GetSocketLocation("WeaponSocket_l"));
-			m_OffHandItem->K2_AttachToComponent(GetMesh(), "WeaponSocket_l", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
+	//		m_OffHandItem->SetActorLocation(GetMesh()->GetSocketLocation("WeaponSocket_l"));
+	//		m_OffHandItem->K2_AttachToComponent(GetMesh(), "WeaponSocket_l", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
 
-			m_MainHandItem->m_IsOffHand = true;
-		}
-	}
+	//		m_MainHandItem->m_IsOffHand = true;
+	//	}
+	//}
 
 	m_CharacterStatsComponent->OnStatChanged.AddLambda([this](ECharacterStat stat, float walkSpeed, float ignore) 
 		{ 
@@ -594,12 +545,6 @@ void ABaseCharacter::BeginPlay()
 	);
 
 	m_CharacterStatsComponent->Init();
-
-	m_OnSpellsUpdatedHandle = m_LoadoutComponent->OnSpellsUpdated.AddLambda([this](const TArray<FGameplayTag>& spellTags)
-		{
-			//Update AbilityComponent
-		}
-	);
 
 	//Test
 	m_TestEquipToggle = false;

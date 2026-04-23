@@ -4,6 +4,7 @@
 #include "EngageAttackState.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "AttackCombatState.h"
 #include "TheAscendance/AI/Components/HSMAgentComponent.h"
 #include "TheAscendance/AI/Actions/Attacks/Structs/AttackData.h"
@@ -38,7 +39,7 @@ void UEngageAttackState::StartState(UHSMAgentComponent* agent)
 			return;
 		}
 
-		UCoreFunctionLibrary::RequestAsyncLoad(m_AttackCombatState->m_CurrentTelegraphMontage.ToSoftObjectPath(), [this, attackData]()
+		UStreamableFunctionLibrary::RequestAsyncLoad(m_AttackCombatState->m_CurrentTelegraphMontage.ToSoftObjectPath(), [this, attackData]()
 			{
 				m_AttackCombatState->SetAttackState(EAttackState::TELEGRAPH);
 			}

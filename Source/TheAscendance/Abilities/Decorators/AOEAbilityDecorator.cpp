@@ -3,6 +3,7 @@
 
 #include "AOEAbilityDecorator.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/Character.h"
@@ -146,5 +147,5 @@ void UAOEAbilityDecorator::LoadHitNiagara()
 		return;
 	}
 
-	UCoreFunctionLibrary::RequestAsyncLoad(m_AOEHitNiagara.ToSoftObjectPath());
+	UStreamableFunctionLibrary::RequestAsyncLoad(m_AOEHitNiagara.ToSoftObjectPath());
 }

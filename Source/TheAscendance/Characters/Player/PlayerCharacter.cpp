@@ -16,6 +16,7 @@
 #include "TheAscendance/Items/ItemGameplayTags.h"
 #include "TheAscendance/Actors/Interaction/Interfaces/Interactable.h"
 #include "TheAscendance/Abilities/Components/AbilityComponent.h"
+#include "TheAscendance/Characters/Components/EquipmentManagerComponent.h"
 
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -25,6 +26,8 @@ APlayerCharacter::APlayerCharacter() : ABaseCharacter()
 {
 	m_AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("Ability Component"));
 	checkf(m_AbilityComponent, TEXT("Ability Component failed to initialise"));
+	m_EquipmentManagerComponent = CreateDefaultSubobject<UEquipmentManagerComponent>(TEXT("Equipment Manager Component"));
+	checkf(m_EquipmentManagerComponent, TEXT("Equipment Manager Component failed to initialise"));
 
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
@@ -241,31 +244,30 @@ void APlayerCharacter::BeginPlay()
 		}
 
 		m_HandsMesh = mesh;
-
-		if (m_HandsMesh == nullptr)
-		{
-			continue;
-		}
-
-		if (m_MainHandItem != nullptr)
-		{
-			m_MainHandItem->SetActorLocation(m_HandsMesh->GetSocketLocation("WeaponSocket_r"));
-			m_MainHandItem->K2_AttachToComponent(m_HandsMesh, "WeaponSocket_r", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
-		}
-
-		if (m_OffHandItem != nullptr)
-		{
-			m_OffHandItem->SetActorLocation(m_HandsMesh->GetSocketLocation("WeaponSocket_l"));
-			m_OffHandItem->K2_AttachToComponent(m_HandsMesh, "WeaponSocket_l", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
-		}
-
-		break;
 	}
 
 	if (m_AbilityComponent != nullptr)
 	{
-		//m_AbilityComponent->TestSetAbilities(TestAbilities);
 		m_AbilityComponent->SetAbilities(TestAbilityTags);
+	}
+
+	if (m_EquipmentManagerComponent != nullptr)
+	{
+		m_EquipmentManagerComponent->Init(this, m_AbilityComponent);
+	}
+
+	if (m_LoadoutComponent != nullptr)
+	{
+		m_LoadoutComponent->OnUpdate.AddLambda([this](const TArray<FLoadoutSlotData>& equipmentData, const TArray<FGameplayTag>& spellTags)
+			{
+				if (m_EquipmentManagerComponent == nullptr)
+				{
+					LOG_ERROR("[PLAYER CHARACTER] LoadoutComponent tried to update EquipmentManagerComponent but it was invalid");
+					return;
+				}
+
+				m_EquipmentManagerComponent->OnLoadoutUpdated(equipmentData, spellTags);
+			});
 	}
 }
 
@@ -375,25 +377,14 @@ void APlayerCharacter::TestFunction3()
 
 	if (m_TestEquipToggle == false)
 	{
-		m_LoadoutComponent->EquipItem(EEquippablePart::LEFT_HAND, ITEM_EQUIPMENT_SWORD);
+		EquipItem(EEquippablePart::LEFT_HAND, ITEM_EQUIPMENT_SWORD);
 	}
 	else
 	{
-		m_LoadoutComponent->UnEquipItem(EEquippablePart::LEFT_HAND);
+		UnEquipItem(EEquippablePart::LEFT_HAND);
 	}
 
 	m_TestEquipToggle = !m_TestEquipToggle;
-
-	float rand = FMath::RandRange(0, 100);
-
-	if (rand < 50)
-	{
-		m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::SHIELD, 20);
-	}
-	else
-	{
-		m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::SHIELD, -10);
-	}
 }
 
 bool APlayerCharacter::TestMainHandPrimaryAttack()
@@ -448,6 +439,35 @@ void APlayerCharacter::TestEndAttack()
 	}
 
 	m_AbilityComponent->StopAbility();
+}
+
+FVector APlayerCharacter::GetSocketLocationFromPart(EEquippablePart part)
+{
+	if(part != EEquippablePart::RIGHT_HAND && part != EEquippablePart::LEFT_HAND)
+	{
+		return Super::GetSocketLocationFromPart(part);
+	}
+
+	if(m_HandsMesh == nullptr)
+	{
+		LOG_ERROR("[PLAYER CHARACTER] Tried to get socket location from hand part but HandsMesh was invalid");
+		return FVector::Zero();
+	}
+
+	FName socketName = GetSocketNameFromPart(part);
+
+	if (m_HandsMesh->DoesSocketExist(socketName) == false)
+	{
+		LOG_ERROR("[PLAYER CHARACTER] Tried to get socket location for socket that doesn't exist: %s", *socketName.ToString());
+		return FVector::Zero();
+	}
+
+	return m_HandsMesh->GetSocketLocation(socketName);
+}
+
+USkeletalMeshComponent* APlayerCharacter::GetEquipmentMesh()
+{
+	return m_HandsMesh;
 }
 
 void APlayerCharacter::AttackInputRelease()

@@ -20,8 +20,7 @@ struct FEquipmentMap
 
 class ABaseCharacter;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnSpellsUpdated, const TArray<FGameplayTag>& /*SpellTags*/);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnEquipmentUpdated, const FEquipmentMap& /*Equipment*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdate, const TArray<FLoadoutSlotData>& /*equipmentData*/, const TArray<FGameplayTag>& /*spellTags*/);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API ULoadoutComponent : public UActorComponent
@@ -40,19 +39,13 @@ protected:
 	friend class UGrimoire;
 	const TArray<FGameplayTag>& GetSpellTags() const;
 
-	// Called when the game starts
-	virtual void BeginPlay() override;
-
 private:
 	bool Contains(EEquippablePart part);
 
 public:
-	FOnSpellsUpdated OnSpellsUpdated;
-	FOnEquipmentUpdated OnEquipmentUpdated;
+	FOnUpdate OnUpdate;
 
 private:
-	TWeakObjectPtr<ABaseCharacter> m_Owner = nullptr;
-
-	TArray<TSharedPtr<FLoadoutSlotData>> m_Loadout;
+	TArray<FLoadoutSlotData> m_Loadout;
 	TArray<FGameplayTag> m_SpellTags;
 };

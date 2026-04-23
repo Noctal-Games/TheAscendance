@@ -26,43 +26,26 @@ void ULoadoutComponent::EquipItem(EEquippablePart part, const FGameplayTag& item
 		return;
 	}
 
-	if (m_Owner.IsValid() == false)
+	if (Contains(part))
 	{
-		m_Owner = Cast<ABaseCharacter>(GetOwner());
-
-		if(m_Owner.IsValid() == false)
+		//TODO: Add previous item back to inventory if we have one equipped in the slot already
+		for (auto& data : m_Loadout)
 		{
-			LOG_ERROR("[LOADOUT COMPONENT] LoadoutComponent has invalid owner");
-			return;
-		}
-	}
-
-	UnEquipItem(part);
-
-	if(m_Owner->EquipItem(part, itemTag) == false)
-	{
-		LOG_ERROR("[LOADOUT COMPONENT] %s failed to equip item %s", *m_Owner->GetName(), *itemTag.ToString());
-		return;
-	}
-
-	m_Loadout.Add(MakeShared<FLoadoutSlotData>(itemTag, part));
-	LOG_INFO("[LOADOUT COMPONENT] %s equipped item %s", *m_Owner->GetName(), *itemTag.ToString());
-
-	if (OnEquipmentUpdated.IsBound())
-	{
-		FEquipmentMap newMap;
-
-		for (const auto& data : m_Loadout)
-		{
-			if (data.IsValid() == false)
+			if (data.EquippedPart == part)
 			{
-				continue;
+				data.ItemTag = itemTag;
+				break;
 			}
-
-			newMap.Map.Add(data->EquippedPart, data->ItemTag);
 		}
+	}
+	else
+	{
+		m_Loadout.Add(FLoadoutSlotData(itemTag, part));
+	}
 
-		OnEquipmentUpdated.Broadcast(newMap);
+	if(OnUpdate.IsBound())
+	{
+		OnUpdate.Broadcast(m_Loadout, m_SpellTags);
 	}
 }
 
@@ -70,33 +53,19 @@ void ULoadoutComponent::UnEquipItem(EEquippablePart part)
 {
 	bool loadoutChanged = false;
 
-	for (const auto data : m_Loadout)
+	for (auto& data : m_Loadout)
 	{
-		if (data->EquippedPart == part)
+		if (data.EquippedPart == part)
 		{
-			LOG_INFO("[LOADOUT COMPONENT] %s unequipped item %s", *m_Owner->GetName(), *data->ItemTag.ToString());
-			m_Owner->UnEquipItem(part);
-			m_Loadout.Remove(data);
+			data.ItemTag = FGameplayTag();
 			loadoutChanged = true;
 			break;
 		}
 	}
 
-	if (loadoutChanged == true && OnEquipmentUpdated.IsBound())
+	if (loadoutChanged == true && OnUpdate.IsBound())
 	{
-		FEquipmentMap newMap;
-
-		for (const auto& data : m_Loadout)
-		{
-			if (data.IsValid() == false)
-			{
-				continue;
-			}
-
-			newMap.Map.Add(data->EquippedPart, data->ItemTag);
-		}
-
-		OnEquipmentUpdated.Broadcast(newMap);
+		OnUpdate.Broadcast(m_Loadout, m_SpellTags);
 	}
 }
 
@@ -110,9 +79,9 @@ void ULoadoutComponent::SetSpells(const TArray<FGameplayTag>& spellTags)
 
 	m_SpellTags = spellTags;
 
-	if (OnSpellsUpdated.IsBound())
+	if (OnUpdate.IsBound())
 	{
-		OnSpellsUpdated.Broadcast(spellTags);
+		OnUpdate.Broadcast(m_Loadout, m_SpellTags);
 	}
 }
 
@@ -125,17 +94,11 @@ bool ULoadoutComponent::Contains(EEquippablePart part)
 {
 	for (const auto data : m_Loadout)
 	{
-		if (data->EquippedPart == part)
+		if (data.EquippedPart == part)
 		{
 			return true;
 		}
 	}
 
 	return false;
-}
-
-// Called when the game starts
-void ULoadoutComponent::BeginPlay()
-{
-	Super::BeginPlay();
 }

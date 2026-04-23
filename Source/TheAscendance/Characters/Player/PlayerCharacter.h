@@ -67,6 +67,10 @@ public:
 	bool TestOffHandSecondaryAttack();
 	void TestEndAttack();
 
+	virtual FVector GetSocketLocationFromPart(EEquippablePart part) override;
+
+	virtual USkeletalMeshComponent* GetEquipmentMesh() override;
+
 	void AttackInputRelease();
 
 	UFUNCTION(BlueprintCallable)

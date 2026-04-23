@@ -3,6 +3,7 @@
 #include "HeldItem.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "TheAscendance/Characters/BaseCharacter.h"
 #include "TheAscendance/Items/Structs/ItemData.h"
 #include "TheAscendance/Items/Structs/WeaponData.h"
@@ -49,7 +50,7 @@ void AHeldItem::Init(FItemData* itemData)
 
 	if (m_Mesh.IsNull() == false)
 	{
-		UCoreFunctionLibrary::RequestAsyncLoad(m_Mesh.ToSoftObjectPath(), [this]() { SetStaticMesh(); });
+		UStreamableFunctionLibrary::RequestAsyncLoad(m_Mesh.ToSoftObjectPath(), [this]() { SetStaticMesh(); });
 	}
 
 	if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())

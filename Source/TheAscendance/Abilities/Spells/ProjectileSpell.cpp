@@ -4,6 +4,7 @@
 #include "ProjectileSpell.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "Structs/SpellData.h"
 #include "TheAscendance/Actors/Projectile/Interfaces/Projectile.h"
 #include "TheAscendance/Core/AbilityHelpers.h"
@@ -30,7 +31,7 @@ void UProjectileSpell::Init(UAbilityComponent* ownerComponent, UAbilityData* abi
 			return;
 		}
 
-		UCoreFunctionLibrary::RequestAsyncLoad(m_ProjectileNiagara.ToSoftObjectPath());
+		UStreamableFunctionLibrary::RequestAsyncLoad(m_ProjectileNiagara.ToSoftObjectPath());
 	}
 	else
 	{

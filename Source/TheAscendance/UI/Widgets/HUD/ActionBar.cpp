@@ -16,8 +16,6 @@ void UActionBar::Init(ULoadoutComponent* ownerLoadoutComponent)
 		return;
 	}
 
-	m_OnSpellsUpdatedHandled = m_OwnerLoadoutComponent->OnSpellsUpdated.AddUObject(this, &UActionBar::OnSpellsUpdated);
-	m_OnEquipmentUpdatedHandled = m_OwnerLoadoutComponent->OnEquipmentUpdated.AddUObject(this, &UActionBar::OnEquipmentUpdated);
 }
 
 void UActionBar::NativeConstruct()
@@ -29,8 +27,6 @@ void UActionBar::NativeDestruct()
 {
 	if (m_OwnerLoadoutComponent.IsValid())
 	{
-		m_OwnerLoadoutComponent->OnSpellsUpdated.Remove(m_OnSpellsUpdatedHandled);
-		m_OwnerLoadoutComponent->OnEquipmentUpdated.Remove(m_OnEquipmentUpdatedHandled);
 	}
 
 	Super::NativeDestruct();

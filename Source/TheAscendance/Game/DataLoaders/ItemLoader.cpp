@@ -59,7 +59,33 @@ FItemData* UItemLoader::GetItemData(const FGameplayTag& itemTag)
 		}
 	}
 
+	//Check Equipment Table as well since some items have their data there instead of the item table
 	LOG_ERROR("[ITEM LOADER] Could not load ItemData for Item: %s", *itemTag.ToString());
+	return nullptr;
+}
+
+FEquippableItemData* UItemLoader::GetEquipmentData(const FGameplayTag& itemTag)
+{
+	if (m_EquipmentTable == nullptr)
+	{
+		LOG_ERROR("[ITEM LOADER] Tried to load EquipmentData without a valid EquipmentTable");
+		return nullptr;
+	}
+
+	static const FString contextString(TEXT("Equipment Context String"));
+
+	TArray<FEquippableItemData*> equipmentStructs;
+	m_EquipmentTable->GetAllRows(contextString, equipmentStructs);
+
+	for (const auto data : equipmentStructs)
+	{
+		if (data->ItemTag == itemTag)
+		{
+			return data;
+		}
+	}
+
+	LOG_ERROR("[ITEM LOADER] Could not load EquipmentData for Item: %s", *itemTag.ToString());
 	return nullptr;
 }
 

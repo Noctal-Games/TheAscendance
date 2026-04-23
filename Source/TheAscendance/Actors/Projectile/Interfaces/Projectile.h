@@ -15,6 +15,7 @@ class UProjectile : public UInterface
 
 class IAbility;
 class UProjectileSpellData;
+class UNiagaraSystem;
 
 class THEASCENDANCE_API IProjectile
 {

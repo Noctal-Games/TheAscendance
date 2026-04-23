@@ -4,6 +4,7 @@
 #include "ActionBarIcon.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Items/Structs/ItemData.h"
 #include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
@@ -34,7 +35,7 @@ void UActionBarIcon::UpdateIcon()
 
 						if (m_Texture.IsNull() == false)
 						{
-							UCoreFunctionLibrary::RequestAsyncLoad(m_Texture.ToSoftObjectPath(), [this]() { SetIcon(); });
+							UStreamableFunctionLibrary::RequestAsyncLoad(m_Texture.ToSoftObjectPath(), [this]() { SetIcon(); });
 							return;
 						}
 					}
@@ -51,7 +52,7 @@ void UActionBarIcon::UpdateIcon()
 
 			if (m_Texture.IsNull() == false)
 			{
-				UCoreFunctionLibrary::RequestAsyncLoad(m_Texture.ToSoftObjectPath(), [this]() { SetIcon(); });
+				UStreamableFunctionLibrary::RequestAsyncLoad(m_Texture.ToSoftObjectPath(), [this]() { SetIcon(); });
 				return;
 			}
 		}

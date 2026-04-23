@@ -4,6 +4,7 @@
 #include "Item.h"
 #include "Structs/ItemData.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 
@@ -37,7 +38,7 @@ void AItem::Init(FItemData* itemData)
 
 	if (m_Mesh.IsNull() == false)
 	{
-		UCoreFunctionLibrary::RequestAsyncLoad(m_Mesh.ToSoftObjectPath(), [this]() { SetStaticMesh(); });
+		UStreamableFunctionLibrary::RequestAsyncLoad(m_Mesh.ToSoftObjectPath(), [this]() { SetStaticMesh(); });
 	}
 }
 

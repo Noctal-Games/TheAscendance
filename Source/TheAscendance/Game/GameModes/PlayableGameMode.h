@@ -18,6 +18,7 @@ class UItemLoader;
 class IAbility;
 class UAbilityComponent;
 struct FItemData;
+struct FEquippableItemData;
 struct FWeaponData;
 struct FWeaponTypeData;
 struct FSpellTableData;
@@ -33,6 +34,7 @@ public:
 	UEffectData* LoadEffectData(const FGameplayTag& effectTag) const;
 
 	FItemData* GetItemData(const FGameplayTag& itemTag) const;
+	FEquippableItemData* GetEquipmentData(const FGameplayTag& itemTag) const;
 	FWeaponData* GetWeaponData(const FGameplayTag& itemTag) const;
 	const FWeaponTypeData* GetWeaponTypeData(EWeaponType type) const;
 

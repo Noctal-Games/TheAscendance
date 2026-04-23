@@ -17,6 +17,7 @@ class UEffectHandlerComponent;
 class AHeldItem;
 class UCharacterTrajectoryComponent;
 class ULoadoutComponent;
+class UEquipmentManagerComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterDeath, ABaseCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTakeDamage);
@@ -94,6 +95,10 @@ public:
 	void TurnTowards(const FRotator& targetRotation);
 
 	FVector GetSocketLocation(FName socketName);
+	virtual FVector GetSocketLocationFromPart(EEquippablePart part);
+	FName GetSocketNameFromPart(EEquippablePart part);
+
+	virtual USkeletalMeshComponent* GetEquipmentMesh();
 
 	virtual float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None);
 
@@ -144,6 +149,9 @@ protected:
 	TObjectPtr<UCharacterTrajectoryComponent> m_CharacterTrajectoryComponent = nullptr;
 	UPROPERTY()
 	TObjectPtr<ULoadoutComponent> m_LoadoutComponent = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UEquipmentManagerComponent> m_EquipmentManagerComponent = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<AHeldItem> m_MainHandItem = nullptr;

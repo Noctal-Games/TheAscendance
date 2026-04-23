@@ -4,6 +4,7 @@
 #include "SpellInfoDisplay.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
 #include "TheAscendance/UI/Data/SpellDataEntryObject.h"
 
@@ -32,7 +33,7 @@ void USpellInfoDisplay::Init(const USpellDataEntryObject* spellDataEntry)
 
 	if (m_SpellData.IsNull() == false)
 	{
-		UCoreFunctionLibrary::RequestAsyncLoad(m_SpellData.ToSoftObjectPath(), [this]() { DisplaySpellData(); });
+		UStreamableFunctionLibrary::RequestAsyncLoad(m_SpellData.ToSoftObjectPath(), [this]() { DisplaySpellData(); });
 	}
 }
 

@@ -3,6 +3,7 @@
 
 #include "ChargedAbilityDecorator.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 
 void UChargedAbilityDecorator::Start()
 {
@@ -71,7 +72,7 @@ void UChargedAbilityDecorator::LoadAnimation()
 		return;
 	}
 
-	UCoreFunctionLibrary::RequestAsyncLoad(m_ChargingAnimation.ToSoftObjectPath());
+	UStreamableFunctionLibrary::RequestAsyncLoad(m_ChargingAnimation.ToSoftObjectPath());
 }
 
 void UChargedAbilityDecorator::SetToCharged()

@@ -53,6 +53,17 @@ FItemData* APlayableGameMode::GetItemData(const FGameplayTag& itemTag) const
 	return m_ItemLoader->GetItemData(itemTag);
 }
 
+FEquippableItemData* APlayableGameMode::GetEquipmentData(const FGameplayTag& itemTag) const
+{
+	if (m_ItemLoader == nullptr)
+	{
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid ItemLoader");
+		return nullptr;
+	}
+
+	return nullptr;
+}
+
 FWeaponData* APlayableGameMode::GetWeaponData(const FGameplayTag& itemTag) const
 {
 	if (m_ItemLoader == nullptr)

@@ -71,18 +71,12 @@ void UGrimoire::NativeConstruct()
 		return;
 	}
 
-	m_PlayerLoadout->OnSpellsUpdated.AddUObject(this, &UGrimoire::UpdateGrimoire);
 
 	UpdateGrimoire(m_PlayerLoadout->GetSpellTags());
 }
 
 void UGrimoire::NativeDestruct()
 {
-	if (m_PlayerLoadout != nullptr)
-	{
-		m_PlayerLoadout->OnSpellsUpdated.RemoveAll(this);
-	}
-
 	Super::NativeDestruct();
 }
 

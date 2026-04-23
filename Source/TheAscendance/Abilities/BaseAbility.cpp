@@ -4,6 +4,7 @@
 #include "BaseAbility.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "Structs/AbilityData.h"
 #include "Components/AbilityComponent.h"
 
@@ -37,7 +38,7 @@ void UBaseAbility::Init(UAbilityComponent* ownerComponent, UAbilityData* ability
 
 	m_Cooldown = abilityData->Cooldown;
 
-	UCoreFunctionLibrary::RequestAsyncLoad(m_AbilityAnimation.ToSoftObjectPath());
+	UStreamableFunctionLibrary::RequestAsyncLoad(m_AbilityAnimation.ToSoftObjectPath());
 
 	if (m_DecoratedSelf != nullptr)
 	{
@@ -135,7 +136,7 @@ void UBaseAbility::LoadHitNiagara()
 		return;
 	}
 
-	UCoreFunctionLibrary::RequestAsyncLoad(m_HitNiagara.ToSoftObjectPath());
+	UStreamableFunctionLibrary::RequestAsyncLoad(m_HitNiagara.ToSoftObjectPath());
 }
 
 const FGameplayTag& UBaseAbility::GetAbilityTag() const
