@@ -7,6 +7,7 @@
 #include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "Structs/AbilityData.h"
 #include "Components/AbilityComponent.h"
+#include "TheAscendance/Characters/Interfaces/Susceptible.h"
 
 #include "NiagaraFunctionLibrary.h"
 
@@ -107,6 +108,50 @@ void UBaseAbility::OnInputReleased()
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: RELEASED", *GetAbilityTag().ToString());
 }
 
+void UBaseAbility::OnOverlap(AActor* overlapActor, const FVector& overlapLocation, int damage)
+{
+	if (m_DecoratedSelf->DealDamage(overlapActor, damage) == false)
+	{
+		m_DecoratedSelf->ApplyEffects(overlapActor);
+	}
+}
+
+void UBaseAbility::OnHit(AActor* hitActor, const FVector& hitLocation)
+{
+	if (hitActor != nullptr && m_HitActors.Contains(hitActor) == false)
+	{
+		m_HitActors.Add(hitActor);
+	}
+}
+
+void UBaseAbility::ProcessHit(const FVector& hitLocation)
+{
+	for (auto actor : m_HitActors)
+	{
+		int damage = 0;
+		m_DecoratedSelf->ProcessHitDamage(damage, actor->GetActorLocation(), hitLocation);
+
+		if (m_DecoratedSelf->DealDamage(actor, damage) == false)
+		{
+			m_DecoratedSelf->ApplyEffects(actor);
+		}
+	}
+
+	m_DecoratedSelf->SpawnHitNiagara(hitLocation);
+	m_HitActors.Empty();
+}
+
+bool UBaseAbility::DealDamage(AActor* hitActor, int damage)
+{
+	if (ISusceptible* target = Cast<ISusceptible>(hitActor))
+	{
+		target->Damage(damage, true);
+		return target->IsDead();
+	}
+
+	return true;
+}
+
 void UBaseAbility::SpawnHitNiagara(const FVector& hitLocation)
 {
 	if (m_HitNiagara.IsValid() == false)
@@ -150,6 +195,11 @@ const FGameplayTag& UBaseAbility::GetAbilityTag() const
 	return m_AbilityData->AbilityTag;
 }
 
+TArray<TObjectPtr<AActor>> UBaseAbility::GetHitActors()
+{
+	return m_HitActors;
+}
+
 float UBaseAbility::PlayAnimMontageOnOwner(UAnimMontage* animation)
 {
 	if (m_OwnerComponent.IsValid() == false)
@@ -179,12 +229,25 @@ AActor* UBaseAbility::GetAbilityOwner()
 
 bool UBaseAbility::CanStart() const
 {
+	if (m_OwnerComponent == nullptr)
+	{
+		LOG_ERROR("[BASE ABILITY] CanStart was called but OwnerComponent is invalid");
+		return false;
+	}
+
+	if (m_AbilityData == nullptr)
+	{
+		LOG_ERROR("[BASE ABILITY] CanStart was called but AbilityData is invalid");
+		return false;
+	}
+
 	if (m_CooldownTimer > 0.0f)
 	{
 		return false;
 	}
 
-	return true;
+	float stat = m_OwnerComponent->GetOwnerStat(m_AbilityData->UsedStat);
+	return stat >= m_AbilityData->StatCost;
 }
 
 void UBaseAbility::Update(float deltaTime)
@@ -199,4 +262,17 @@ void UBaseAbility::Update(float deltaTime)
 
 void UBaseAbility::AffectOwnerStat()
 {
+	if (m_OwnerComponent == nullptr)
+	{
+		LOG_ERROR("[BASE ABILITY] AffectOwnerStat was called but OwnerComponent is invalid");
+		return;
+	}
+
+	if (m_AbilityData == nullptr)
+	{
+		LOG_ERROR("[BASE ABILITY] AffectOwnerStat was called but AbilityData is invalid");
+		return;
+	}
+
+	m_OwnerComponent->AffectOwnerStat(m_AbilityData->UsedStat, m_AbilityData->StatCost);
 }

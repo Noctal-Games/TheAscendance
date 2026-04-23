@@ -8,6 +8,7 @@
 #include "GameplayTagContainer.h"
 #include "TheAscendance/Abilities/Structs/AbilityModifierData.h"
 #include "TheAscendance/Abilities/Enums/AbilityType.h"
+#include "TheAscendance/Characters/Enums/CharacterStat.h"
 #include "AbilityData.generated.h"
 
 class UAnimMontage;
@@ -15,7 +16,7 @@ class USpellData;
 class UNiagaraSystem;
 
 //Make abstract
-UCLASS(BlueprintType)
+UCLASS(Abstract)
 class THEASCENDANCE_API UAbilityData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
@@ -23,7 +24,9 @@ class THEASCENDANCE_API UAbilityData : public UPrimaryDataAsset
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Ability"))
 	FGameplayTag AbilityTag;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ToolTip = "Mana cost for spells. Stamina cost for non-spells"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	ECharacterStat UsedStat = ECharacterStat::NONE;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int StatCost = 0;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Cooldown = 0.0f;
@@ -37,4 +40,25 @@ public:
 	TSoftObjectPtr<UNiagaraSystem> HitNiagara = nullptr;
 
 	EAbilityType AbilityType = EAbilityType::NONE;
+};
+
+USTRUCT(BlueprintType)
+struct FAbilityTableData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Ability"))
+	FGameplayTag AbilityTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName AbilityName = "";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FString AbilityDescription = "";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UTexture2D> AbilityIcon = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UAbilityData> AbilityData = nullptr;
 };

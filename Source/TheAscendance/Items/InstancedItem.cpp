@@ -19,26 +19,36 @@ void AInstancedItem::BeginPlay()
 		return;
 	}
 
-	if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
+
+	if (UItemRegistrySubsystem* registry = UCoreFunctionLibrary::GetItemRegistrySubsystem())
 	{
-		//Init(gameMode->GetItemData(m_InstanceTag));
-		
-		if (UItemRegistrySubsystem* registry = gameMode->GetGameInstance()->GetSubsystem<UItemRegistrySubsystem>())
+		if (const TSoftObjectPtr<UItemData>* itemRef = registry->GetItemRef(m_InstanceTag))
 		{
-			if (UItemDataAsset* itemDataAsset = registry->LoadItemData(m_InstanceTag))
-			{
-				LOG_WARNING("[INSTANCED ITEM] Successfully loaded ItemData for InstancedItem with tag: %s", *m_InstanceTag.ToString());
-			}
-			else
-			{
-				LOG_ERROR("[INSTANCED ITEM] Failed to load ItemData for InstancedItem with tag: %s", *m_InstanceTag.ToString());
-			}
+			m_ItemDataAsset = *itemRef;
+
+			TWeakObjectPtr<AInstancedItem> weakThis(this);
+
+			UStreamableFunctionLibrary::RequestAsyncLoad(m_ItemDataAsset.ToSoftObjectPath(), [weakThis]()
+				{
+					if (weakThis.IsValid())
+					{
+						weakThis->Test();
+					}
+				}
+			);
 		}
-	}
-	else
-	{
-		LOG_ERROR("[INSTANCED ITEM] Tried to create InstancedItem in world without PlayableGameMode");
+		else
+		{
+			LOG_ERROR("[INSTANCED ITEM] Failed to find ItemData asset for tag: %s", *m_InstanceTag.ToString());
+			return;
+		}
 	}
 }
 
-
+void AInstancedItem::Test()
+{
+	if (m_ItemDataAsset.IsValid())
+	{
+		Init(m_ItemDataAsset.Get());
+	}
+}

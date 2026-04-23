@@ -33,10 +33,18 @@ public:
 
 	virtual void OnInputReleased() override;
 
+	virtual void OnOverlap(AActor* overlapActor, const FVector& overlapLocation, int damage) override;
+	virtual void OnHit(AActor* hitActor, const FVector& hitLocation) override;
+	virtual void ProcessHit(const FVector& hitLocation) override;
+
+	virtual bool DealDamage(AActor* hitActor, int damage) override;
+
 	virtual void SpawnHitNiagara(const FVector& hitLocation) override;
 	virtual void LoadHitNiagara() override;
 
 	virtual const FGameplayTag& GetAbilityTag() const override;
+
+	virtual TArray<TObjectPtr<AActor>> GetHitActors() override;
 
 	virtual float PlayAnimMontageOnOwner(UAnimMontage* animation) override;
 	virtual UAbilityData* GetAbilityData() override;
@@ -55,6 +63,9 @@ protected:
 	TScriptInterface<IAbility> m_DecoratedSelf = nullptr;
 	UPROPERTY()
 	TWeakObjectPtr<UAbilityComponent> m_OwnerComponent = nullptr;
+
+	UPROPERTY()
+	TArray<TObjectPtr<AActor>> m_HitActors;
 private:
 	UPROPERTY()
 	TSoftObjectPtr<UAnimMontage> m_AbilityAnimation = nullptr;

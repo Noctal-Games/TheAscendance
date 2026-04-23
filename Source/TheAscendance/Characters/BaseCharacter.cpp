@@ -183,7 +183,7 @@ bool ABaseCharacter::MainHandPrimaryAttack()
 		return false;
 	}
 
-	m_IsMainHandAttacking = m_MainHandItem->StartPrimaryAttack();
+	//m_IsMainHandAttacking = m_MainHandItem->StartPrimaryAttack();
 
 	if (m_IsMainHandAttacking == true)
 	{
@@ -200,7 +200,7 @@ bool ABaseCharacter::MainHandSecondaryAttack()
 		return false;
 	}
 
-	m_IsMainHandAttacking = m_MainHandItem->StartSecondaryAttack();
+	//m_IsMainHandAttacking = m_MainHandItem->StartSecondaryAttack();
 
 	if (m_IsMainHandAttacking == true)
 	{
@@ -217,7 +217,7 @@ bool ABaseCharacter::OffHandPrimaryAttack()
 		return false;
 	}
 
-	m_IsOffHandAttacking = m_OffHandItem->StartPrimaryAttack();
+	//m_IsOffHandAttacking = m_OffHandItem->StartPrimaryAttack();
 
 	if (m_IsOffHandAttacking == true)
 	{
@@ -234,7 +234,7 @@ bool ABaseCharacter::OffHandSecondaryAttack()
 		return false;
 	}
 
-	m_IsOffHandAttacking = m_OffHandItem->StartSecondaryAttack();
+	//m_IsOffHandAttacking = m_OffHandItem->StartSecondaryAttack();
 
 	if (m_IsOffHandAttacking == true)
 	{
@@ -271,7 +271,7 @@ EWeaponType ABaseCharacter::MainHandWeaponType()
 		return EWeaponType::HAND;
 	}
 
-	return m_MainHandItem->GetWeaponType();
+	return EWeaponType::HAND;
 }
 
 EWeaponType ABaseCharacter::OffHandWeaponType()
@@ -281,7 +281,7 @@ EWeaponType ABaseCharacter::OffHandWeaponType()
 		return EWeaponType::HAND;
 	}
 
-	return m_OffHandItem->GetWeaponType();
+	return EWeaponType::HAND;
 }
 
 void ABaseCharacter::EndMainHandAttack()
@@ -292,7 +292,7 @@ void ABaseCharacter::EndMainHandAttack()
 	}
 
 	m_IsMainHandAttacking = false;
-	return m_MainHandItem->EndAttack();
+	return;
 }
 
 void ABaseCharacter::EndOffHandAttack()
@@ -303,7 +303,7 @@ void ABaseCharacter::EndOffHandAttack()
 	}
 
 	m_IsOffHandAttacking = false;
-	return m_OffHandItem->EndAttack();
+	return;
 }
 
 void ABaseCharacter::GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const

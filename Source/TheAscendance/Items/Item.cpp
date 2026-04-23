@@ -24,7 +24,7 @@ AItem::AItem()
 	m_MeshComponent->SetSimulatePhysics(true);
 }
 
-void AItem::Init(FItemData* itemData)
+void AItem::Init(UItemData* itemData)
 {
 	if (itemData == nullptr)
 	{
@@ -32,8 +32,7 @@ void AItem::Init(FItemData* itemData)
 		return;
 	}
 
-	m_ItemData = MakeShared<FItemData>(*itemData);
-
+	m_ItemData = itemData;
 	m_Mesh = m_ItemData->ItemMesh;
 
 	if (m_Mesh.IsNull() == false)
@@ -52,7 +51,7 @@ void AItem::SetStaticMesh()
 
 void AItem::Interact(APlayerCharacter* player)
 {
-	Super::Interact(player);
+	ABaseInteractableActor::Interact(player);
 
 	if (player == nullptr || m_ItemData == nullptr)
 	{

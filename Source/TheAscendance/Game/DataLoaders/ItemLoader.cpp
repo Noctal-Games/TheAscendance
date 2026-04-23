@@ -48,17 +48,6 @@ FItemData* UItemLoader::GetItemData(const FGameplayTag& itemTag)
 
 	static const FString contextString(TEXT("Item Context String"));
 
-	TArray<FItemData*> itemStructs;
-	m_ItemTable->GetAllRows(contextString, itemStructs);
-
-	for (const auto data : itemStructs)
-	{
-		if (data->ItemTag == itemTag)
-		{
-			return data;
-		}
-	}
-
 	//Check Equipment Table as well since some items have their data there instead of the item table
 	LOG_ERROR("[ITEM LOADER] Could not load ItemData for Item: %s", *itemTag.ToString());
 	return nullptr;
@@ -73,17 +62,6 @@ FEquippableItemData* UItemLoader::GetEquipmentData(const FGameplayTag& itemTag)
 	}
 
 	static const FString contextString(TEXT("Equipment Context String"));
-
-	TArray<FEquippableItemData*> equipmentStructs;
-	m_EquipmentTable->GetAllRows(contextString, equipmentStructs);
-
-	for (const auto data : equipmentStructs)
-	{
-		if (data->ItemTag == itemTag)
-		{
-			return data;
-		}
-	}
 
 	LOG_ERROR("[ITEM LOADER] Could not load EquipmentData for Item: %s", *itemTag.ToString());
 	return nullptr;

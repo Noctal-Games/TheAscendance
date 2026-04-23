@@ -12,5 +12,6 @@ enum class EAbilityType : uint8
 	NONE,
 	PROJECTILE_SPELL,
 	HITSCAN_SPELL,
-	LOCAL_SPELL
+	LOCAL_SPELL,
+	MELEE
 };

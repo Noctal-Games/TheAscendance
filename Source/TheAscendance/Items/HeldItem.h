@@ -4,16 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TheAscendance/Items/Enums/WeaponType.h"
 #include "HeldItem.generated.h"
 
-class ABaseCharacter;
-class UBoxComponent;
 class UStaticMeshComponent;
 class UStaticMesh;
-struct FItemData;
-struct FWeaponData;
-struct FWeaponTypeData;
+class UWeaponItemData;
 
 UCLASS()
 class THEASCENDANCE_API AHeldItem : public AActor
@@ -23,50 +18,19 @@ class THEASCENDANCE_API AHeldItem : public AActor
 public:	
 	AHeldItem();
 
-	void SetItemOwner(ABaseCharacter* owner);
-
-	void Init(FItemData* itemData);
-	void SetStaticMesh();
+	virtual void Init(UWeaponItemData* itemData);
 	void UnEquip();
 
-	bool StartPrimaryAttack();
-	bool StartSecondaryAttack();
-
-	void EndAttack();
-
-	EWeaponType GetWeaponType();
-
-	//void UpdateItem();
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+private:
+	void SetStaticMesh();
 
 private:
-	void EndPrimaryAttack();
-	void EndSecondaryAttack();
-
-protected:
-	friend class ABaseCharacter;
-
-	bool m_IsOffHand = false;
-private:
-	TWeakObjectPtr<ABaseCharacter> m_Owner = nullptr;
-
 	UPROPERTY();
-	TSoftObjectPtr<UStaticMesh> m_Mesh = nullptr;
+	TObjectPtr<UWeaponItemData> m_ItemData = nullptr;
 
 	UPROPERTY();
 	TObjectPtr<UStaticMeshComponent> m_MeshComponent = nullptr;
 
-	TSharedPtr<FItemData> m_ItemData = nullptr;
-	UPROPERTY()
-	TObjectPtr<UBoxComponent> m_Collider = nullptr;
-
-	UPROPERTY()
-	TArray<TObjectPtr<ABaseCharacter>> m_HitCharacters;
-
-	TSharedPtr<FWeaponData> m_WeaponData = nullptr;
-	TSharedPtr<FWeaponTypeData> m_WeaponTypeData = nullptr;
-
-	bool m_IsPrimaryAttacking = false;
+	UPROPERTY();
+	TSoftObjectPtr<UStaticMesh> m_Mesh = nullptr;
 };

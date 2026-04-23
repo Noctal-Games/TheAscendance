@@ -23,25 +23,6 @@ void UActionBarIcon::UpdateIcon()
 
 	if(m_EquipmentTag.IsValid() && m_EquipmentTag != FGameplayTag::EmptyTag)
 	{
-		if (FWeaponData* weaponData = gameMode->GetWeaponData(m_EquipmentTag))
-		{
-			if(const FWeaponTypeData* weaponTypeData = gameMode->GetWeaponTypeData(weaponData->WeaponType))
-			{
-				if(weaponTypeData->CastsSpell == false)
-				{
-					if (FItemData* itemData = gameMode->GetItemData(m_EquipmentTag))
-					{
-						m_Texture = itemData->ItemIcon;
-
-						if (m_Texture.IsNull() == false)
-						{
-							UStreamableFunctionLibrary::RequestAsyncLoad(m_Texture.ToSoftObjectPath(), [this]() { SetIcon(); });
-							return;
-						}
-					}
-				}
-			}
-		}
 	}
 
 	if(m_SpellTag.IsValid() && m_SpellTag != FGameplayTag::EmptyTag)

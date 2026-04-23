@@ -4,16 +4,15 @@
 #include "ItemRegistrySubsystem.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
-#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "TheAscendance/Items/Structs/ItemData.h"
 
 #include "Engine/AssetManager.h"
 
-UItemDataAsset* UItemRegistrySubsystem::LoadItemData(const FGameplayTag& itemTag)
+UItemData* UItemRegistrySubsystem::LoadItemData(const FGameplayTag& itemTag)
 {
     LOG_INFO("[ITEM REGISTRY] Loading ItemData asset for tag: %s", *itemTag.ToString());
 
-    TSoftObjectPtr<UItemDataAsset>* item = m_ItemMap.Find(itemTag);
+    TSoftObjectPtr<UItemData>* item = m_ItemMap.Find(itemTag);
 
     if (item == nullptr)
     {
@@ -21,7 +20,7 @@ UItemDataAsset* UItemRegistrySubsystem::LoadItemData(const FGameplayTag& itemTag
         return nullptr;
     }
 
-    UItemDataAsset* loadedItem = UStreamableFunctionLibrary::LoadAsset<UItemDataAsset>(item->ToSoftObjectPath());
+    UItemData* loadedItem = UStreamableFunctionLibrary::LoadAsset<UItemData>(item->ToSoftObjectPath());
 
     if (loadedItem == nullptr)
     {
@@ -33,24 +32,15 @@ UItemDataAsset* UItemRegistrySubsystem::LoadItemData(const FGameplayTag& itemTag
 	return loadedItem;
 }
 
-const UItemDataAsset* UItemRegistrySubsystem::GetItemData(const FGameplayTag& itemTag) const
+const TSoftObjectPtr<UItemData>* UItemRegistrySubsystem::GetItemRef(const FGameplayTag& itemTag)
 {
-    LOG_INFO("[ITEM REGISTRY] Attempting to Get ItemData asset for tag: %s", *itemTag.ToString());
-
-    if (const TSoftObjectPtr<UItemDataAsset>* item = m_ItemMap.Find(itemTag))
+    if (m_ItemMap.Contains(itemTag) == false)
     {
-		UItemDataAsset* loadedItem = item->Get();
-
-        if (loadedItem == nullptr)
-        {
-			LOG_ERROR("[ITEM REGISTRY] Failed to get item data asset for tag: %s. Item was not loaded beforehand", *itemTag.ToString());
-        }
-
-        return loadedItem;
+        LOG_ERROR("[ITEM REGISTRY] Registry doesn't contain ItemData asset tag: %s", *itemTag.ToString());
+        return nullptr;
     }
 
-    LOG_ERROR("[ITEM REGISTRY] Failed to get item data asset for tag: %s. Item was not found in the Registry", *itemTag.ToString());
-    return nullptr;
+    return &m_ItemMap[itemTag];
 }
 
 void UItemRegistrySubsystem::Initialize(FSubsystemCollectionBase& collection)
@@ -68,14 +58,14 @@ void UItemRegistrySubsystem::BuildRegistry()
     IAssetRegistry& assetRegistry = assetRegistryModule.Get();
     TArray<FAssetData> assetDataList;
 
-    assetRegistry.GetAssetsByClass(UItemDataAsset::StaticClass()->GetClassPathName(), assetDataList);
+    assetRegistry.GetAssetsByClass(UItemData::StaticClass()->GetClassPathName(), assetDataList, true);
 
     for (const FAssetData& assetData : assetDataList)
     {
-        for (const auto& Tag : assetData.TagsAndValues)
-        {
-            LOG_WARNING("TAG: %s == %s", *Tag.Key.ToString(), *Tag.Value.AsString());
-        }
+        //for (const auto& Tag : assetData.TagsAndValues)
+        //{
+        //    LOG_WARNING("TAG: %s == %s", *Tag.Key.ToString(), *Tag.Value.AsString());
+        //}
 
         FName itemTagName;
         if (assetData.GetTagValue("ItemTag", itemTagName) == false)
@@ -99,7 +89,7 @@ void UItemRegistrySubsystem::BuildRegistry()
             continue;
         }
 
-        TSoftObjectPtr<UItemDataAsset> softItem(assetPath);
+        TSoftObjectPtr<UItemData> softItem(assetPath);
         m_ItemMap.Add(itemTag, softItem);
         LOG_INFO("[ITEM REGISTRY] Registered item: %s -> %s",*itemTag.ToString(), *assetPath.ToString());
     }

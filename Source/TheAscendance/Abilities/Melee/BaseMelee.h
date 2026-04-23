@@ -3,16 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "TheAscendance/Abilities/BaseAbility.h"
-#include "BaseSpell.generated.h"
+#include "BaseMelee.generated.h"
 
-class USpellData;
-class UNiagaraSystem;
-
-UCLASS(Abstract)
-class THEASCENDANCE_API UBaseSpell : public UBaseAbility
+/**
+ * 
+ */
+UCLASS()
+class THEASCENDANCE_API UBaseMelee : public UBaseAbility
 {
 	GENERATED_BODY()
-
+	
 };

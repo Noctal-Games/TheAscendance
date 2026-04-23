@@ -8,6 +8,7 @@
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Characters/BaseCharacter.h"
 #include "TheAscendance/Items/Structs/ItemData.h"
+#include "TheAscendance/Game/Subsystems/ItemRegistrySubsystem.h"
 
 // Sets default values for this component's properties
 UEquipmentManagerComponent::UEquipmentManagerComponent()
@@ -69,7 +70,6 @@ void UEquipmentManagerComponent::Init(ABaseCharacter* owner, UAbilityComponent* 
 			continue;
 		}
 
-		newItem->SetItemOwner(m_Owner.Get());
 		newItem->UnEquip();
 
 		newItem->SetActorLocation(m_Owner->GetSocketLocationFromPart(part));
@@ -112,11 +112,11 @@ void UEquipmentManagerComponent::OnLoadoutUpdated(const TArray<FLoadoutSlotData>
 			continue;
 		}
 
-		FItemData* itemData = nullptr;
+		UWeaponItemData* itemData = nullptr;
 
-		if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
+		if (UItemRegistrySubsystem* registry = UCoreFunctionLibrary::GetGameWorld()->GetGameInstance()->GetSubsystem<UItemRegistrySubsystem>())
 		{
-			itemData = gameMode->GetItemData(data.ItemTag);
+			itemData = registry->LoadItemData<UWeaponItemData>(data.ItemTag);
 		}
 
 		if (itemData == nullptr)

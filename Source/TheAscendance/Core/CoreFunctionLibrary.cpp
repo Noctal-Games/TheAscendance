@@ -140,6 +140,17 @@ UGameEventSubsystem* UCoreFunctionLibrary::GetGameEventSubsystem()
 	return nullptr;
 }
 
+UItemRegistrySubsystem* UCoreFunctionLibrary::GetItemRegistrySubsystem()
+{
+	if (UWorld* world = GetGameWorld())
+	{
+		return world->GetGameInstance()->GetSubsystem<UItemRegistrySubsystem>();
+	}
+
+	LOG_ERROR("[CORE FUNCTION LIBRARY] GameWorld was invalid");
+	return nullptr;
+}
+
 void UCoreFunctionLibrary::ClearTimerHandle(FTimerHandle& inHandle, const FString handleName)
 {
 	if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())

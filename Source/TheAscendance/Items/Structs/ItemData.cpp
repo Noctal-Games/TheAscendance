@@ -1,13 +1,13 @@
 #include "ItemData.h"
 // Fill out your copyright notice in the Description page of Project Settings.
 
-void UItemDataAsset::GetAssetRegistryTags(TArray<FAssetRegistryTag>& outTags) const
+void UItemData::GetAssetRegistryTags(FAssetRegistryTagsContext context) const
 {
-    Super::GetAssetRegistryTags(outTags);
-
-    outTags.Add(FAssetRegistryTag(
+    context.AddTag(FAssetRegistryTag(
         TEXT("ItemTag"),
         ItemTag.ToString(),
-        FAssetRegistryTag::TT_Alphabetical
+        FAssetRegistryTag::TT_Hidden
     ));
+
+    Super::GetAssetRegistryTags(context);
 }
