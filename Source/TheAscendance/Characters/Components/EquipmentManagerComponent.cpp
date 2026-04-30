@@ -9,6 +9,8 @@
 #include "TheAscendance/Characters/BaseCharacter.h"
 #include "TheAscendance/Items/Structs/ItemData.h"
 #include "TheAscendance/Game/Subsystems/ItemRegistrySubsystem.h"
+#include "TheAscendance/Characters/Components/LoadoutComponent.h"
+#include "TheAscendance/Abilities/Components/AbilityComponent.h"
 
 // Sets default values for this component's properties
 UEquipmentManagerComponent::UEquipmentManagerComponent()
@@ -20,7 +22,7 @@ UEquipmentManagerComponent::UEquipmentManagerComponent()
 	// ...
 }
 
-void UEquipmentManagerComponent::Init(ABaseCharacter* owner, UAbilityComponent* abilityComponent)
+void UEquipmentManagerComponent::Init(ABaseCharacter* owner, UAbilityComponent* abilityComponent, ULoadoutComponent* loadoutComponent)
 {
 	m_Owner = owner;
 
@@ -38,6 +40,16 @@ void UEquipmentManagerComponent::Init(ABaseCharacter* owner, UAbilityComponent* 
 		return;
 	}
 
+	m_LoadoutComponent = loadoutComponent;
+
+	if (m_LoadoutComponent == nullptr)
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] Loadout Component is invalid.");
+		return;
+	}
+
+	m_LoadoutComponent->OnSpellsUpdate.AddUObject(this, &UEquipmentManagerComponent::UpdateAbilities);
+
 	UWorld* world = UCoreFunctionLibrary::GetGameWorld();
 	
 	if (world == nullptr)
@@ -45,7 +57,6 @@ void UEquipmentManagerComponent::Init(ABaseCharacter* owner, UAbilityComponent* 
 		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] World is invalid.");
 		return;
 	}
-
 
 	USkeletalMeshComponent* mesh = m_Owner->GetEquipmentMesh();
 
@@ -79,58 +90,154 @@ void UEquipmentManagerComponent::Init(ABaseCharacter* owner, UAbilityComponent* 
 	}
 }
 
-void UEquipmentManagerComponent::EquipItem(const FGameplayTag& itemTag)
+void UEquipmentManagerComponent::EquipItem(const FGameplayTag& itemTag, EEquippablePart part)
 {
+	if(m_LoadoutComponent == nullptr)
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] Tried to Equip but Loadout Component is invalid.");
+		return;
+	}
+
+	if (itemTag.IsValid() == false)
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] Tried to equip invalid ItemTag");
+		return;
+	}
+
+	UEquippableItemData* itemData = nullptr;
+
+	if (UItemRegistrySubsystem* registry = UCoreFunctionLibrary::GetGameWorld()->GetGameInstance()->GetSubsystem<UItemRegistrySubsystem>())
+	{
+		itemData = registry->LoadItemData<UEquippableItemData>(itemTag);
+	}
+
+	if (itemData == nullptr)
+	{
+		LOG_WARNING("[EQUIPMENT MANAGER COMPONENT] ItemData was invalid when attempting to equip item: %s... Either the item doesn't exist, or is not of an equippable type", *itemTag.ToString());
+		return;
+	}
+
+	switch (itemData->EquipmentSlotUsed)
+	{
+		case EEquipmentSlot::ONE_HAND:
+			if (part != EEquippablePart::RIGHT_HAND && part != EEquippablePart::LEFT_HAND)
+			{
+				LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] Tried to equip a ONE_HAND item to a non-hand part", *itemTag.ToString());
+				return;
+			}
+		case EEquipmentSlot::TWO_HAND:
+			if (part != EEquippablePart::RIGHT_HAND && part != EEquippablePart::LEFT_HAND)
+			{
+				LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] Tried to equip a TWO_HAND item to a non-hand part", *itemTag.ToString());
+				return;
+			}
+
+			if (m_LoadoutComponent->IsPartEquipped(EEquippablePart::RIGHT_HAND) == false && m_LoadoutComponent->IsPartEquipped(EEquippablePart::LEFT_HAND) == false)
+			{
+				break;
+			}
+			else
+			{
+				LOG_INFO("[EQUIPMENT MANAGER COMPONENT] Tried to equip TWO_HAND item, but one or both hands were already equipped.");
+				break;
+			}
+
+		default:
+			if (m_LoadoutComponent->IsPartEquipped(part) == false)
+			{
+				break;
+			}
+
+			LOG_INFO("[EQUIPMENT MANAGER COMPONENT] Tried to equip item: %s to part: %s but it is already equipped.", *itemTag.ToString(), *UEnum::GetValueAsString(part));
+			return;
+	}
+
+	if (m_Equipment.Contains(part) == false)
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] EquipmentManager does not hold an item reference for: %s", *UEnum::GetValueAsString(part));
+		return;
+	}
+
+	TWeakObjectPtr<AHeldItem> heldItem = m_Equipment[part];
+
+	if (heldItem == nullptr)
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] EquipmentManager does not hold a reference to a valid Item Object for: %s", *UEnum::GetValueAsString(part));
+		return;
+	}
+
+	if (itemData->EquipmentSlotUsed == EEquipmentSlot::TWO_HAND)
+	{			
+		//LEFT OR RIGHT HAND already validated, other parts are not possible at this point
+		part == EEquippablePart::RIGHT_HAND ? m_LoadoutComponent->BlockEquipItem(EEquippablePart::LEFT_HAND) : m_LoadoutComponent->BlockEquipItem(EEquippablePart::RIGHT_HAND);
+	}
+
+	m_LoadoutComponent->EquipItem(part, itemTag);
+
+	heldItem->Init(Cast<UWeaponItemData>(itemData));
+	UpdateAbilities();
 }
 
 void UEquipmentManagerComponent::UnEquipItem(EEquippablePart part)
 {
+	if (m_LoadoutComponent == nullptr)
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] Tried to UnEquip but Loadout Component is invalid.");
+		return;
+	}
+
+	if (m_Equipment.Contains(part) == false)
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] EquipmentManager does not hold an item reference for: %s", *UEnum::GetValueAsString(part));
+		return;
+	}
+
+	AHeldItem* heldItem = m_Equipment[part];
+
+	if (heldItem == nullptr)
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] EquipmentManager does not hold a reference to a valid Item Object for: %s", *UEnum::GetValueAsString(part));
+		return;
+	}
+
+	UEquippableItemData* itemData = nullptr;//heldItem->GetData();
+
+	if (itemData == nullptr)
+	{
+		LOG_WARNING("[EQUIPMENT MANAGER COMPONENT] ItemData was invalid when attempting to unequip part: %s... Either the part has no equipped item, or the item contains invalid data (logged internally)", *UEnum::GetValueAsString(part));
+		return;
+	}
+
+	if (itemData->EquipmentSlotUsed == EEquipmentSlot::TWO_HAND)
+	{
+		//LEFT OR RIGHT HAND already validated, other parts are not possible at this point
+		part == EEquippablePart::RIGHT_HAND ? m_LoadoutComponent->UnEquipItem(EEquippablePart::LEFT_HAND) : m_LoadoutComponent->UnEquipItem(EEquippablePart::RIGHT_HAND);
+	}
+
+	m_LoadoutComponent->UnEquipItem(part);
+	UpdateAbilities();
 }
 
-void UEquipmentManagerComponent::OnLoadoutUpdated(const TArray<FLoadoutSlotData>& equipmentData, const TArray<FGameplayTag>& spellTags)
+void UEquipmentManagerComponent::UpdateAbilities()
 {
-	for(const auto& data : equipmentData)
+	if(m_AbilityComponent == nullptr)
 	{
-		//EquipPart should never be NONE as the LoadoutComponent should filter these out
-		if (m_Equipment.Contains(data.EquippedPart) == false)
-		{
-			LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] EquipmentManager does not hold a reference for: %s", *UEnum::GetValueAsString(data.EquippedPart));
-			continue;
-		}
-
-		TWeakObjectPtr<AHeldItem> heldItem = m_Equipment[data.EquippedPart];
-
-		if (heldItem == nullptr)
-		{
-			LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] EquipmentManager does not hold a reference to a valid Item Object for: %s", *UEnum::GetValueAsString(data.EquippedPart));
-			continue;
-		}
-
-		if (data.ItemTag.IsValid() == false)
-		{
-			heldItem->UnEquip();
-			continue;
-		}
-
-		UWeaponItemData* itemData = nullptr;
-
-		if (UItemRegistrySubsystem* registry = UCoreFunctionLibrary::GetGameWorld()->GetGameInstance()->GetSubsystem<UItemRegistrySubsystem>())
-		{
-			itemData = registry->LoadItemData<UWeaponItemData>(data.ItemTag);
-		}
-
-		if (itemData == nullptr)
-		{
-			LOG_WARNING("[EQUIPMENT MANAGER COMPONENT] ItemData was invalid when attempting to equip item: %s... Unequipping the target part entirely as a failsafe.", *data.ItemTag.ToString())
-			heldItem->UnEquip();
-		}
-		else
-		{
-			heldItem->Init(itemData);
-		}
-
-		// Get Item Weapon Data if valid and determine active ability, then provide ability tag to component
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] Tried to Update Abilities but Ability Component is invalid.");
+		return;
 	}
+
+	const TArray<FGameplayTag>& abilityTags = m_LoadoutComponent->GetSpellTags();
+
+	if (AHeldItem* heldItem = m_Equipment[EEquippablePart::LEFT_HAND])
+	{
+		//Get attack data and process
+	}
+	if (AHeldItem* heldItem = m_Equipment[EEquippablePart::RIGHT_HAND])
+	{
+		//Get attack data and process
+	}
+
+	m_AbilityComponent->SetAbilities(abilityTags);
 }
 
 // Called when the game starts

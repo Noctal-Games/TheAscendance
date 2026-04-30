@@ -17,7 +17,7 @@ UAbilityComponent::UAbilityComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	m_Abilities.SetNum(MaxAbilities);
+	m_Abilities.SetNum(UAbilityHelpers::MaxAbilities);
 }
 
 void UAbilityComponent::SetAbilities(const TArray<FGameplayTag>& abilityTags)
@@ -28,9 +28,63 @@ void UAbilityComponent::SetAbilities(const TArray<FGameplayTag>& abilityTags)
 		return;
 	}
 
-	check(m_Abilities.Num() == MaxAbilities);
+	check(m_Abilities.Num() == UAbilityHelpers::MaxAbilities);
+	//check(abilityTags.Num() == MaxAbilities);
 
-	int maxCount = FMath::Min(abilityTags.Num(), MaxAbilities);
+	int maxCount = FMath::Min(abilityTags.Num(), UAbilityHelpers::MaxAbilities);
+
+	for (int i = 0; i < maxCount; i++)
+	{
+		if (abilityTags[i].IsValid() == false)
+		{
+			if (m_Abilities[i] != nullptr)
+			{
+				m_Abilities[i] = nullptr;
+			}
+
+			continue;
+		}
+
+		if (m_Abilities.IsValidIndex(i) == false)
+		{
+			LOG_ERROR("[ABILITY COMPONENT] SetSpells iterator went out of valid range");
+			return;
+		}
+
+		if (IAbility* ability = m_Abilities[i].GetInterface())
+		{
+			if (ability->GetAbilityTag() == abilityTags[i])
+			{
+				//No Change
+				continue;
+			}
+		}
+
+		//Below failure checks are already logged internally
+		if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
+		{
+			if (IAbility* ability = gameMode->CreateAbilityFromTag(abilityTags[i], this))
+			{
+				m_Abilities[i] = ability->_getUObject();
+			}
+		}
+	}
+
+	TriggerOnAbilitiesUpdate();
+}
+
+void UAbilityComponent::TestSetAbilities(const TArray<FGameplayTag>& abilityTags)
+{
+	if (m_Owner == nullptr)
+	{
+		LOG_ERROR("[ABILITY COMPONENT] SetAbilities was called but Owner is invalid");
+		return;
+	}
+
+	check(m_Abilities.Num() == UAbilityHelpers::MaxAbilities);
+	check(abilityTags.Num() == UAbilityHelpers::MaxAbilities);
+
+	int maxCount = FMath::Min(abilityTags.Num(), UAbilityHelpers::MaxAbilities);
 
 	for (int i = 0; i < maxCount; i++)
 	{
@@ -70,64 +124,20 @@ void UAbilityComponent::SetAbilities(const TArray<FGameplayTag>& abilityTags)
 	}
 }
 
-void UAbilityComponent::TestSetAbilities(const TArray<TObjectPtr<UAbilityData>>& abilities)
+void UAbilityComponent::StartAbility(UAbilityHelpers::EAbilitySlot slot)
 {
-	if (m_Factory == nullptr)
-	{
-		m_Factory = MakeUnique<AbilityFactory>();
-	}
+	//for(const auto& ability : m_Abilities)
+	//{
+	//	if (ability == nullptr)
+	//	{
+	//		continue;
+	//	}
 
-	if (m_Owner == nullptr)
-	{
-		LOG_ERROR("[ABILITY COMPONENT] SetAbilities was called but Owner is invalid");
-		return;
-	}
-
-	check(m_Abilities.Num() == MaxAbilities);
-
-	int maxCount = FMath::Min(abilities.Num(), MaxAbilities);
-
-	for (int i = 0; i < maxCount; i++)
-	{
-		if (abilities[i] == nullptr)
-		{
-			if (m_Abilities[i] != nullptr)
-			{
-				m_Abilities[i] = nullptr;
-			}
-
-			continue;
-		}
-
-		if (m_Abilities.IsValidIndex(i) == false)
-		{
-			LOG_ERROR("[ABILITY COMPONENT] SetSpells iterator went out of valid range");
-			return;
-		}
-
-		if (IAbility* ability = m_Abilities[i].GetInterface())
-		{
-			if (ability->GetAbilityTag() == abilities[i]->AbilityTag)
-			{
-				//No Change
-				continue;
-			}
-		}
-
-		if (IAbility* ability = m_Factory->CreateAbility(abilities[i], this))
-		{
-			m_Abilities[i] = ability->_getUObject();
-		}
-	}
-}
-
-void UAbilityComponent::StartAbility(int slot)
-{
-	if (slot - 1 < 0 || slot > m_Abilities.Num())
-	{
-		LOG_ERROR("[ABILITY COMPONENT] Tried to StartAbility from a slot that is out of range");
-		return;
-	}
+	//	if (ability->CanStart())
+	//	{
+	//		return;
+	//	}
+	//}
 
 	if (m_Abilities[slot - 1] == nullptr)
 	{
@@ -188,6 +198,29 @@ float UAbilityComponent::PlayAnimMontageOnOwner(UAnimMontage* animation)
 	}
 
 	return m_Owner->PlayAnimationMontage(animation);
+}
+
+void UAbilityComponent::TriggerOnAbilitiesUpdate()
+{
+	TArray<FAbilityInfo> abilityInfo;
+
+	for(const auto& ability : m_Abilities)
+	{
+		if (ability == nullptr)
+		{
+			abilityInfo.Add(FAbilityInfo());
+			continue;
+		}
+
+		if(UAbilityData* data = ability->GetAbilityData())
+		{
+			FAbilityInfo info;
+			info.Icon = data->AbilityIcon;
+			abilityInfo.Add(info);
+		}
+	}
+
+	OnAbilitiesUpdate.Broadcast(abilityInfo);
 }
 
 FVector UAbilityComponent::GetCastLocation()

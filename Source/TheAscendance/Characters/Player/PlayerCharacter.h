@@ -51,6 +51,7 @@ public:
 	virtual void OnMovementModeChanged(EMovementMode prevMovementMode, uint8 previousCustomMode) override;
 
 	UCameraComponent* GetCamera();
+	UAbilityComponent* GetAbilityComponent();
 
 	virtual float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None) override;
 

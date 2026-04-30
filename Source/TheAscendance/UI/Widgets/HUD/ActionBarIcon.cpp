@@ -11,62 +11,30 @@
 
 #include "Components/Image.h"
 
-void UActionBarIcon::UpdateIcon()
+void UActionBarIcon::LoadAbilityIcon(const TSoftObjectPtr<UTexture2D>& icon)
 {
-	APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode();
+	m_Texture = icon;
 
-	if(gameMode == nullptr)
+	if (m_Texture.IsNull() == false)
 	{
-		LOG_ERROR("[ACTION BAR ICON] Failed to update icon - GameMode was invalid");
+		UStreamableFunctionLibrary::RequestAsyncLoad(m_Texture.ToSoftObjectPath(), [this]() { SetIcon(); });
 		return;
 	}
 
-	if(m_EquipmentTag.IsValid() && m_EquipmentTag != FGameplayTag::EmptyTag)
-	{
-	}
+	LOG_ERROR("[ACTION BAR ICON] Failed to load icon - Texture was invalid. Using default");
+	ClearAbilityIcon();
+}
 
-	if(m_SpellTag.IsValid() && m_SpellTag != FGameplayTag::EmptyTag)
-	{
-		if (const FSpellTableData* spellData = gameMode->GetSpellTableData(m_SpellTag))
-		{
-			m_Texture = spellData->SpellIcon;
-
-			if (m_Texture.IsNull() == false)
-			{
-				UStreamableFunctionLibrary::RequestAsyncLoad(m_Texture.ToSoftObjectPath(), [this]() { SetIcon(); });
-				return;
-			}
-		}
-	}
-
+void UActionBarIcon::ClearAbilityIcon()
+{
 	m_ActionIconImage->SetBrushFromTexture(EmptyActionIcon);
-}
-
-void UActionBarIcon::SetSpellTag(const FGameplayTag& spellTag)
-{
-	if(m_SpellTag != spellTag)
-	{
-		m_SpellTag = spellTag;
-		UpdateIcon();
-	}
-}
-
-void UActionBarIcon::SetEquipmentTag(const FGameplayTag& equipmentTag)
-{
-	LOG_ONSCREEN(-1, 5.0f, FColor::Green, "%s", *equipmentTag.ToString());
-
-	if(m_EquipmentTag != equipmentTag)
-	{
-		m_EquipmentTag = equipmentTag;
-		UpdateIcon();
-	}
 }
 
 void UActionBarIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	m_ActionIconImage->SetBrushFromTexture(EmptyActionIcon);
+	ClearAbilityIcon();
 }
 
 void UActionBarIcon::NativeDestruct()
@@ -83,6 +51,6 @@ void UActionBarIcon::SetIcon()
 	else
 	{
 		LOG_ERROR("[ACTION BAR ICON] Failed to set icon - Texture was invalid. Using default");
-		m_ActionIconImage->SetBrushFromTexture(EmptyActionIcon);
+		ClearAbilityIcon();
 	}
 }

@@ -19,6 +19,16 @@ class THEASCENDANCE_API UAbilityHelpers : public UObject
 public:
 	static IProjectile* SpawnProjectile(IAbility* owningAbility, const FVector& spawnLocation = FVector::ZeroVector, TArray<TInstancedStruct<FProjectileModifier>>* modifiers = nullptr);
 
+public:
+	static constexpr int MaxAbilities = 4;
+	static enum EAbilitySlot
+	{
+		MAINHAND_PRIMARY = 1,
+		MAINHAND_ALT = 2,
+		OFFHAND_PRIMARY = 3,
+		OFFHAND_ALT = 4
+	};
+
 private:
 	static TUniquePtr<ProjectileFactory> m_ProjectileFactory;
 };

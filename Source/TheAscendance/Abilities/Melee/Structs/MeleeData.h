@@ -6,6 +6,19 @@
 #include "TheAscendance/Abilities/Structs/AbilityData.h"
 #include "MeleeData.generated.h"
 
+USTRUCT()
+struct FMeleeAbilityData
+{
+	GENERATED_BODY()
+
+	FMeleeAbilityData() {};
+
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "Ability.Melee"))
+	FGameplayTag AbilityTag;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Bonus flat damage, will be applied to all damage sources in the ability"))
+	float BonusDamage = 0.0f;
+};
+
 UCLASS(BlueprintType)
 class THEASCENDANCE_API UMeleeData : public UAbilityData
 {

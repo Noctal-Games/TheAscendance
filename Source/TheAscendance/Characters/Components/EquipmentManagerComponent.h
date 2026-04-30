@@ -10,10 +10,11 @@
 #include "EquipmentManagerComponent.generated.h"
 
 class UAbilityComponent;
+class ULoadoutComponent;
 class ABaseCharacter;
 class AHeldItem;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class THEASCENDANCE_API UEquipmentManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -22,14 +23,14 @@ public:
 	// Sets default values for this component's properties
 	UEquipmentManagerComponent();
 
-	void Init(ABaseCharacter* owner, UAbilityComponent* abilityComponent);
+	void Init(ABaseCharacter* owner, UAbilityComponent* abilityComponent, ULoadoutComponent* loadoutComponent);
 
-	void EquipItem(const FGameplayTag& itemTag);
+	void EquipItem(const FGameplayTag& itemTag, EEquippablePart part);
 	void UnEquipItem(EEquippablePart part);
 
-	void OnLoadoutUpdated(const TArray<FLoadoutSlotData>& equipmentData, const TArray<FGameplayTag>& spellTags);
-
 protected:
+	void UpdateAbilities();
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
@@ -42,4 +43,6 @@ private:
 
 	UPROPERTY()
 	TWeakObjectPtr<UAbilityComponent> m_AbilityComponent = nullptr;
+	UPROPERTY()
+	TWeakObjectPtr<ULoadoutComponent> m_LoadoutComponent = nullptr;
 };

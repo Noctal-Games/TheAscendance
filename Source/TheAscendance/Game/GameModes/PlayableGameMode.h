@@ -16,6 +16,7 @@ class ABaseEnemy;
 class UAbilityLoader;
 class UItemLoader;
 class IAbility;
+class UAbilityData;
 class UAbilityComponent;
 struct FItemData;
 struct FEquippableItemData;
@@ -41,6 +42,7 @@ public:
 	const FSpellTableData* GetSpellTableData(const FGameplayTag& spellTag) const;
 
 	IAbility* CreateAbilityFromTag(const FGameplayTag& abilityTag, UAbilityComponent* owner) const;
+	UAbilityData* GetAbilityData(const FGameplayTag& abilityTag) const;
 
 	UFUNCTION(BlueprintCallable)
 	ABaseEnemy* CreateEnemyFromID(int enemyID) const;

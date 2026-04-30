@@ -20,7 +20,7 @@ struct FEquipmentMap
 
 class ABaseCharacter;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnUpdate, const TArray<FLoadoutSlotData>& /*equipmentData*/, const TArray<FGameplayTag>& /*spellTags*/);
+DECLARE_MULTICAST_DELEGATE(FOnSpellsUpdate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API ULoadoutComponent : public UActorComponent
@@ -32,18 +32,22 @@ public:
 	ULoadoutComponent();
 
 	void EquipItem(EEquippablePart part, const FGameplayTag& itemTag);
+	void BlockEquipItem(EEquippablePart part);
 	void UnEquipItem(EEquippablePart part);
 
 	void SetSpells(const TArray<FGameplayTag>& spellTags);
+
+	bool IsPartEquipped(const EEquippablePart& part);
 protected:
 	friend class UGrimoire;
+	friend class UEquipmentManagerComponent;
 	const TArray<FGameplayTag>& GetSpellTags() const;
 
 private:
 	bool Contains(EEquippablePart part);
 
-public:
-	FOnUpdate OnUpdate;
+protected:
+	FOnSpellsUpdate OnSpellsUpdate;
 
 private:
 	TArray<FLoadoutSlotData> m_Loadout;

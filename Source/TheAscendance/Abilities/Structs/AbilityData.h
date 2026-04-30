@@ -25,6 +25,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Ability"))
 	FGameplayTag AbilityTag;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UTexture2D> AbilityIcon = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	ECharacterStat UsedStat = ECharacterStat::NONE;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int StatCost = 0;

@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "TheAscendance/Core/AbilityHelpers.h"
 #include "TheAscendance/Characters/Enums/CharacterStat.h"
+#include "TheAscendance/Abilities/Structs/AbilityInfo.h"
 #include "GameplayTagContainer.h"
 // Test
 #include "TheAscendance/Abilities/AbilityFactory.h"
@@ -16,6 +18,8 @@ class ABaseCharacter;
 class UAnimMontage;
 class UAbilityData;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnAbilitiesUpdate, const TArray<FAbilityInfo>&);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API UAbilityComponent : public UActorComponent
 {
@@ -26,10 +30,10 @@ public:
 	UAbilityComponent();
 
 	void SetAbilities(const TArray<FGameplayTag>& abilityTags);
-	void TestSetAbilities(const TArray<TObjectPtr<UAbilityData>>& abilities);
+	void TestSetAbilities(const TArray<FGameplayTag>& abilityTags);
 
 	//Starts the overall ability. Charging, animations, etc.
-	void StartAbility(int slot);
+	void StartAbility(UAbilityHelpers::EAbilitySlot slot);
 	//Triggered by animations, this is the actual ability start event. So when a spell is cast, a melee collision is activated, etc.
 	void TriggerAbility();
 	//Stops the ability. Clears up all timer handles, etc.
@@ -52,9 +56,11 @@ protected:
 
 	float PlayAnimMontageOnOwner(UAnimMontage* animation);
 
+private:
+	void TriggerOnAbilitiesUpdate();
 
 public:
-	static constexpr int MaxAbilities = 4;
+	FOnAbilitiesUpdate OnAbilitiesUpdate;
 
 private:
 	UPROPERTY()

@@ -3,8 +3,10 @@
 
 #include "LoadoutComponent.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Core/AbilityHelpers.h"
 #include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Characters/BaseCharacter.h"
+#include "TheAscendance/Abilities/Components/AbilityComponent.h"
 
 // Sets default values for this component's properties
 ULoadoutComponent::ULoadoutComponent()
@@ -13,22 +15,14 @@ ULoadoutComponent::ULoadoutComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
+	m_SpellTags.SetNum(UAbilityHelpers::MaxAbilities);
 	// ...
 }
 
 void ULoadoutComponent::EquipItem(EEquippablePart part, const FGameplayTag& itemTag)
 {
-	FGameplayTag equipmentTag = FGameplayTag::RequestGameplayTag(TEXT("Item.Equipment"));
-
-	if (itemTag.MatchesTag(equipmentTag) == false)
-	{
-		LOG_ERROR("[LOADOUT COMPONENT] Tried to equip non-equipment Item");
-		return;
-	}
-
 	if (Contains(part))
 	{
-		//TODO: Add previous item back to inventory if we have one equipped in the slot already
 		for (auto& data : m_Loadout)
 		{
 			if (data.EquippedPart == part)
@@ -42,35 +36,48 @@ void ULoadoutComponent::EquipItem(EEquippablePart part, const FGameplayTag& item
 	{
 		m_Loadout.Add(FLoadoutSlotData(itemTag, part));
 	}
+}
 
-	if(OnUpdate.IsBound())
+void ULoadoutComponent::BlockEquipItem(EEquippablePart part)
+{
+	if (Contains(part))
 	{
-		OnUpdate.Broadcast(m_Loadout, m_SpellTags);
+		for (auto& data : m_Loadout)
+		{
+			if (data.EquippedPart == part)
+			{
+				//EmptyTag used to block equipping an item in this slot, instead of using an invalid tag, to avoid confusion with unequipped slots (used for two-handed items, etc)
+				data.ItemTag = FGameplayTag::EmptyTag;
+				break;
+			}
+		}
+	}
+	else
+	{
+		m_Loadout.Add(FLoadoutSlotData(FGameplayTag::EmptyTag, part));
 	}
 }
 
 void ULoadoutComponent::UnEquipItem(EEquippablePart part)
 {
-	bool loadoutChanged = false;
-
 	for (auto& data : m_Loadout)
 	{
 		if (data.EquippedPart == part)
 		{
 			data.ItemTag = FGameplayTag();
-			loadoutChanged = true;
 			break;
 		}
-	}
-
-	if (loadoutChanged == true && OnUpdate.IsBound())
-	{
-		OnUpdate.Broadcast(m_Loadout, m_SpellTags);
 	}
 }
 
 void ULoadoutComponent::SetSpells(const TArray<FGameplayTag>& spellTags)
 {
+	if(spellTags.Num() != UAbilityHelpers::MaxAbilities)
+	{
+		LOG_ERROR("[LOADOUT COMPONENT] SetSpells was given an array of size %d but expected size is %d", spellTags.Num(), UAbilityHelpers::MaxAbilities)
+		return;
+	}
+
 	if (m_SpellTags == spellTags)
 	{
 		LOG_INFO("[LOADOUT COMPONENT] SetSpells made no changes")
@@ -79,10 +86,26 @@ void ULoadoutComponent::SetSpells(const TArray<FGameplayTag>& spellTags)
 
 	m_SpellTags = spellTags;
 
-	if (OnUpdate.IsBound())
+	if (OnSpellsUpdate.IsBound())
 	{
-		OnUpdate.Broadcast(m_Loadout, m_SpellTags);
+		OnSpellsUpdate.Broadcast();
 	}
+}
+
+bool ULoadoutComponent::IsPartEquipped(const EEquippablePart& part)
+{
+	for (const auto data : m_Loadout)
+	{
+		if (data.EquippedPart != part)
+		{
+			continue;
+		}
+
+		return data.ItemTag.IsValid();
+	}
+
+	LOG_WARNING("[LOADOUT COMPONENT] IsPartEquipped was called for part %s but it was not found in the loadout", *UEnum::GetValueAsString(part));
+	return false;
 }
 
 const TArray<FGameplayTag>& ULoadoutComponent::GetSpellTags() const

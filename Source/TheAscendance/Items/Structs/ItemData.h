@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "UObject/AssetRegistryTagsContext.h"
 #include "TheAscendance/Items/Enums/EquipmentSlot.h"
+#include "TheAscendance/Abilities/Melee/Structs/MeleeData.h"
 #include "GameplayTagContainer.h"
 #include "ItemData.generated.h"
 
@@ -46,7 +47,7 @@ class THEASCENDANCE_API UEquippableItemData : public UItemData
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TArray<EEquipmentSlot> EquipmentSlotsUsed;
+	EEquipmentSlot EquipmentSlotUsed;
 };
 
 UCLASS(BlueprintType)
@@ -56,7 +57,8 @@ class THEASCENDANCE_API UWeaponItemData : public UEquippableItemData
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UMeleeData> MainAbility = nullptr;
+	FMeleeAbilityData PrimaryAbility;
+
 	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UMeleeData> AltAbility = nullptr;
+	FMeleeAbilityData AltAbility;
 };

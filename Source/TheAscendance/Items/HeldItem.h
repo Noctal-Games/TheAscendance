@@ -9,6 +9,7 @@
 class UStaticMeshComponent;
 class UStaticMesh;
 class UWeaponItemData;
+class UEquippableItemData;
 
 UCLASS()
 class THEASCENDANCE_API AHeldItem : public AActor
@@ -33,4 +34,7 @@ private:
 
 	UPROPERTY();
 	TSoftObjectPtr<UStaticMesh> m_Mesh = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UEquippableItemData> m_EquippableData = nullptr;
 };

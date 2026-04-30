@@ -166,6 +166,11 @@ UCameraComponent* APlayerCharacter::GetCamera()
 	return m_Camera;
 }
 
+UAbilityComponent* APlayerCharacter::GetAbilityComponent()
+{
+	return m_AbilityComponent;
+}
+
 float APlayerCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate, FName startSection)
 {
 	if (m_HandsMesh == nullptr)
@@ -253,21 +258,7 @@ void APlayerCharacter::BeginPlay()
 
 	if (m_EquipmentManagerComponent != nullptr)
 	{
-		m_EquipmentManagerComponent->Init(this, m_AbilityComponent);
-	}
-
-	if (m_LoadoutComponent != nullptr)
-	{
-		m_LoadoutComponent->OnUpdate.AddLambda([this](const TArray<FLoadoutSlotData>& equipmentData, const TArray<FGameplayTag>& spellTags)
-			{
-				if (m_EquipmentManagerComponent == nullptr)
-				{
-					LOG_ERROR("[PLAYER CHARACTER] LoadoutComponent tried to update EquipmentManagerComponent but it was invalid");
-					return;
-				}
-
-				m_EquipmentManagerComponent->OnLoadoutUpdated(equipmentData, spellTags);
-			});
+		m_EquipmentManagerComponent->Init(this, m_AbilityComponent, m_LoadoutComponent);
 	}
 }
 
@@ -394,7 +385,7 @@ bool APlayerCharacter::TestMainHandPrimaryAttack()
 		return false;
 	}
 
-	m_AbilityComponent->StartAbility(1);
+	m_AbilityComponent->StartAbility(UAbilityHelpers::MAINHAND_PRIMARY);
 	return true;
 }
 
@@ -405,7 +396,7 @@ bool APlayerCharacter::TestMainHandSecondaryAttack()
 		return false;
 	}
 
-	m_AbilityComponent->StartAbility(3);
+	m_AbilityComponent->StartAbility(UAbilityHelpers::MAINHAND_ALT);
 	return true;
 }
 
@@ -416,7 +407,7 @@ bool APlayerCharacter::TestOffHandPrimaryAttack()
 		return false;
 	}
 
-	m_AbilityComponent->StartAbility(2);
+	m_AbilityComponent->StartAbility(UAbilityHelpers::OFFHAND_PRIMARY);
 	return true;
 }
 
@@ -427,7 +418,7 @@ bool APlayerCharacter::TestOffHandSecondaryAttack()
 		return false;
 	}
 
-	m_AbilityComponent->StartAbility(4);
+	m_AbilityComponent->StartAbility(UAbilityHelpers::OFFHAND_ALT);
 	return true;
 }
 
