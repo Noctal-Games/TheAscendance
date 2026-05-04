@@ -14,6 +14,11 @@
 
 void UActionBarIcon::LoadAbility(const FGameplayTag& abilityTag, const TSoftObjectPtr<UTexture2D>& icon)
 {
+	if (m_AbilityTag != abilityTag && m_CooldownWidget != nullptr)
+	{
+		m_CooldownWidget->StartCooldown(0.0f, 0.0f);
+	}
+
 	m_AbilityTag = abilityTag;
 	m_Texture = icon;
 
@@ -42,6 +47,11 @@ void UActionBarIcon::OnCooldownTriggered(const FGameplayTag& abilityTag, float r
 
 void UActionBarIcon::ClearAbility()
 {
+	if (m_CooldownWidget != nullptr)
+	{
+		m_CooldownWidget->StartCooldown(0.0f, 0.0f);
+	}
+
 	m_AbilityTag = FGameplayTag();
 	ClearAbilityIcon();
 }
