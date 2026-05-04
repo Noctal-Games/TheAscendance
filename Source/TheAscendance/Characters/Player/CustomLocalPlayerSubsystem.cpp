@@ -191,7 +191,7 @@ void UCustomLocalPlayerSubsystem::HandleMainHandPrimaryAttack()
 		return;
 	}
 
-	m_PlayerCharacter->TestMainHandPrimaryAttack();
+	m_PlayerCharacter->Attack(EAbilitySlot::MAINHAND_PRIMARY);
 }
 
 void UCustomLocalPlayerSubsystem::HandleMainHandSecondaryAttack()
@@ -202,7 +202,7 @@ void UCustomLocalPlayerSubsystem::HandleMainHandSecondaryAttack()
 		return;
 	}
 
-	m_PlayerCharacter->TestMainHandSecondaryAttack();
+	m_PlayerCharacter->Attack(EAbilitySlot::MAINHAND_ALT);
 }
 
 void UCustomLocalPlayerSubsystem::HandleOffhandPrimaryAttack()
@@ -213,7 +213,7 @@ void UCustomLocalPlayerSubsystem::HandleOffhandPrimaryAttack()
 		return;
 	}
 
-	m_PlayerCharacter->TestOffHandPrimaryAttack();
+	m_PlayerCharacter->Attack(EAbilitySlot::OFFHAND_PRIMARY);
 }
 
 void UCustomLocalPlayerSubsystem::HandleOffhandSecondaryAttack()
@@ -224,7 +224,7 @@ void UCustomLocalPlayerSubsystem::HandleOffhandSecondaryAttack()
 		return;
 	}
 
-	m_PlayerCharacter->TestOffHandSecondaryAttack();
+	m_PlayerCharacter->Attack(EAbilitySlot::OFFHAND_ALT);
 }
 
 void UCustomLocalPlayerSubsystem::HandleInteract()
@@ -278,15 +278,15 @@ void UCustomLocalPlayerSubsystem::HandleTestFunction1()
 
 void UCustomLocalPlayerSubsystem::HandleTestFunction2()
 {
-	HandleToggleGrimoire();
+	//HandleToggleGrimoire();
 
-	//if (m_PlayerCharacter.IsValid() == false)
-	//{
-	//	LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Invalid PlayerCharacter reference");
-	//	return;
-	//}
+	if (m_PlayerCharacter.IsValid() == false)
+	{
+		LOG_ERROR("[LOCAL PLAYER SUBSYSTEM] Invalid PlayerCharacter reference");
+		return;
+	}
 
-	//m_PlayerCharacter->TestFunction2();
+	m_PlayerCharacter->TestFunction2();
 }
 
 void UCustomLocalPlayerSubsystem::HandleTestFunction3()

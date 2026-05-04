@@ -8,6 +8,7 @@
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Items/Structs/ItemData.h"
 #include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
+#include "ActionCooldownWidget.h"
 
 #include "Components/Image.h"
 
@@ -33,8 +34,10 @@ void UActionBarIcon::OnCooldownTriggered(const FGameplayTag& abilityTag, float r
 		return;
 	}
 
-	LOG_ONSCREEN(-1, 3.0f, FColor::Red, "COOLDOWN FOR: %s", *abilityTag.ToString());
-	//Do Cooldown
+	if(m_CooldownWidget != nullptr)
+	{
+		m_CooldownWidget->StartCooldown(remaining, max);
+	}
 }
 
 void UActionBarIcon::ClearAbility()

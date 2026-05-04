@@ -7,7 +7,6 @@
 #include "PlayerMovementComponent.h"
 #include "TheAscendance/Characters/Components/CharacterStatsComponent.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
-#include "TheAscendance/Items/HeldItem.h"
 #include "TheAscendance/Characters/CharacterGameplayTags.h"
 #include "TheAscendance/Game/Subsystems/AudioManagerSubsystem.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
@@ -15,8 +14,8 @@
 #include "TheAscendance/Abilities/Spells/SpellGameplayTags.h"
 #include "TheAscendance/Items/ItemGameplayTags.h"
 #include "TheAscendance/Actors/Interaction/Interfaces/Interactable.h"
-#include "TheAscendance/Abilities/Components/AbilityComponent.h"
 #include "TheAscendance/Characters/Components/EquipmentManagerComponent.h"
+
 
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -24,8 +23,6 @@
 // Sets default values
 APlayerCharacter::APlayerCharacter() : ABaseCharacter()
 {
-	m_AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("Ability Component"));
-	checkf(m_AbilityComponent, TEXT("Ability Component failed to initialise"));
 	m_EquipmentManagerComponent = CreateDefaultSubobject<UEquipmentManagerComponent>(TEXT("Equipment Manager Component"));
 	checkf(m_EquipmentManagerComponent, TEXT("Equipment Manager Component failed to initialise"));
 
@@ -203,24 +200,26 @@ float APlayerCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float 
 	return duration;
 }
 
-void APlayerCharacter::TriggerAbility()
+bool APlayerCharacter::EquipItem(EEquippablePart part, const FGameplayTag& itemTag)
 {
-	if (m_AbilityComponent == nullptr)
+	if (m_EquipmentManagerComponent == nullptr)
 	{
-		return;
+		LOG_ERROR("[PLAYER CHARACTER] Tried to Equip item but EquipmentManagerComponent was null");
+		return false;
 	}
 
-	m_AbilityComponent->TriggerAbility();
+	return m_EquipmentManagerComponent->EquipItem(itemTag, part);
 }
 
-void APlayerCharacter::StopAbility()
+void APlayerCharacter::UnEquipItem(EEquippablePart part)
 {
-	if (m_AbilityComponent == nullptr)
+	if (m_EquipmentManagerComponent == nullptr)
 	{
+		LOG_ERROR("[PLAYER CHARACTER] Tried to Equip item but EquipmentManagerComponent was null");
 		return;
 	}
 
-	m_AbilityComponent->StopAbility();
+	m_EquipmentManagerComponent->UnEquipItem(part);
 }
 
 // Called when the game starts or when spawned
@@ -251,14 +250,14 @@ void APlayerCharacter::BeginPlay()
 		m_HandsMesh = mesh;
 	}
 
-	if (m_AbilityComponent != nullptr)
-	{
-		m_AbilityComponent->SetAbilities(TestAbilityTags);
-	}
-
 	if (m_EquipmentManagerComponent != nullptr)
 	{
 		m_EquipmentManagerComponent->Init(this, m_AbilityComponent, m_LoadoutComponent);
+	}
+
+	if(m_LoadoutComponent != nullptr)
+	{
+		m_LoadoutComponent->SetSpells(TestSpellTags);
 	}
 }
 
@@ -356,80 +355,40 @@ void APlayerCharacter::TestFunction1()
 
 void APlayerCharacter::TestFunction2()
 {
-	//LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 2");
-	//EndMainHandAttack();
-	//EndOffHandAttack();
+	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "[PLAYER CHARACTER] TEST 3");
 
+	if (m_TestEquipToggle == false)
+	{
+		if (EquipItem(EEquippablePart::RIGHT_HAND, ITEM_EQUIPMENT_GREATSWORD) == false)
+		{
+			return;
+		}
+	}
+	else
+	{
+		UnEquipItem(EEquippablePart::RIGHT_HAND);
+	}
+
+	m_TestEquipToggle = !m_TestEquipToggle;
 }
 
 void APlayerCharacter::TestFunction3()
 {
 	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "[PLAYER CHARACTER] TEST 3");
 
-	if (m_TestEquipToggle == false)
+	if (m_TestEquipToggle2 == false)
 	{
-		EquipItem(EEquippablePart::LEFT_HAND, ITEM_EQUIPMENT_SWORD);
+		if (EquipItem(EEquippablePart::LEFT_HAND, ITEM_EQUIPMENT_SWORD) == false)
+		{
+			return;
+		}
 	}
 	else
 	{
 		UnEquipItem(EEquippablePart::LEFT_HAND);
 	}
 
-	m_TestEquipToggle = !m_TestEquipToggle;
-}
-
-bool APlayerCharacter::TestMainHandPrimaryAttack()
-{
-	if (m_AbilityComponent == nullptr)
-	{
-		return false;
-	}
-
-	m_AbilityComponent->StartAbility(EAbilitySlot::MAINHAND_PRIMARY);
-	return true;
-}
-
-bool APlayerCharacter::TestMainHandSecondaryAttack()
-{
-	if (m_AbilityComponent == nullptr)
-	{
-		return false;
-	}
-
-	m_AbilityComponent->StartAbility(EAbilitySlot::MAINHAND_ALT);
-	return true;
-}
-
-bool APlayerCharacter::TestOffHandPrimaryAttack()
-{
-	if (m_AbilityComponent == nullptr)
-	{
-		return false;
-	}
-
-	m_AbilityComponent->StartAbility(EAbilitySlot::OFFHAND_PRIMARY);
-	return true;
-}
-
-bool APlayerCharacter::TestOffHandSecondaryAttack()
-{
-	if (m_AbilityComponent == nullptr)
-	{
-		return false;
-	}
-
-	m_AbilityComponent->StartAbility(EAbilitySlot::OFFHAND_ALT);
-	return true;
-}
-
-void APlayerCharacter::TestEndAttack()
-{
-	if (m_AbilityComponent == nullptr)
-	{
-		return;
-	}
-
-	m_AbilityComponent->StopAbility();
+	m_TestEquipToggle2 = !m_TestEquipToggle2;
 }
 
 FVector APlayerCharacter::GetSocketLocationFromPart(EEquippablePart part)

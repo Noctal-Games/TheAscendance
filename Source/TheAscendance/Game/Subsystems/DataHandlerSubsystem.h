@@ -12,8 +12,7 @@ UENUM()
 enum class EDataGroup : uint8
 {
 	ENEMIES,
-	ITEMS,
-	WEAPONS,
+	MELEE,
 	SPELLS,
 	EFFECTS
 };

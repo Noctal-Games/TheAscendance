@@ -9,6 +9,7 @@
 
 class UImage;
 class UBorder;
+class UActionCooldownWidget;
 
 UCLASS()
 class THEASCENDANCE_API UActionBarIcon : public UCommonUserWidget
@@ -38,6 +39,8 @@ private:
 	TObjectPtr<UImage> m_ActionIconImage = nullptr;
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget, DisplayName = "Action Icon Border"))
 	TObjectPtr<UBorder> m_ActionIconBorder = nullptr;
+	UPROPERTY(EditAnywhere, meta = (BindWidget, DisplayName = "Action Cooldown Widget"))
+	TObjectPtr<UActionCooldownWidget> m_CooldownWidget;
 
 	UPROPERTY()
 	TSoftObjectPtr<UTexture2D> m_Texture = nullptr;

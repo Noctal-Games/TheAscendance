@@ -17,6 +17,7 @@
 #include "Spells/Structs/SpellData.h"
 #include "Spells/ProjectileSpell.h"
 #include "Spells/LocalSpell.h"
+#include "Melee/BaseMelee.h"
 
 
 #include "InstancedStruct.h"
@@ -41,6 +42,11 @@ IAbility* AbilityFactory::CreateAbility(UAbilityData* abilityData, UAbilityCompo
 		case EAbilityType::LOCAL_SPELL:
 		{
 			ability = NewObject<ULocalSpell>();
+			break;
+		}
+		case EAbilityType::MELEE:
+		{
+			ability = NewObject<UBaseMelee>();
 			break;
 		}
 		default:

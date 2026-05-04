@@ -61,8 +61,5 @@ struct FAbilityTableData : public FTableRowBase
 	FString AbilityDescription = "";
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSoftObjectPtr<UTexture2D> AbilityIcon = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftObjectPtr<UAbilityData> AbilityData = nullptr;
 };

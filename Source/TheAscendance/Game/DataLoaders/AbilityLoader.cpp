@@ -1,12 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SpellLoader.h"
+#include "AbilityLoader.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Game/Subsystems/DataHandlerSubsystem.h"
 #include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
+#include "TheAscendance/Abilities/Melee/Structs/MeleeData.h"
 #include "TheAscendance/Abilities/Interfaces/Ability.h"
 
 void UAbilityLoader::Init()
@@ -23,57 +24,19 @@ void UAbilityLoader::Init()
 		{
 			LOG_INFO("[ABILITY LOADER] Succeeded to load SpellDataTable");
 		}
+
+		m_MeleeTable = dataHandler->LoadData(EDataGroup::MELEE);
+
+		if (m_MeleeTable == nullptr)
+		{
+			LOG_ERROR("[ABILITY LOADER] Failed to load MeleeDataTable");
+		}
+		else
+		{
+			LOG_INFO("[ABILITY LOADER] Succeeded to load MeleeDataTable");
+		}
 	}
 }
-
-//ISpell* USpellLoader::CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const
-//{
-//	if (m_SpellTable == nullptr || m_SpellFactory == nullptr)
-//	{
-//		LOG_ERROR("[SPELL LOADER] Tried to CreateSpell without a valid SpellTable or without a SpellFactory");
-//		return nullptr;
-//	}
-//
-//	static const FString contextString(TEXT("Spell Context String"));
-//
-//	TArray<FSpellTableData*> spellStructs;
-//	m_SpellTable->GetAllRows(contextString, spellStructs);
-//
-//	for (const auto data : spellStructs)
-//	{
-//		if (data->SpellTag != spellTag)
-//		{
-//			continue;
-//		}
-//
-//		FSoftObjectPath path(data->SpellData.ToSoftObjectPath());
-//		UObject* pathObject = path.ResolveObject();
-//
-//		if (pathObject == nullptr)
-//		{
-//			pathObject = path.TryLoad();
-//		}
-//
-//		if (pathObject == nullptr)
-//		{
-//			LOG_ERROR("[SPELL LOADER] Failed to load SpellData for Spell: %s", *spellTag.ToString());
-//			return nullptr;
-//		}
-//
-//		if (USpellData* spellData = Cast<USpellData>(pathObject))
-//		{
-//			if(spellTag != spellData->SpellTag)
-//			{
-//				LOG_ERROR("[SPELL LOADER] SpellTag mismatch between SpellTable and SpellData for Spell: %s", *spellTag.ToString());
-//			}
-//
-//			return m_SpellFactory->CreateSpell(spellData, spellOwner);
-//		}
-//	}
-//
-//	LOG_ERROR("[SPELL LOADER] Failed to create Spell for Spell: %s", *spellTag.ToString());
-//	return nullptr;
-//}
 
 IAbility* UAbilityLoader::CreateAbilityFromTag(const FGameplayTag& abilityTag, UAbilityComponent* abilityOwner)
 { 
@@ -101,11 +64,17 @@ IAbility* UAbilityLoader::CreateAbilityFromData(UAbilityData* abilityData, UAbil
 UAbilityData* UAbilityLoader::GetAbilityData(const FGameplayTag& abilityTag)
 {
 	const FGameplayTag spellTag = FGameplayTag::RequestGameplayTag(TEXT("Ability.Spell"));
+	const FGameplayTag meleeTag = FGameplayTag::RequestGameplayTag(TEXT("Ability.Melee"));
+
 	UAbilityData* abilityData = nullptr;
 
 	if (abilityTag.MatchesTag(spellTag) == true)
 	{
 		abilityData = GetSpellAbilityDataFromTag(abilityTag);
+	}
+	else if (abilityTag.MatchesTag(meleeTag) == true)
+	{
+		abilityData = GetMeleeAbilityDataFromTag(abilityTag);
 	}
 	else
 	{
@@ -166,7 +135,7 @@ const TArray<TSharedPtr<FSpellTableData>> UAbilityLoader::GetAllSpellTableDataEn
 	return toReturn;
 }
 
-USpellData* UAbilityLoader::GetSpellAbilityDataFromTag(const FGameplayTag& spellTag) const
+USpellData* UAbilityLoader::GetSpellAbilityDataFromTag(const FGameplayTag& abilityTag) const
 {
 	if (m_SpellTable == nullptr)
 	{
@@ -176,17 +145,17 @@ USpellData* UAbilityLoader::GetSpellAbilityDataFromTag(const FGameplayTag& spell
 
 	static const FString contextString(TEXT("Spell Context String"));
 
-	TArray<FSpellTableData*> spellStructs;
+	TArray<FAbilityTableData*> spellStructs;
 	m_SpellTable->GetAllRows(contextString, spellStructs);
 
 	for (const auto& data : spellStructs)
 	{
-		if (data->SpellTag != spellTag)
+		if (data->AbilityTag != abilityTag)
 		{
 			continue;
 		}
 
-		FSoftObjectPath path(data->SpellData.ToSoftObjectPath());
+		FSoftObjectPath path(data->AbilityData.ToSoftObjectPath());
 		UObject* pathObject = path.ResolveObject();
 
 		if (pathObject == nullptr)
@@ -196,21 +165,70 @@ USpellData* UAbilityLoader::GetSpellAbilityDataFromTag(const FGameplayTag& spell
 
 		if (pathObject == nullptr)
 		{
-			LOG_ERROR("[ABILITY LOADER] Failed to load SpellData for Spell: %s", *spellTag.ToString());
+			LOG_ERROR("[ABILITY LOADER] Failed to load SpellData for Spell: %s", *abilityTag.ToString());
 			return nullptr;
 		}
 
 		if (USpellData* spellAbilityData = Cast<USpellData>(pathObject))
 		{
-			if(spellTag != spellAbilityData->AbilityTag)
+			if(abilityTag != spellAbilityData->AbilityTag)
 			{
-				LOG_ERROR("[ABILITY LOADER] AbilityTag mismatch between SpellTable and SpellData for Spell: %s", *spellTag.ToString());
+				LOG_ERROR("[ABILITY LOADER] AbilityTag mismatch between SpellTable and SpellData for Spell: %s", *abilityTag.ToString());
 			}
 
 			return spellAbilityData;
 		}
 	}
 
-	LOG_ERROR("[ABILITY LOADER] Failed to GetSpellAbilityData for Spell: %s", *spellTag.ToString());
+	LOG_ERROR("[ABILITY LOADER] Failed to GetSpellAbilityData for Spell: %s", *abilityTag.ToString());
+	return nullptr;
+}
+
+UMeleeData* UAbilityLoader::GetMeleeAbilityDataFromTag(const FGameplayTag& abilityTag) const
+{
+	if (m_MeleeTable == nullptr)
+	{
+		LOG_ERROR("[ABILITY LOADER] Tried to GetMeleeAbilityData without a valid MeleeTable");
+		return nullptr;
+	}
+
+	static const FString contextString(TEXT("Melee Context String"));
+
+	TArray<FAbilityTableData*> meleeStructs;
+	m_MeleeTable->GetAllRows(contextString, meleeStructs);
+
+	for (const auto& data : meleeStructs)
+	{
+		if (data->AbilityTag != abilityTag)
+		{
+			continue;
+		}
+
+		FSoftObjectPath path(data->AbilityData.ToSoftObjectPath());
+		UObject* pathObject = path.ResolveObject();
+
+		if (pathObject == nullptr)
+		{
+			pathObject = path.TryLoad();
+		}
+
+		if (pathObject == nullptr)
+		{
+			LOG_ERROR("[ABILITY LOADER] Failed to load MeleeData for Melee: %s", *abilityTag.ToString());
+			return nullptr;
+		}
+
+		if (UMeleeData* meleeAbilityData = Cast<UMeleeData>(pathObject))
+		{
+			if (abilityTag != meleeAbilityData->AbilityTag)
+			{
+				LOG_ERROR("[ABILITY LOADER] AbilityTag mismatch between MeleeTable and MeleeData for Melee: %s", *abilityTag.ToString());
+			}
+
+			return meleeAbilityData;
+		}
+	}
+
+	LOG_ERROR("[ABILITY LOADER] Failed to GetMeleeAbilityData for Melee: %s", *abilityTag.ToString());
 	return nullptr;
 }

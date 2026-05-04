@@ -4,13 +4,14 @@
 #include "EquipmentManagerComponent.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
-#include "TheAscendance/Items/HeldItem.h"
+#include "TheAscendance/Items/HeldEquippableItem.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Characters/BaseCharacter.h"
 #include "TheAscendance/Items/Structs/ItemData.h"
 #include "TheAscendance/Game/Subsystems/ItemRegistrySubsystem.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
 #include "TheAscendance/Abilities/Components/AbilityComponent.h"
+#include "TheAscendance/Abilities/Enums/AbilitySlot.h"
 
 // Sets default values for this component's properties
 UEquipmentManagerComponent::UEquipmentManagerComponent()
@@ -73,7 +74,7 @@ void UEquipmentManagerComponent::Init(ABaseCharacter* owner, UAbilityComponent* 
 			continue;
 		}
 
-		AHeldItem* newItem = world->SpawnActor<AHeldItem>(AHeldItem::StaticClass());
+		AHeldEquippableItem* newItem = world->SpawnActor<AHeldEquippableItem>(AHeldEquippableItem::StaticClass());
 
 		if(newItem == nullptr)
 		{
@@ -90,18 +91,18 @@ void UEquipmentManagerComponent::Init(ABaseCharacter* owner, UAbilityComponent* 
 	}
 }
 
-void UEquipmentManagerComponent::EquipItem(const FGameplayTag& itemTag, EEquippablePart part)
+bool UEquipmentManagerComponent::EquipItem(const FGameplayTag& itemTag, EEquippablePart part)
 {
 	if(m_LoadoutComponent == nullptr)
 	{
 		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] Tried to Equip but Loadout Component is invalid.");
-		return;
+		return false;
 	}
 
 	if (itemTag.IsValid() == false)
 	{
 		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] Tried to equip invalid ItemTag");
-		return;
+		return false;
 	}
 
 	UEquippableItemData* itemData = nullptr;
@@ -114,7 +115,13 @@ void UEquipmentManagerComponent::EquipItem(const FGameplayTag& itemTag, EEquippa
 	if (itemData == nullptr)
 	{
 		LOG_WARNING("[EQUIPMENT MANAGER COMPONENT] ItemData was invalid when attempting to equip item: %s... Either the item doesn't exist, or is not of an equippable type", *itemTag.ToString());
-		return;
+		return false;
+	}
+
+	if (m_LoadoutComponent->IsPartEquipped(part) == true)
+	{
+		LOG_INFO("[EQUIPMENT MANAGER COMPONENT] Tried to equip item: %s to part: %s but it is already equipped.", *itemTag.ToString(), *UEnum::GetValueAsString(part));
+		return false;
 	}
 
 	switch (itemData->EquipmentSlotUsed)
@@ -123,13 +130,14 @@ void UEquipmentManagerComponent::EquipItem(const FGameplayTag& itemTag, EEquippa
 			if (part != EEquippablePart::RIGHT_HAND && part != EEquippablePart::LEFT_HAND)
 			{
 				LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] Tried to equip a ONE_HAND item to a non-hand part", *itemTag.ToString());
-				return;
+				return false;
 			}
+			break;
 		case EEquipmentSlot::TWO_HAND:
 			if (part != EEquippablePart::RIGHT_HAND && part != EEquippablePart::LEFT_HAND)
 			{
 				LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] Tried to equip a TWO_HAND item to a non-hand part", *itemTag.ToString());
-				return;
+				return false;
 			}
 
 			if (m_LoadoutComponent->IsPartEquipped(EEquippablePart::RIGHT_HAND) == false && m_LoadoutComponent->IsPartEquipped(EEquippablePart::LEFT_HAND) == false)
@@ -139,31 +147,22 @@ void UEquipmentManagerComponent::EquipItem(const FGameplayTag& itemTag, EEquippa
 			else
 			{
 				LOG_INFO("[EQUIPMENT MANAGER COMPONENT] Tried to equip TWO_HAND item, but one or both hands were already equipped.");
-				break;
+				return false;
 			}
-
-		default:
-			if (m_LoadoutComponent->IsPartEquipped(part) == false)
-			{
-				break;
-			}
-
-			LOG_INFO("[EQUIPMENT MANAGER COMPONENT] Tried to equip item: %s to part: %s but it is already equipped.", *itemTag.ToString(), *UEnum::GetValueAsString(part));
-			return;
 	}
 
 	if (m_Equipment.Contains(part) == false)
 	{
 		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] EquipmentManager does not hold an item reference for: %s", *UEnum::GetValueAsString(part));
-		return;
+		return false;
 	}
 
-	TWeakObjectPtr<AHeldItem> heldItem = m_Equipment[part];
+	TWeakObjectPtr<AHeldEquippableItem> heldItem = m_Equipment[part];
 
 	if (heldItem == nullptr)
 	{
 		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] EquipmentManager does not hold a reference to a valid Item Object for: %s", *UEnum::GetValueAsString(part));
-		return;
+		return false;
 	}
 
 	if (itemData->EquipmentSlotUsed == EEquipmentSlot::TWO_HAND)
@@ -176,6 +175,7 @@ void UEquipmentManagerComponent::EquipItem(const FGameplayTag& itemTag, EEquippa
 
 	heldItem->Init(Cast<UWeaponItemData>(itemData));
 	UpdateAbilities();
+	return true;
 }
 
 void UEquipmentManagerComponent::UnEquipItem(EEquippablePart part)
@@ -192,7 +192,7 @@ void UEquipmentManagerComponent::UnEquipItem(EEquippablePart part)
 		return;
 	}
 
-	AHeldItem* heldItem = m_Equipment[part];
+	AHeldEquippableItem* heldItem = m_Equipment[part];
 
 	if (heldItem == nullptr)
 	{
@@ -200,7 +200,7 @@ void UEquipmentManagerComponent::UnEquipItem(EEquippablePart part)
 		return;
 	}
 
-	UEquippableItemData* itemData = nullptr;//heldItem->GetData();
+	const UEquippableItemData* itemData = heldItem->GetItemData();
 
 	if (itemData == nullptr)
 	{
@@ -215,6 +215,7 @@ void UEquipmentManagerComponent::UnEquipItem(EEquippablePart part)
 	}
 
 	m_LoadoutComponent->UnEquipItem(part);
+	heldItem->UnEquip();
 	UpdateAbilities();
 }
 
@@ -226,18 +227,41 @@ void UEquipmentManagerComponent::UpdateAbilities()
 		return;
 	}
 
-	const TArray<FGameplayTag>& abilityTags = m_LoadoutComponent->GetSpellTags();
+	TMap<EAbilitySlot, FGameplayTag> abilities = m_LoadoutComponent->GetSpellsCopy();
 
-	if (AHeldItem* heldItem = m_Equipment[EEquippablePart::LEFT_HAND])
+	if (AHeldEquippableItem* heldItem = m_Equipment[EEquippablePart::RIGHT_HAND])
 	{
-		//Get attack data and process
-	}
-	if (AHeldItem* heldItem = m_Equipment[EEquippablePart::RIGHT_HAND])
-	{
-		//Get attack data and process
+		if (const UWeaponItemData* itemData = heldItem->GetItemData())
+		{
+			if (itemData->PrimaryAbility.DoesSpellOverride == false)
+			{
+				abilities[EAbilitySlot::MAINHAND_PRIMARY] = itemData->PrimaryAbility.AbilityTag;
+			}
+
+			if (itemData->AltAbility.DoesSpellOverride == false)
+			{
+				abilities[EAbilitySlot::MAINHAND_ALT] = itemData->AltAbility.AbilityTag;
+			}
+		}
 	}
 
-	//m_AbilityComponent->SetAbilities(abilityTags);
+	if (AHeldEquippableItem* heldItem = m_Equipment[EEquippablePart::LEFT_HAND])
+	{
+		if(const UWeaponItemData* itemData = heldItem->GetItemData())
+		{
+			if (itemData->PrimaryAbility.DoesSpellOverride == false)
+			{
+				abilities[EAbilitySlot::OFFHAND_PRIMARY] = itemData->PrimaryAbility.AbilityTag;
+			}
+
+			if (itemData->AltAbility.DoesSpellOverride == false)
+			{
+				abilities[EAbilitySlot::OFFHAND_ALT] = itemData->AltAbility.AbilityTag;
+			}
+		}
+	}
+
+	m_AbilityComponent->SetAbilities(abilities);
 }
 
 // Called when the game starts

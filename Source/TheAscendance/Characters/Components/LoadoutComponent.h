@@ -7,6 +7,7 @@
 #include "TheAscendance/Characters/Enums/EquippablePart.h"
 #include "TheAscendance/Characters/Structs/LoadoutSlotData.h"
 #include "GameplayTagContainer.h"
+#include "TheAscendance/Abilities/Enums/AbilitySlot.h"
 #include "LoadoutComponent.generated.h"
 
 USTRUCT()
@@ -42,6 +43,7 @@ protected:
 	friend class UGrimoire;
 	friend class UEquipmentManagerComponent;
 	const TArray<FGameplayTag>& GetSpellTags() const;
+	TMap<EAbilitySlot, FGameplayTag> GetSpellsCopy() const;
 
 private:
 	bool Contains(EEquippablePart part);
@@ -52,4 +54,6 @@ protected:
 private:
 	TArray<FLoadoutSlotData> m_Loadout;
 	TArray<FGameplayTag> m_SpellTags;
+
+	TMap<EAbilitySlot, FGameplayTag> m_TestSpellTags;
 };

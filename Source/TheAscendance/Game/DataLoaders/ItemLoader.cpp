@@ -12,29 +12,29 @@ void UItemLoader::Init()
 {
 	if (UDataHandlerSubsystem* dataHandler = UCoreFunctionLibrary::GetDataHandlerSubsystem())
 	{
-		 m_ItemTable = dataHandler->LoadData(EDataGroup::ITEMS);
+		// m_ItemTable = dataHandler->LoadData(EDataGroup::ITEMS);
 
-		if (m_ItemTable == nullptr)
-		{
-			LOG_ERROR("[ITEM LOADER] Failed to load Item DataTable");
-		}
-		else
-		{
-			LOG_INFO("[ITEM LOADER] Succeeded to load Item DataTable");
-		}
+		//if (m_ItemTable == nullptr)
+		//{
+		//	LOG_ERROR("[ITEM LOADER] Failed to load Item DataTable");
+		//}
+		//else
+		//{
+		//	LOG_INFO("[ITEM LOADER] Succeeded to load Item DataTable");
+		//}
 
-		m_WeaponTable = dataHandler->LoadData(EDataGroup::WEAPONS);
+		//m_WeaponTable = dataHandler->LoadData(EDataGroup::WEAPONS);
 
-		if (m_WeaponTable == nullptr)
-		{
-			LOG_ERROR("[ITEM LOADER] Failed to load Weapon DataTable");
-		}
-		else
-		{
-			LOG_INFO("[ITEM LOADER] Succeeded to load Weapon DataTable");
-		}
+		//if (m_WeaponTable == nullptr)
+		//{
+		//	LOG_ERROR("[ITEM LOADER] Failed to load Weapon DataTable");
+		//}
+		//else
+		//{
+		//	LOG_INFO("[ITEM LOADER] Succeeded to load Weapon DataTable");
+		//}
 
-		m_WeaponTypeData = &dataHandler->GetWeaponTypeMap();
+		//m_WeaponTypeData = &dataHandler->GetWeaponTypeMap();
 	}
 }
 

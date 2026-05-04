@@ -5,7 +5,7 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Game/DataLoaders/ItemLoader.h"
-#include "TheAscendance/Game/DataLoaders/SpellLoader.h"
+#include "TheAscendance/Game/DataLoaders/AbilityLoader.h"
 #include "TheAscendance/Game/DataLoaders/EnemyLoader.h"
 #include "TheAscendance/Game/DataLoaders/EffectLoader.h"
 

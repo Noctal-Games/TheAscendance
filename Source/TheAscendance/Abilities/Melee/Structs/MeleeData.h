@@ -15,6 +15,8 @@ struct FMeleeAbilityData
 
 	UPROPERTY(EditDefaultsOnly, meta = (Categories = "Ability.Melee"))
 	FGameplayTag AbilityTag;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Spell abilities override if assigned to the same slot"))
+	bool DoesSpellOverride = false;
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Bonus flat damage, will be applied to all damage sources in the ability"))
 	float BonusDamage = 0.0f;
 };
@@ -29,4 +31,22 @@ public:
 	{
 		AbilityType = EAbilityType::MELEE;
 	}
+};
+
+USTRUCT(BlueprintType)
+struct FMeleeTableData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Ability.Melee"))
+	FGameplayTag MeleeTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FName MeleeName = "";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FString MeleeDescription = "";
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UMeleeData> MeleeData = nullptr;
 };

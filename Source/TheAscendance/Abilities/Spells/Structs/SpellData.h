@@ -91,7 +91,7 @@ struct FSpellTableData : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Ability"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Ability.Spell"))
 	FGameplayTag SpellTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

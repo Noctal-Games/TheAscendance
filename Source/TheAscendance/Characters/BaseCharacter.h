@@ -10,6 +10,7 @@
 #include "Enums/CharacterStat.h"
 #include "TheAscendance/Items/Enums/WeaponType.h"
 #include "Enums/EquippablePart.h"
+#include "TheAscendance/Abilities/Enums/AbilitySlot.h"
 #include "BaseCharacter.generated.h"
 
 class UCharacterStatsComponent;
@@ -18,6 +19,7 @@ class AHeldItem;
 class UCharacterTrajectoryComponent;
 class ULoadoutComponent;
 class UEquipmentManagerComponent;
+class UAbilityComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterDeath, ABaseCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTakeDamage);
@@ -50,10 +52,7 @@ public:
 	virtual bool HasImmunity(const FGameplayTag& immunity) const override;
 	virtual bool HasResistance(const FGameplayTag& resistance) const override;
 
-	bool MainHandPrimaryAttack();
-	bool MainHandSecondaryAttack();
-	bool OffHandPrimaryAttack();
-	bool OffHandSecondaryAttack();
+	bool Attack(EAbilitySlot abilitySlot);
 
 	UFUNCTION(BlueprintCallable)
 	bool IsAttacking()
@@ -114,9 +113,6 @@ protected:
 	friend class UPlayerHUD;
 	friend class UGrimoire;
 
-	bool EquipItem(EEquippablePart part, const FGameplayTag& itemTag);
-	void UnEquipItem(EEquippablePart part);
-
 	UCharacterStatsComponent* GetCharacterStatsComponent();
 	ULoadoutComponent* GetLoadoutComponent() const;
 
@@ -149,14 +145,8 @@ protected:
 	TObjectPtr<UCharacterTrajectoryComponent> m_CharacterTrajectoryComponent = nullptr;
 	UPROPERTY()
 	TObjectPtr<ULoadoutComponent> m_LoadoutComponent = nullptr;
-
 	UPROPERTY()
-	TObjectPtr<UEquipmentManagerComponent> m_EquipmentManagerComponent = nullptr;
-
-	UPROPERTY()
-	TObjectPtr<AHeldItem> m_MainHandItem = nullptr;
-	UPROPERTY()
-	TObjectPtr<AHeldItem> m_OffHandItem = nullptr;
+	TObjectPtr<UAbilityComponent> m_AbilityComponent = nullptr;
 
 	UPROPERTY()
 	FGameplayTagContainer m_EffectImmunities;
@@ -164,6 +154,8 @@ protected:
 	FGameplayTagContainer m_EffectResistances;
 
 	bool m_TestEquipToggle = false;
+	bool m_TestEquipToggle2 = false;
+
 	bool m_AnimTest = false;
 
 	bool m_IsSprinting = false;

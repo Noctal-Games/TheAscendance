@@ -8,7 +8,7 @@ UDataTable* UDataHandlerSubsystem::LoadData(EDataGroup dataGroup)
 {
 	if (m_DataTables.Contains(dataGroup) == false)
 	{
-		LOG_ERROR("DataLoader m_DataTables doesn't contain DataGroup: %s", *UEnum::GetValueAsString(dataGroup));
+		LOG_ERROR("[DATA LOADER SUBSYSTEM] m_DataTables doesn't contain DataGroup: %s", *UEnum::GetValueAsString(dataGroup));
 		return nullptr;
 	}
 
@@ -27,17 +27,17 @@ UDataTable* UDataHandlerSubsystem::LoadData(EDataGroup dataGroup)
 
 	if (pathObject == nullptr)
 	{
-		LOG_ERROR("DataLoader failed to load DataTable for DataGroup: %s", *UEnum::GetValueAsString(dataGroup));
+		LOG_ERROR("[DATA LOADER SUBSYSTEM] Failed to load DataTable for DataGroup: %s", *UEnum::GetValueAsString(dataGroup));
 		return nullptr;
 	}
 
 	if (UDataTable* dataTable = Cast<UDataTable>(pathObject))
 	{
-		LOG_INFO("DataLoader succeeded at loading DataTable for DataGroup: %s", *UEnum::GetValueAsString(dataGroup));
+		LOG_INFO("[DATA LOADER SUBSYSTEM] Succeeded at loading DataTable for DataGroup: %s", *UEnum::GetValueAsString(dataGroup));
 		return dataTable;
 	}
 
-	LOG_ERROR("DataLoader failed to load DataTable for DataGroup: %s", *UEnum::GetValueAsString(dataGroup));
+	LOG_ERROR("[DATA LOADER SUBSYSTEM] Failed to load DataTable for DataGroup: %s", *UEnum::GetValueAsString(dataGroup));
 	return nullptr;
 }
 

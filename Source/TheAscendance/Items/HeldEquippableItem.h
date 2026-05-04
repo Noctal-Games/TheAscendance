@@ -4,28 +4,30 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "HeldItem.generated.h"
+#include "HeldEquippableItem.generated.h"
 
 class UStaticMeshComponent;
 class UStaticMesh;
 class UWeaponItemData;
-class UEquippableItemData;
 
 UCLASS()
-class THEASCENDANCE_API AHeldItem : public AActor
+class THEASCENDANCE_API AHeldEquippableItem : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	AHeldItem();
+	// Sets default values for this actor's properties
+	AHeldEquippableItem();
 
 	virtual void Init(UWeaponItemData* itemData);
 	void UnEquip();
 
+	const UWeaponItemData* GetItemData() const;
+
 private:
 	void SetStaticMesh();
 
-private:
+protected:
 	UPROPERTY();
 	TObjectPtr<UWeaponItemData> m_ItemData = nullptr;
 
@@ -34,7 +36,4 @@ private:
 
 	UPROPERTY();
 	TSoftObjectPtr<UStaticMesh> m_Mesh = nullptr;
-
-	UPROPERTY()
-	TObjectPtr<UEquippableItemData> m_EquippableData = nullptr;
 };

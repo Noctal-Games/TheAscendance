@@ -12,7 +12,7 @@
 class UAbilityComponent;
 class ULoadoutComponent;
 class ABaseCharacter;
-class AHeldItem;
+class AHeldEquippableItem;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class THEASCENDANCE_API UEquipmentManagerComponent : public UActorComponent
@@ -25,7 +25,7 @@ public:
 
 	void Init(ABaseCharacter* owner, UAbilityComponent* abilityComponent, ULoadoutComponent* loadoutComponent);
 
-	void EquipItem(const FGameplayTag& itemTag, EEquippablePart part);
+	bool EquipItem(const FGameplayTag& itemTag, EEquippablePart part);
 	void UnEquipItem(EEquippablePart part);
 
 protected:
@@ -36,7 +36,7 @@ protected:
 
 private:
 	UPROPERTY()
-	TMap<EEquippablePart, TObjectPtr<AHeldItem>> m_Equipment;
+	TMap<EEquippablePart, TObjectPtr<AHeldEquippableItem>> m_Equipment;
 
 	UPROPERTY()
 	TWeakObjectPtr<ABaseCharacter> m_Owner = nullptr;

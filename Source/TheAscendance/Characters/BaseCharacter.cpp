@@ -7,8 +7,8 @@
 #include "Components/CharacterStatsComponent.h"
 #include "Components/LoadoutComponent.h"
 #include "TheAscendance/Effects/Components/EffectHandlerComponent.h"
-#include "TheAscendance/Items/HeldItem.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
+#include "TheAscendance/Abilities/Components/AbilityComponent.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -28,6 +28,8 @@ ABaseCharacter::ABaseCharacter()
 	checkf(m_CharacterTrajectoryComponent, TEXT("Character Trajectory Component failed to initialise"));
 	m_LoadoutComponent = CreateDefaultSubobject<ULoadoutComponent>(TEXT("Loadout Component"));
 	checkf(m_LoadoutComponent, TEXT("Loadout Component failed to initialise"));
+	m_AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("Ability Component"));
+	checkf(m_AbilityComponent, TEXT("Ability Component failed to initialise"));
 
 	SetRootComponent(GetCapsuleComponent());
 
@@ -176,132 +178,34 @@ bool ABaseCharacter::HasResistance(const FGameplayTag& resistance) const
 	return m_EffectResistances.HasTag(resistance);
 }
 
-bool ABaseCharacter::MainHandPrimaryAttack()
-{
-	if (IsAttacking() == true || m_MainHandItem == nullptr/* Can attack checks*/)
-	{
-		return false;
-	}
-
-	//m_IsMainHandAttacking = m_MainHandItem->StartPrimaryAttack();
-
-	if (m_IsMainHandAttacking == true)
-	{
-		m_AttackTimer = 0.5f;
-	}
-
-	return m_IsMainHandAttacking;
-}
-
-bool ABaseCharacter::MainHandSecondaryAttack()
-{
-	if (IsAttacking() == true || m_MainHandItem == nullptr/* Can attack checks*/)
-	{
-		return false;
-	}
-
-	//m_IsMainHandAttacking = m_MainHandItem->StartSecondaryAttack();
-
-	if (m_IsMainHandAttacking == true)
-	{
-		m_AttackTimer = 0.5f;
-	}
-
-	return m_IsMainHandAttacking;
-}
-
-bool ABaseCharacter::OffHandPrimaryAttack()
-{
-	if (IsAttacking() == true || m_OffHandItem == nullptr/* Can attack checks*/)
-	{
-		return false;
-	}
-
-	//m_IsOffHandAttacking = m_OffHandItem->StartPrimaryAttack();
-
-	if (m_IsOffHandAttacking == true)
-	{
-		m_AttackTimer = 0.5f;
-	}
-
-	return m_IsOffHandAttacking;
-}
-
-bool ABaseCharacter::OffHandSecondaryAttack()
-{
-	if (IsAttacking() == true || m_OffHandItem == nullptr/* Can attack checks*/)
-	{
-		return false;
-	}
-
-	//m_IsOffHandAttacking = m_OffHandItem->StartSecondaryAttack();
-
-	if (m_IsOffHandAttacking == true)
-	{
-		m_AttackTimer = 0.5f;
-	}
-
-	return m_IsOffHandAttacking;
-}
-
 bool ABaseCharacter::IsMainHandPrimaryAttacking()
 {
-	if (m_MainHandItem == nullptr)
-	{
-		return true;
-	}
-
 	return false;
 }
 
 bool ABaseCharacter::IsOffHandPrimaryAttacking()
 {
-	if (m_OffHandItem == nullptr)
-	{
-		return true;
-	}
-
 	return false;
 }
 
 EWeaponType ABaseCharacter::MainHandWeaponType()
 {
-	if (m_MainHandItem == nullptr)
-	{
-		return EWeaponType::HAND;
-	}
-
 	return EWeaponType::HAND;
 }
 
 EWeaponType ABaseCharacter::OffHandWeaponType()
 {
-	if (m_OffHandItem == nullptr)
-	{
-		return EWeaponType::HAND;
-	}
-
 	return EWeaponType::HAND;
 }
 
 void ABaseCharacter::EndMainHandAttack()
 {
-	if (m_MainHandItem == nullptr/* Can attack checks*/)
-	{
-		return;
-	}
-
 	m_IsMainHandAttacking = false;
 	return;
 }
 
 void ABaseCharacter::EndOffHandAttack()
 {
-	if (m_OffHandItem == nullptr/* Can attack checks*/)
-	{
-		return;
-	}
-
 	m_IsOffHandAttacking = false;
 	return;
 }
@@ -409,39 +313,36 @@ float ABaseCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float pl
 
 	return duration;
 }
+
+bool ABaseCharacter::Attack(EAbilitySlot abilitySlot)
+{
+	if (m_AbilityComponent == nullptr)
+	{
+		return false;
+	}
+
+	m_AbilityComponent->StartAbility(abilitySlot);
+	return true;
+}
+
 void ABaseCharacter::TriggerAbility()
 {
+	if (m_AbilityComponent == nullptr)
+	{
+		return;
+	}
+
+	m_AbilityComponent->TriggerAbility();
 }
 
 void ABaseCharacter::StopAbility()
 {
-}
-
-bool ABaseCharacter::EquipItem(EEquippablePart part, const FGameplayTag& itemTag)
-{
-	if(m_LoadoutComponent == nullptr)
+	if (m_AbilityComponent == nullptr)
 	{
-		LOG_ERROR("[BASE CHARACTER] Tried to Equip item but LoadoutComponent was null");
-		return false;
-	}
-
-	//Remove from Inventory
-
-	m_LoadoutComponent->EquipItem(part, itemTag);
-	return true;
-}
-
-void ABaseCharacter::UnEquipItem(EEquippablePart part)
-{
-	if (m_LoadoutComponent == nullptr)
-	{
-		LOG_ERROR("[BASE CHARACTER] Tried to UnEquip item but LoadoutComponent was null");
 		return;
 	}
 
-	//Add to inventory logic
-
-	m_LoadoutComponent->UnEquipItem(part);
+	m_AbilityComponent->StopAbility();
 }
 
 UCharacterStatsComponent* ABaseCharacter::GetCharacterStatsComponent()
