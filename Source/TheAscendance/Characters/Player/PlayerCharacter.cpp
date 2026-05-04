@@ -430,7 +430,7 @@ void APlayerCharacter::AttackInputRelease()
 	m_AbilityComponent->OnInputReleased();
 }
 
-void APlayerCharacter::TestSetSpells(const TArray<FGameplayTag>& spellTags)
+void APlayerCharacter::TestSetSpells(const TMap<EAbilitySlot, FGameplayTag>& spellTags)
 {
 	m_LoadoutComponent->SetSpells(spellTags);
 }

@@ -66,7 +66,7 @@ public:
 	void AttackInputRelease();
 
 	UFUNCTION(BlueprintCallable)
-	void TestSetSpells(const TArray<FGameplayTag>& spellTags);
+	void TestSetSpells(const TMap<EAbilitySlot, FGameplayTag>& spellTags);
 
 	virtual bool IsSprinting() override;
 
@@ -90,11 +90,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float InteractRange = 500.0f;
 
-	UPROPERTY(EditDefaultsOnly)
-	TMap<EAbilitySlot ,FGameplayTag> TestAbilityTags;
-
 	UPROPERTY(EditDefaultsOnly, meta = (Category = "Ability.Spell"))
-	TArray<FGameplayTag> TestSpellTags;
+	TMap<EAbilitySlot, FGameplayTag> TestSpellTags;
 protected:
 	friend class UPlayerHUD;
 

@@ -14,8 +14,6 @@ ULoadoutComponent::ULoadoutComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
-
-	m_SpellTags.SetNum(UAbilityHelpers::MaxAbilities);
 	// ...
 }
 
@@ -72,36 +70,9 @@ void ULoadoutComponent::UnEquipItem(EEquippablePart part)
 	}
 }
 
-void ULoadoutComponent::SetSpells(const TArray<FGameplayTag>& spellTags)
+void ULoadoutComponent::SetSpells(const TMap<EAbilitySlot, FGameplayTag>& spellTags)
 {
-	if(spellTags.Num() != UAbilityHelpers::MaxAbilities)
-	{
-		LOG_ERROR("[LOADOUT COMPONENT] SetSpells was given an array of size %d but expected size is %d", spellTags.Num(), UAbilityHelpers::MaxAbilities)
-		return;
-	}
-
-	if (m_SpellTags == spellTags)
-	{
-		LOG_INFO("[LOADOUT COMPONENT] SetSpells made no changes")
-		return;
-	}
-
 	m_SpellTags = spellTags;
-
-	for(int i = 0; i < spellTags.Num(); i++)
-	{
-		const UEnum* abilityEnum = StaticEnum<EAbilitySlot>();
-
-		if (abilityEnum->IsValidEnumValue(i))
-		{
-			EAbilitySlot slot = static_cast<EAbilitySlot>(i);
-			m_TestSpellTags.Add(slot, spellTags[i]);
-		}
-		else
-		{
-			LOG_WARNING("Invalid enum value: %d", i);
-		}
-	}
 
 	if (OnSpellsUpdate.IsBound())
 	{
@@ -126,14 +97,14 @@ bool ULoadoutComponent::IsPartEquipped(const EEquippablePart& part)
 	return false;
 }
 
-const TArray<FGameplayTag>& ULoadoutComponent::GetSpellTags() const
+const TMap<EAbilitySlot, FGameplayTag>& ULoadoutComponent::GetSpellTags() const
 {
 	return m_SpellTags;
 }
 
 TMap<EAbilitySlot, FGameplayTag> ULoadoutComponent::GetSpellsCopy() const
 {
-	return m_TestSpellTags;
+	return m_SpellTags;
 }
 
 bool ULoadoutComponent::Contains(EEquippablePart part)

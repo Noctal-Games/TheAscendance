@@ -63,3 +63,15 @@ struct FAbilityTableData : public FTableRowBase
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftObjectPtr<UAbilityData> AbilityData = nullptr;
 };
+
+USTRUCT()
+struct FProcessedAbility
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TObjectPtr<UAbilityData> AbilityData = nullptr;
+
+	UPROPERTY()
+	TArray<EAbilitySlot> Slots;
+};

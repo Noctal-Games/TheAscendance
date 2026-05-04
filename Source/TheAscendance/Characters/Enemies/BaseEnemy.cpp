@@ -88,7 +88,7 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 	spells.Add(equipment.OffHandSpells.PrimarySpell);
 	spells.Add(equipment.OffHandSpells.SecondarySpell);
 
-	m_LoadoutComponent->SetSpells(spells);
+	//m_LoadoutComponent->SetSpells(spells);
 
 	for (const FLoadoutSlotData& loadoutData : equipment.LoadoutData)
 	{

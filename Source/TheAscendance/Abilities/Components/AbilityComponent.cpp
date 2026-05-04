@@ -18,47 +18,113 @@ UAbilityComponent::UAbilityComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	m_Abilities.SetNum(UAbilityHelpers::MaxAbilities);
 }
 
-void UAbilityComponent::SetAbilities(const TMap<EAbilitySlot, FGameplayTag>& abilityTags)
-{
-	if (m_Owner == nullptr)
+bool UAbilityComponent::AddAbilityFromTag(const FGameplayTag& abilityTag)
+
+{	if (m_Owner == nullptr)
 	{
-		LOG_ERROR("[ABILITY COMPONENT] SetAbilities was called but Owner is invalid");
-		return;
+		LOG_ERROR("[ABILITY COMPONENT] AddAbilityFromTag was called but Owner is invalid");
+		return false;
 	}
 
 	APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode();
 
 	if (gameMode == nullptr)
 	{
-		LOG_ERROR("[ABILITY COMPONENT] SetAbilities was called but GameMode is invalid");
-		return;
+		LOG_ERROR("[ABILITY COMPONENT] AddAbilityFromTag was called but GameMode is invalid");
+		return false;
 	}
 
+	if (UAbilityData* data = gameMode->GetAbilityData(abilityTag))
+	{
+		return AddAbilityFromData(data);
+	}
+
+	LOG_ERROR("[ABILITY COMPONENT] AddAbilityFromTag was called with an invalid tag: %s", *abilityTag.ToString());
+	return false;
+}
+
+bool UAbilityComponent::AddAbilityFromData(UAbilityData* abilityData)
+{
+	if (m_Owner == nullptr)
+	{
+		LOG_ERROR("[ABILITY COMPONENT] AddAbilityFromData was called but Owner is invalid");
+		return false;
+	}
+
+	if (abilityData == nullptr)
+	{
+		LOG_ERROR("[ABILITY COMPONENT] AddAbilityFromData called with invalid AbilityData");
+		return false;
+	}
+
+	APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode();
+
+	if (gameMode == nullptr)
+	{
+		LOG_ERROR("[ABILITY COMPONENT] AddAbilityFromData was called but GameMode is invalid");
+		return false;
+	}
+
+	if (IAbility* ability = gameMode->CreateAbilityFromData(abilityData, this))
+	{
+		m_Abilities.Add(ability->_getUObject());
+		BroadcastAbilities();
+		return true;
+	}
+
+	LOG_ERROR("[ABILITY COMPONENT] AddAbilityFromData was called but an ability could not be created from the provided data: %s", *abilityData->AbilityTag.ToString());
+	return false;
+}
+
+void UAbilityComponent::SetProcessedAbilities(const TArray<FProcessedAbility>& abilities)
+{
 	m_Abilities.Empty();
 
-	TMap<EAbilitySlot, UAbilityData*> abilityData;
-
-	for (const auto& abilityTagPair : abilityTags)
+	for (const FProcessedAbility& ability : abilities)
 	{
-		if (abilityTagPair.Value.IsValid() == false || abilityTagPair.Value == FGameplayTag::EmptyTag)
-		{
-			continue;
-		}
-
-		if (UAbilityData* data = gameMode->GetAbilityData(abilityTagPair.Value))
-		{
-			abilityData.Add(abilityTagPair.Key, data);
-		}
+		AddAbilityWithSlots(ability);
 	}
 
-	ProcessAbilityPair(abilityData, EAbilitySlot::MAINHAND_PRIMARY, EAbilitySlot::OFFHAND_PRIMARY, FString("PRIMARY"), gameMode);
-	ProcessAbilityPair(abilityData, EAbilitySlot::MAINHAND_ALT, EAbilitySlot::OFFHAND_ALT, FString("ALT"), gameMode);
+	BroadcastAbilities();
+}
 
-	TriggerOnAbilitiesUpdate();
+bool UAbilityComponent::AddAbilityWithSlots(const FProcessedAbility& abilityData)
+{
+	if (m_Owner == nullptr)
+	{
+		LOG_ERROR("[ABILITY COMPONENT] AddAbilityWithSlots was called but Owner is invalid");
+		return false;
+	}
+
+	if(abilityData.AbilityData == nullptr)
+	{
+		LOG_ERROR("[ABILITY COMPONENT] AddAbilityWithSlots was called but the provided AbilityData is invalid");
+		return false;
+	}
+
+	APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode();
+
+	if (gameMode == nullptr)
+	{
+		LOG_ERROR("[ABILITY COMPONENT] AddAbilityWithSlots was called but GameMode is invalid");
+		return false;
+	}
+
+	if (IAbility* ability = gameMode->CreateAbilityFromData(abilityData.AbilityData, this))
+	{
+		for (const auto& slot : abilityData.Slots)
+		{
+			ability->AddSlot(slot);
+		}
+
+		m_Abilities.Add(ability->_getUObject());
+		return true;
+	}
+
+	LOG_ERROR("[ABILITY COMPONENT] AddAbilityWithSlots was called but an ability could not be created from the provided data: %s", *abilityData.AbilityData->AbilityTag.ToString());
+	return false;
 }
 
 void UAbilityComponent::StartAbility(EAbilitySlot slot)
@@ -73,6 +139,33 @@ void UAbilityComponent::StartAbility(EAbilitySlot slot)
 		const FAbilityInfo& info = ability->GetAbilityInfo();
 
 		if (info.SlotsUsed.Contains(slot) == false)
+		{
+			continue;
+		}
+
+		if (ability->CanStart() == false)
+		{
+			return;
+		}
+
+		m_ActiveAbility = ability;
+		m_ActiveAbility->Start();
+		return;
+	}
+}
+
+void UAbilityComponent::StartAbility(const FGameplayTag& abilityTag)
+{
+	for (const auto& ability : m_Abilities)
+	{
+		if (ability == nullptr)
+		{
+			continue;
+		}
+
+		const FAbilityInfo& info = ability->GetAbilityInfo();
+
+		if (info.Tag != abilityTag)
 		{
 			continue;
 		}
@@ -142,7 +235,6 @@ void UAbilityComponent::TriggerOnAbilitiesUpdate()
 	{
 		if (ability == nullptr)
 		{
-			abilityInfo.Add(FAbilityInfo());
 			continue;
 		}
 
@@ -152,69 +244,40 @@ void UAbilityComponent::TriggerOnAbilitiesUpdate()
 	OnAbilitiesUpdate.Broadcast(abilityInfo);
 }
 
-void UAbilityComponent::ProcessAbilityPair(TMap<EAbilitySlot, UAbilityData*>& abilityData,EAbilitySlot mainSlot, EAbilitySlot offSlot, const FString& label, APlayableGameMode* gameMode)
+void UAbilityComponent::CleanAbilities()
 {
-	UAbilityData* mainData = nullptr;
-	UAbilityData* offData = nullptr;
-
-	if (UAbilityData** found = abilityData.Find(mainSlot))
+	for (int i = m_Abilities.Num() - 1; i >= 0; --i)
 	{
-		mainData = *found;
-	}
+		TScriptInterface<IAbility> ability = m_Abilities[i];
 
-	if (UAbilityData** found = abilityData.Find(offSlot))
-	{
-		offData = *found;
-	}
-
-	if (mainData != nullptr && offData != nullptr)
-	{
-		if (mainData->IsTwoHanded && offData->IsTwoHanded)
+		if (ability == nullptr)
 		{
-			LOG_WARNING("[ABILITY COMPONENT] Both %s abilities are two-handed. Prioritizing MAINHAND.", *label);
-			offData = nullptr;
+			m_Abilities.RemoveAtSwap(i);
+			continue;
 		}
-		else if (mainData->IsTwoHanded)
+
+		UObject* abilityObj = ability.GetObject();
+
+		if (IsValid(abilityObj) == false)
 		{
-			LOG_WARNING("[ABILITY COMPONENT] MAINHAND_%s is two-handed. Ignoring OFFHAND ability.", *label);
-			offData = nullptr;
+			m_Abilities.RemoveAtSwap(i);
+			continue;
 		}
-		else if (offData->IsTwoHanded)
+
+		const FAbilityInfo& info = ability->GetAbilityInfo();
+
+		if (info.Tag.IsValid() == false)
 		{
-			LOG_WARNING("[ABILITY COMPONENT] OFFHAND_%s is two-handed. Ignoring MAINHAND ability.", *label);
-			mainData = nullptr;
+			m_Abilities.RemoveAtSwap(i);
+			continue;
 		}
 	}
+}
 
-	if (mainData != nullptr)
-	{
-		if (IAbility* ability = gameMode->CreateAbilityFromData(mainData, this))
-		{
-			ability->AddSlot(mainSlot);
-
-			if (mainData->IsTwoHanded)
-			{
-				ability->AddSlot(offSlot);
-			}
-
-			m_Abilities.Add(ability->_getUObject());
-		}
-	}
-
-	if (offData != nullptr)
-	{
-		if (IAbility* ability = gameMode->CreateAbilityFromData(offData, this))
-		{
-			ability->AddSlot(offSlot);
-
-			if (offData->IsTwoHanded)
-			{
-				ability->AddSlot(mainSlot);
-			}
-
-			m_Abilities.Add(ability->_getUObject());
-		}
-	}
+void UAbilityComponent::BroadcastAbilities()
+{
+	CleanAbilities();
+	TriggerOnAbilitiesUpdate();
 }
 
 FVector UAbilityComponent::GetCastLocation()
@@ -282,6 +345,45 @@ void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	}
 }
 
+//void UAbilityComponent::SetAbilities(const TMap<EAbilitySlot, FGameplayTag>& abilityTags)
+//{
+//	if (m_Owner == nullptr)
+//	{
+//		LOG_ERROR("[ABILITY COMPONENT] SetAbilities was called but Owner is invalid");
+//		return;
+//	}
+//
+//	APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode();
+//
+//	if (gameMode == nullptr)
+//	{
+//		LOG_ERROR("[ABILITY COMPONENT] SetAbilities was called but GameMode is invalid");
+//		return;
+//	}
+//
+//	m_Abilities.Empty();
+//
+//	TMap<EAbilitySlot, UAbilityData*> abilityData;
+//
+//	for (const auto& abilityTagPair : abilityTags)
+//	{
+//		if (abilityTagPair.Value.IsValid() == false || abilityTagPair.Value == FGameplayTag::EmptyTag)
+//		{
+//			continue;
+//		}
+//
+//		if (UAbilityData* data = gameMode->GetAbilityData(abilityTagPair.Value))
+//		{
+//			abilityData.Add(abilityTagPair.Key, data);
+//		}
+//	}
+//
+//	ProcessAbilityPair(abilityData, EAbilitySlot::MAINHAND_PRIMARY, EAbilitySlot::OFFHAND_PRIMARY, FString("PRIMARY"), gameMode);
+//	ProcessAbilityPair(abilityData, EAbilitySlot::MAINHAND_ALT, EAbilitySlot::OFFHAND_ALT, FString("ALT"), gameMode);
+//
+//	TriggerOnAbilitiesUpdate();
+//}
+// 
 //if (m_Owner == nullptr)
 //{
 //	LOG_ERROR("[ABILITY COMPONENT] SetAbilities was called but Owner is invalid");
@@ -484,3 +586,68 @@ void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 
 //m_ActiveAbility = m_Abilities[slot - 1];
 //m_ActiveAbility->Start();
+
+//void UAbilityComponent::ProcessAbilityPair(TMap<EAbilitySlot, UAbilityData*>& abilityData, EAbilitySlot mainSlot, EAbilitySlot offSlot, const FString& label, APlayableGameMode* gameMode)
+//{
+//	UAbilityData* mainData = nullptr;
+//	UAbilityData* offData = nullptr;
+//
+//	if (UAbilityData** found = abilityData.Find(mainSlot))
+//	{
+//		mainData = *found;
+//	}
+//
+//	if (UAbilityData** found = abilityData.Find(offSlot))
+//	{
+//		offData = *found;
+//	}
+//
+//	if (mainData != nullptr && offData != nullptr)
+//	{
+//		if (mainData->IsTwoHanded && offData->IsTwoHanded)
+//		{
+//			LOG_WARNING("[ABILITY COMPONENT] Both %s abilities are two-handed. Prioritizing MAINHAND.", *label);
+//			offData = nullptr;
+//		}
+//		else if (mainData->IsTwoHanded)
+//		{
+//			LOG_WARNING("[ABILITY COMPONENT] MAINHAND_%s is two-handed. Ignoring OFFHAND ability.", *label);
+//			offData = nullptr;
+//		}
+//		else if (offData->IsTwoHanded)
+//		{
+//			LOG_WARNING("[ABILITY COMPONENT] OFFHAND_%s is two-handed. Ignoring MAINHAND ability.", *label);
+//			mainData = nullptr;
+//		}
+//	}
+//
+//	if (mainData != nullptr)
+//	{
+//		if (IAbility* ability = gameMode->CreateAbilityFromData(mainData, this))
+//		{
+//			ability->AddSlot(mainSlot);
+//
+//			if (mainData->IsTwoHanded)
+//			{
+//				ability->AddSlot(offSlot);
+//			}
+//
+//			m_Abilities.Add(ability->_getUObject());
+//		}
+//	}
+//
+//	if (offData != nullptr)
+//	{
+//		if (IAbility* ability = gameMode->CreateAbilityFromData(offData, this))
+//		{
+//			ability->AddSlot(offSlot);
+//
+//			if (offData->IsTwoHanded)
+//			{
+//				ability->AddSlot(mainSlot);
+//			}
+//
+//			m_Abilities.Add(ability->_getUObject());
+//		}
+//	}
+//}

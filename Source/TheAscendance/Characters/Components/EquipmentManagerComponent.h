@@ -7,12 +7,14 @@
 #include "TheAscendance/Characters/Structs/LoadoutSlotData.h"
 #include "TheAscendance/Characters/Enums/EquippablePart.h"
 #include "GameplayTagContainer.h"
+#include "TheAscendance/Abilities/Structs/AbilityData.h"
 #include "EquipmentManagerComponent.generated.h"
 
 class UAbilityComponent;
 class ULoadoutComponent;
 class ABaseCharacter;
 class AHeldEquippableItem;
+class APlayableGameMode;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class THEASCENDANCE_API UEquipmentManagerComponent : public UActorComponent
@@ -33,6 +35,10 @@ protected:
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+private:
+	TArray<FProcessedAbility> ProcessAbilities();
+	void ProcessAbilityPair(APlayableGameMode* gameMode, TArray<FProcessedAbility>& inAbilities, TMap<EAbilitySlot, FGameplayTag>& abilityData, EAbilitySlot mainSlot, EAbilitySlot offSlot, const FString& label);
 
 private:
 	UPROPERTY()

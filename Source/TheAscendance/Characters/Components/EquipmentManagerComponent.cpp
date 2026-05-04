@@ -10,8 +10,8 @@
 #include "TheAscendance/Items/Structs/ItemData.h"
 #include "TheAscendance/Game/Subsystems/ItemRegistrySubsystem.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
-#include "TheAscendance/Abilities/Components/AbilityComponent.h"
 #include "TheAscendance/Abilities/Enums/AbilitySlot.h"
+#include "TheAscendance/Abilities/Components/AbilityComponent.h"
 
 // Sets default values for this component's properties
 UEquipmentManagerComponent::UEquipmentManagerComponent()
@@ -227,41 +227,8 @@ void UEquipmentManagerComponent::UpdateAbilities()
 		return;
 	}
 
-	TMap<EAbilitySlot, FGameplayTag> abilities = m_LoadoutComponent->GetSpellsCopy();
-
-	if (AHeldEquippableItem* heldItem = m_Equipment[EEquippablePart::RIGHT_HAND])
-	{
-		if (const UWeaponItemData* itemData = heldItem->GetItemData())
-		{
-			if (itemData->PrimaryAbility.DoesSpellOverride == false)
-			{
-				abilities[EAbilitySlot::MAINHAND_PRIMARY] = itemData->PrimaryAbility.AbilityTag;
-			}
-
-			if (itemData->AltAbility.DoesSpellOverride == false)
-			{
-				abilities[EAbilitySlot::MAINHAND_ALT] = itemData->AltAbility.AbilityTag;
-			}
-		}
-	}
-
-	if (AHeldEquippableItem* heldItem = m_Equipment[EEquippablePart::LEFT_HAND])
-	{
-		if(const UWeaponItemData* itemData = heldItem->GetItemData())
-		{
-			if (itemData->PrimaryAbility.DoesSpellOverride == false)
-			{
-				abilities[EAbilitySlot::OFFHAND_PRIMARY] = itemData->PrimaryAbility.AbilityTag;
-			}
-
-			if (itemData->AltAbility.DoesSpellOverride == false)
-			{
-				abilities[EAbilitySlot::OFFHAND_ALT] = itemData->AltAbility.AbilityTag;
-			}
-		}
-	}
-
-	m_AbilityComponent->SetAbilities(abilities);
+	TArray<FProcessedAbility> processedAbilities = ProcessAbilities();
+	m_AbilityComponent->SetProcessedAbilities(processedAbilities);
 }
 
 // Called when the game starts
@@ -273,3 +240,129 @@ void UEquipmentManagerComponent::BeginPlay()
 	
 }
 
+TArray<FProcessedAbility> UEquipmentManagerComponent::ProcessAbilities()
+{
+	TArray<FProcessedAbility> result;
+
+	if (m_LoadoutComponent == nullptr)
+	{
+		return result;
+	}
+
+	UWorld* world = UCoreFunctionLibrary::GetGameWorld();
+
+	if (world == nullptr)
+	{
+		return result;
+	}
+
+	TMap<EAbilitySlot, FGameplayTag> slotMap = m_LoadoutComponent->GetSpellsCopy();
+
+	if (AHeldEquippableItem* heldItem = m_Equipment[EEquippablePart::RIGHT_HAND])
+	{
+		if (const UWeaponItemData* itemData = heldItem->GetItemData())
+		{
+			if (itemData->PrimaryAbility.DoesSpellOverride == false)
+			{
+				slotMap.FindOrAdd(EAbilitySlot::MAINHAND_PRIMARY) = itemData->PrimaryAbility.AbilityTag;
+			}
+
+			if (itemData->AltAbility.DoesSpellOverride == false)
+			{
+				slotMap.FindOrAdd(EAbilitySlot::MAINHAND_ALT) = itemData->AltAbility.AbilityTag;
+			}
+		}
+	}
+
+	if (AHeldEquippableItem* heldItem = m_Equipment[EEquippablePart::LEFT_HAND])
+	{
+		if (const UWeaponItemData* itemData = heldItem->GetItemData())
+		{
+			if (itemData->PrimaryAbility.DoesSpellOverride == false)
+			{
+				slotMap.FindOrAdd(EAbilitySlot::OFFHAND_PRIMARY) = itemData->PrimaryAbility.AbilityTag;
+			}
+
+			if (itemData->AltAbility.DoesSpellOverride == false)
+			{
+				slotMap.FindOrAdd(EAbilitySlot::OFFHAND_ALT) = itemData->AltAbility.AbilityTag;
+			}
+		}
+	}
+
+	APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode();
+
+	ProcessAbilityPair(gameMode, result, slotMap, EAbilitySlot::MAINHAND_PRIMARY, EAbilitySlot::OFFHAND_PRIMARY, FString("PRIMARY"));
+	ProcessAbilityPair(gameMode, result, slotMap, EAbilitySlot::MAINHAND_ALT, EAbilitySlot::OFFHAND_ALT, FString("ALT"));
+
+	return result;
+}
+
+void UEquipmentManagerComponent::ProcessAbilityPair(APlayableGameMode* gameMode, TArray<FProcessedAbility>& inAbilities, TMap<EAbilitySlot, FGameplayTag>& abilityData, EAbilitySlot mainSlot, EAbilitySlot offSlot, const FString& label)
+{
+	if (gameMode == nullptr)
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] ProcessAbilityPair was called but GameMode is invalid");
+		return;
+	}
+
+	UAbilityData* mainData = nullptr;
+	UAbilityData* offData = nullptr;
+
+	if (FGameplayTag* found = abilityData.Find(mainSlot))
+	{
+		mainData = gameMode->GetAbilityData(*found);
+	}
+
+	if (FGameplayTag* found = abilityData.Find(offSlot))
+	{
+		offData = gameMode->GetAbilityData(*found);
+	}
+
+	if (mainData != nullptr && offData != nullptr)
+	{
+		if (mainData->IsTwoHanded && offData->IsTwoHanded)
+		{
+			LOG_WARNING("[ABILITY COMPONENT] Both %s abilities are two-handed. Prioritizing MAINHAND.", *label);
+			offData = nullptr;
+		}
+		else if (mainData->IsTwoHanded)
+		{
+			LOG_WARNING("[ABILITY COMPONENT] MAINHAND_%s is two-handed. Ignoring OFFHAND ability.", *label);
+			offData = nullptr;
+		}
+		else if (offData->IsTwoHanded)
+		{
+			LOG_WARNING("[ABILITY COMPONENT] OFFHAND_%s is two-handed. Ignoring MAINHAND ability.", *label);
+			mainData = nullptr;
+		}
+	}
+
+	if (mainData != nullptr)
+	{
+		FProcessedAbility ability;
+		ability.AbilityData = mainData;
+		ability.Slots.Add(mainSlot);
+
+		if (mainData->IsTwoHanded)
+		{
+			ability.Slots.Add(offSlot);
+		}
+
+		inAbilities.Add(ability);
+	}
+
+	if (offData != nullptr)
+	{
+		FProcessedAbility ability;
+		ability.AbilityData = offData;
+		ability.Slots.Add(offSlot);
+
+		if (offData->IsTwoHanded)
+		{
+			ability.Slots.Add(mainSlot);
+		}
+
+		inAbilities.Add(ability);
+	}
+}

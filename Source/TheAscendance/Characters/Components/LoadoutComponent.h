@@ -36,13 +36,13 @@ public:
 	void BlockEquipItem(EEquippablePart part);
 	void UnEquipItem(EEquippablePart part);
 
-	void SetSpells(const TArray<FGameplayTag>& spellTags);
+	void SetSpells(const TMap<EAbilitySlot, FGameplayTag>& spellTags);
 
 	bool IsPartEquipped(const EEquippablePart& part);
 protected:
 	friend class UGrimoire;
 	friend class UEquipmentManagerComponent;
-	const TArray<FGameplayTag>& GetSpellTags() const;
+	const TMap<EAbilitySlot, FGameplayTag>& GetSpellTags() const;
 	TMap<EAbilitySlot, FGameplayTag> GetSpellsCopy() const;
 
 private:
@@ -53,7 +53,5 @@ protected:
 
 private:
 	TArray<FLoadoutSlotData> m_Loadout;
-	TArray<FGameplayTag> m_SpellTags;
-
-	TMap<EAbilitySlot, FGameplayTag> m_TestSpellTags;
+	TMap<EAbilitySlot, FGameplayTag> m_SpellTags;
 };

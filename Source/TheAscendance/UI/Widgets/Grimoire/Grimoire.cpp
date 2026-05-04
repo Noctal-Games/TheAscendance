@@ -32,7 +32,7 @@ bool UGrimoire::NativeOnHandleBackAction()
 		{
 			TArray<FGameplayTag> spellTags;
 			m_SpellLoadoutDisplay->GetSelectedSpellTags(spellTags);
-			m_PlayerLoadout->SetSpells(spellTags);
+			//m_PlayerLoadout->SetSpells(spellTags);
 		}
 
 		DeactivateWidget();
@@ -72,7 +72,7 @@ void UGrimoire::NativeConstruct()
 	}
 
 
-	UpdateGrimoire(m_PlayerLoadout->GetSpellTags());
+	//UpdateGrimoire(m_PlayerLoadout->GetSpellTags());
 }
 
 void UGrimoire::NativeDestruct()
@@ -130,7 +130,7 @@ void UGrimoire::UpdateGrimoire(const TArray<FGameplayTag>& spellTags)
 		}
 
 		m_SpellInventoryGrid->PopulateList(unequippedSpellEntries);
-		m_SpellLoadoutDisplay->Init(m_PlayerLoadout->GetSpellTags(), equippedSpellEntries);
+		//m_SpellLoadoutDisplay->Init(m_PlayerLoadout->GetSpellTags(), equippedSpellEntries);
 	}
 	else
 	{
