@@ -11,8 +11,9 @@
 
 #include "Components/Image.h"
 
-void UActionBarIcon::LoadAbilityIcon(const TSoftObjectPtr<UTexture2D>& icon)
+void UActionBarIcon::LoadAbility(const FGameplayTag& abilityTag, const TSoftObjectPtr<UTexture2D>& icon)
 {
+	m_AbilityTag = abilityTag;
 	m_Texture = icon;
 
 	if (m_Texture.IsNull() == false)
@@ -25,9 +26,21 @@ void UActionBarIcon::LoadAbilityIcon(const TSoftObjectPtr<UTexture2D>& icon)
 	ClearAbilityIcon();
 }
 
-void UActionBarIcon::ClearAbilityIcon()
+void UActionBarIcon::OnCooldownTriggered(const FGameplayTag& abilityTag, float remaining, float max)
 {
-	m_ActionIconImage->SetBrushFromTexture(EmptyActionIcon);
+	if (m_AbilityTag != abilityTag)
+	{
+		return;
+	}
+
+	LOG_ONSCREEN(-1, 3.0f, FColor::Red, "COOLDOWN FOR: %s", *abilityTag.ToString());
+	//Do Cooldown
+}
+
+void UActionBarIcon::ClearAbility()
+{
+	m_AbilityTag = FGameplayTag();
+	ClearAbilityIcon();
 }
 
 void UActionBarIcon::NativeConstruct()
@@ -53,4 +66,9 @@ void UActionBarIcon::SetIcon()
 		LOG_ERROR("[ACTION BAR ICON] Failed to set icon - Texture was invalid. Using default");
 		ClearAbilityIcon();
 	}
+}
+
+void UActionBarIcon::ClearAbilityIcon()
+{
+	m_ActionIconImage->SetBrushFromTexture(EmptyActionIcon);
 }

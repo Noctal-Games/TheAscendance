@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Characters/BaseCharacter.h"
+#include "TheAscendance/Abilities/Enums/AbilitySlot.h"
 #include "TheAscendance/Actors/Interaction/Enums/InteractType.h"
 #include "PlayerCharacter.generated.h"
 
@@ -97,7 +98,7 @@ public:
 	float InteractRange = 500.0f;
 
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FGameplayTag> TestAbilityTags;
+	TMap<EAbilitySlot ,FGameplayTag> TestAbilityTags;
 
 	UPROPERTY(EditAnywhere)
 	TArray<TObjectPtr<UAbilityData>> TestAbilities;

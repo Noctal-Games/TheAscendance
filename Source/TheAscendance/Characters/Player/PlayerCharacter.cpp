@@ -385,7 +385,7 @@ bool APlayerCharacter::TestMainHandPrimaryAttack()
 		return false;
 	}
 
-	m_AbilityComponent->StartAbility(UAbilityHelpers::MAINHAND_PRIMARY);
+	m_AbilityComponent->StartAbility(EAbilitySlot::MAINHAND_PRIMARY);
 	return true;
 }
 
@@ -396,7 +396,7 @@ bool APlayerCharacter::TestMainHandSecondaryAttack()
 		return false;
 	}
 
-	m_AbilityComponent->StartAbility(UAbilityHelpers::MAINHAND_ALT);
+	m_AbilityComponent->StartAbility(EAbilitySlot::MAINHAND_ALT);
 	return true;
 }
 
@@ -407,7 +407,7 @@ bool APlayerCharacter::TestOffHandPrimaryAttack()
 		return false;
 	}
 
-	m_AbilityComponent->StartAbility(UAbilityHelpers::OFFHAND_PRIMARY);
+	m_AbilityComponent->StartAbility(EAbilitySlot::OFFHAND_PRIMARY);
 	return true;
 }
 
@@ -418,7 +418,7 @@ bool APlayerCharacter::TestOffHandSecondaryAttack()
 		return false;
 	}
 
-	m_AbilityComponent->StartAbility(UAbilityHelpers::OFFHAND_ALT);
+	m_AbilityComponent->StartAbility(EAbilitySlot::OFFHAND_ALT);
 	return true;
 }
 

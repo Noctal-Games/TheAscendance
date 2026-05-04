@@ -10,6 +10,7 @@
 
 class IAbility;
 class UAbilityComponent;
+class UAbilityData;
 struct FSpellTableData;
 
 UCLASS()
@@ -20,7 +21,9 @@ class THEASCENDANCE_API UAbilityLoader : public UObject
 public:
 	void Init();
 
-	IAbility* CreateAbilityFromTag(const FGameplayTag& spellTag, UAbilityComponent* abilityOwner);
+	IAbility* CreateAbilityFromTag(const FGameplayTag& abilityTag, UAbilityComponent* abilityOwner);
+	IAbility* CreateAbilityFromData(UAbilityData* abilityData , UAbilityComponent* abilityOwner);
+	UAbilityData* GetAbilityData(const FGameplayTag& abilityTag);
 	FSpellTableData* GetSpellTableDataFromTag(const FGameplayTag& spellTag) const;
 	const TArray<TSharedPtr<FSpellTableData>> GetAllSpellTableDataEntries() const;
 

@@ -53,6 +53,8 @@ public:
 	virtual UAbilityData* GetAbilityData() override;
 	virtual AActor* GetAbilityOwner() override;
 
+	virtual const FAbilityInfo& GetAbilityInfo() const override;
+	virtual void AddSlot(EAbilitySlot slot) override;
 protected:
 	UPROPERTY()
 	TScriptInterface<IAbility> m_DecoratedAbility = nullptr;

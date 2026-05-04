@@ -237,7 +237,7 @@ void UEquipmentManagerComponent::UpdateAbilities()
 		//Get attack data and process
 	}
 
-	m_AbilityComponent->SetAbilities(abilityTags);
+	//m_AbilityComponent->SetAbilities(abilityTags);
 }
 
 // Called when the game starts

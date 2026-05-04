@@ -18,14 +18,16 @@ class THEASCENDANCE_API UActionBarIcon : public UCommonUserWidget
 
 protected:
 	friend class UActionBar;
+	void LoadAbility(const FGameplayTag& abilityTag, const TSoftObjectPtr<UTexture2D>& icon);
+	void ClearAbility();
 
-	void LoadAbilityIcon(const TSoftObjectPtr<UTexture2D>& icon);
-	void ClearAbilityIcon();
+	void OnCooldownTriggered(const FGameplayTag& abilityTag, float remaining, float max);
 
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 private:
 	void SetIcon();
+	void ClearAbilityIcon();
 
 public:
 	UPROPERTY(EditDefaultsOnly)
@@ -39,4 +41,6 @@ private:
 
 	UPROPERTY()
 	TSoftObjectPtr<UTexture2D> m_Texture = nullptr;
+
+	FGameplayTag m_AbilityTag;
 };

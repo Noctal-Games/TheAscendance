@@ -42,6 +42,7 @@ public:
 	const FSpellTableData* GetSpellTableData(const FGameplayTag& spellTag) const;
 
 	IAbility* CreateAbilityFromTag(const FGameplayTag& abilityTag, UAbilityComponent* owner) const;
+	IAbility* CreateAbilityFromData(UAbilityData* abilityData, UAbilityComponent* owner) const;
 	UAbilityData* GetAbilityData(const FGameplayTag& abilityTag) const;
 
 	UFUNCTION(BlueprintCallable)

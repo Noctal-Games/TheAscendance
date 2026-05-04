@@ -37,7 +37,9 @@ void UBaseAbility::Init(UAbilityComponent* ownerComponent, UAbilityData* ability
 		return;
 	}
 
-	m_Cooldown = abilityData->Cooldown;
+	m_AbilityInfo.Tag = m_AbilityData->AbilityTag;
+	m_AbilityInfo.Icon = m_AbilityData->AbilityIcon;
+	m_Cooldown = m_AbilityData->Cooldown;
 
 	UStreamableFunctionLibrary::RequestAsyncLoad(m_AbilityAnimation.ToSoftObjectPath());
 
@@ -99,7 +101,7 @@ void UBaseAbility::TriggerAbility()
 		return;
 	}
 	
-	m_CooldownTimer = m_Cooldown;
+	TriggerCooldown();
 	AffectOwnerStat();
 }
 
@@ -200,6 +202,18 @@ TArray<TObjectPtr<AActor>> UBaseAbility::GetHitActors()
 	return m_HitActors;
 }
 
+void UBaseAbility::ProcessOverlapDamage(int& damage)
+{
+}
+
+void UBaseAbility::ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation)
+{
+}
+
+void UBaseAbility::ApplyEffects(AActor* hitActor)
+{
+}
+
 float UBaseAbility::PlayAnimMontageOnOwner(UAnimMontage* animation)
 {
 	if (m_OwnerComponent.IsValid() == false)
@@ -260,6 +274,16 @@ void UBaseAbility::Update(float deltaTime)
 	m_CooldownTimer -= deltaTime;
 }
 
+const FAbilityInfo& UBaseAbility::GetAbilityInfo() const
+{
+	return m_AbilityInfo;
+}
+
+void UBaseAbility::AddSlot(EAbilitySlot slot)
+{
+	m_AbilityInfo.SlotsUsed.Add(slot);
+}
+
 void UBaseAbility::AffectOwnerStat()
 {
 	if (m_OwnerComponent == nullptr)
@@ -275,4 +299,14 @@ void UBaseAbility::AffectOwnerStat()
 	}
 
 	m_OwnerComponent->AffectOwnerStat(m_AbilityData->UsedStat, m_AbilityData->StatCost);
+}
+
+void UBaseAbility::TriggerCooldown()
+{
+	m_CooldownTimer = m_Cooldown;
+
+	if (m_OwnerComponent != nullptr && m_AbilityData != nullptr)
+	{
+		m_OwnerComponent->OnAbilityCooldown.Broadcast(m_AbilityData->AbilityTag, m_CooldownTimer, m_Cooldown);
+	}
 }

@@ -77,7 +77,12 @@ void UAbilityLoader::Init()
 
 IAbility* UAbilityLoader::CreateAbilityFromTag(const FGameplayTag& abilityTag, UAbilityComponent* abilityOwner)
 { 
-	if(m_AbilityFactory == nullptr)
+	return CreateAbilityFromData(GetAbilityData(abilityTag), abilityOwner);
+}
+
+IAbility* UAbilityLoader::CreateAbilityFromData(UAbilityData* abilityData, UAbilityComponent* abilityOwner)
+{
+	if (m_AbilityFactory == nullptr)
 	{
 		LOG_INFO("[ABILITY LOADER] AbilityFactory is invalid, attempting to create one");
 
@@ -90,17 +95,25 @@ IAbility* UAbilityLoader::CreateAbilityFromTag(const FGameplayTag& abilityTag, U
 		}
 	}
 
-	IAbility* toReturn = nullptr;
+	return m_AbilityFactory->CreateAbility(abilityData, abilityOwner);
+}
 
+UAbilityData* UAbilityLoader::GetAbilityData(const FGameplayTag& abilityTag)
+{
 	const FGameplayTag spellTag = FGameplayTag::RequestGameplayTag(TEXT("Ability.Spell"));
+	UAbilityData* abilityData = nullptr;
 
 	if (abilityTag.MatchesTag(spellTag) == true)
 	{
-		toReturn = m_AbilityFactory->CreateAbility(GetSpellAbilityDataFromTag(abilityTag), abilityOwner);
+		abilityData = GetSpellAbilityDataFromTag(abilityTag);
 	}
-	// Future Ability Types would be checked here with additional else if statements
+	else
+	{
+		LOG_ERROR("[ABILITY LOADER] AbilityTag does not match any Ability.Type tags");
+	}
 
-	return toReturn;
+	// Future Ability Types would be checked here with additional else if statements
+	return abilityData;
 }
 
 FSpellTableData* UAbilityLoader::GetSpellTableDataFromTag(const FGameplayTag& spellTag) const

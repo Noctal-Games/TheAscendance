@@ -21,6 +21,8 @@ class THEASCENDANCE_API UActionBar : public UCommonUserWidget
 public:
 	void Init(UAbilityComponent* abilityComponent);
 
+	void OnCooldownTriggered(const FGameplayTag& abilityTag, float remaining, float max);
+
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 protected:

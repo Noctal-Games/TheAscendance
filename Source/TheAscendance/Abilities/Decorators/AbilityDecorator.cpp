@@ -3,6 +3,7 @@
 
 #include "AbilityDecorator.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Abilities/Structs/AbilityInfo.h"
 
 void UAbilityDecorator::Decorate(IAbility* decorator)
 {
@@ -266,4 +267,27 @@ AActor* UAbilityDecorator::GetAbilityOwner()
 	}
 
 	return m_DecoratedAbility->GetAbilityOwner();
+}
+
+const FAbilityInfo& UAbilityDecorator::GetAbilityInfo() const
+{
+	if (m_DecoratedAbility == nullptr)
+	{
+		LOG_ERROR("[ABILITY DECORATOR] Invalid DecoratedAbility");
+		static const FAbilityInfo emptyInfo;
+		return emptyInfo;
+	}
+
+	return m_DecoratedAbility->GetAbilityInfo();
+}
+
+void UAbilityDecorator::AddSlot(EAbilitySlot slot)
+{
+	if (m_DecoratedAbility == nullptr)
+	{
+		LOG_ERROR("[ABILITY DECORATOR] Invalid DecoratedAbility");
+		return;
+	}
+
+	m_DecoratedAbility->AddSlot(slot);
 }

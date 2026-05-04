@@ -21,13 +21,6 @@ public:
 
 public:
 	static constexpr int MaxAbilities = 4;
-	static enum EAbilitySlot
-	{
-		MAINHAND_PRIMARY = 1,
-		MAINHAND_ALT = 2,
-		OFFHAND_PRIMARY = 3,
-		OFFHAND_ALT = 4
-	};
 
 private:
 	static TUniquePtr<ProjectileFactory> m_ProjectileFactory;

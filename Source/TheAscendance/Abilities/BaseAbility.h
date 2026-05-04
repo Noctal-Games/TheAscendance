@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "Interfaces/Ability.h"
+#include "Structs/AbilityInfo.h"
 #include "BaseAbility.generated.h"
 
 class UAbilityData;
@@ -33,6 +34,13 @@ public:
 
 	virtual void OnInputReleased() override;
 
+	virtual float PlayAnimMontageOnOwner(UAnimMontage* animation) override;
+
+	virtual const FGameplayTag& GetAbilityTag() const override;
+	virtual bool CanStart() const override;
+
+	virtual void Update(float deltaTime) override;
+
 	virtual void OnOverlap(AActor* overlapActor, const FVector& overlapLocation, int damage) override;
 	virtual void OnHit(AActor* hitActor, const FVector& hitLocation) override;
 	virtual void ProcessHit(const FVector& hitLocation) override;
@@ -42,21 +50,28 @@ public:
 	virtual void SpawnHitNiagara(const FVector& hitLocation) override;
 	virtual void LoadHitNiagara() override;
 
-	virtual const FGameplayTag& GetAbilityTag() const override;
-
 	virtual TArray<TObjectPtr<AActor>> GetHitActors() override;
 
-	virtual float PlayAnimMontageOnOwner(UAnimMontage* animation) override;
+	virtual void ProcessOverlapDamage(int& damage) override;
+	virtual void ProcessHitDamage(int& damage, const FVector& targetLocation, const FVector& hitLocation) override;
+
+	virtual void ApplyEffects(AActor* hitActor) override;
+
 	virtual UAbilityData* GetAbilityData() override;
 	virtual AActor* GetAbilityOwner() override;
 
-	virtual bool CanStart() const override;
-	virtual void Update(float deltaTime) override;
 
+	virtual const FAbilityInfo& GetAbilityInfo() const override;
+	virtual void AddSlot(EAbilitySlot slot) override;
 protected:
 	virtual void AffectOwnerStat();
 
+private:
+	void TriggerCooldown();
+
 protected:
+	FAbilityInfo m_AbilityInfo;
+
 	UPROPERTY()
 	TObjectPtr<UAbilityData> m_AbilityData = nullptr;
 	UPROPERTY()

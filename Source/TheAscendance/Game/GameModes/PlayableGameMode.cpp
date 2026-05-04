@@ -108,6 +108,17 @@ IAbility* APlayableGameMode::CreateAbilityFromTag(const FGameplayTag& abilityTag
 	return m_AbilityLoader->CreateAbilityFromTag(abilityTag, owner);
 }
 
+IAbility* APlayableGameMode::CreateAbilityFromData(UAbilityData* abilityData, UAbilityComponent* owner) const
+{
+	if (m_AbilityLoader == nullptr)
+	{
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid AbilityLoader");
+		return nullptr;
+	}
+
+	return m_AbilityLoader->CreateAbilityFromData(abilityData, owner);
+}
+
 UAbilityData* APlayableGameMode::GetAbilityData(const FGameplayTag& abilityTag) const
 {
 	if (m_AbilityLoader == nullptr)
@@ -116,7 +127,7 @@ UAbilityData* APlayableGameMode::GetAbilityData(const FGameplayTag& abilityTag) 
 		return nullptr;
 	}
 
-	return nullptr;
+	return m_AbilityLoader->GetAbilityData(abilityTag);
 }
 
 ABaseEnemy* APlayableGameMode::CreateEnemyFromID(int enemyID) const

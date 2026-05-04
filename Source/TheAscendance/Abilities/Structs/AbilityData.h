@@ -33,6 +33,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Cooldown = 0.0f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool IsTwoHanded = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftObjectPtr<UAnimMontage> AbilityAnimation = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (ExcludeBaseStruct))

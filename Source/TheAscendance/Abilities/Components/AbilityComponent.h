@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "TheAscendance/Core/AbilityHelpers.h"
+#include "TheAscendance/Abilities/Enums/AbilitySlot.h"
 #include "TheAscendance/Characters/Enums/CharacterStat.h"
 #include "TheAscendance/Abilities/Structs/AbilityInfo.h"
 #include "GameplayTagContainer.h"
@@ -17,8 +17,10 @@ class IAbility;
 class ABaseCharacter;
 class UAnimMontage;
 class UAbilityData;
+class APlayableGameMode;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnAbilitiesUpdate, const TArray<FAbilityInfo>&);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnAbilityCooldown, const FGameplayTag& /*abilityTag*/, float /*remaining*/, float /*max*/);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API UAbilityComponent : public UActorComponent
@@ -29,11 +31,10 @@ public:
 	// Sets default values for this component's properties
 	UAbilityComponent();
 
-	void SetAbilities(const TArray<FGameplayTag>& abilityTags);
-	void TestSetAbilities(const TArray<FGameplayTag>& abilityTags);
+	void SetAbilities(const TMap<EAbilitySlot, FGameplayTag>& abilityTags);
 
 	//Starts the overall ability. Charging, animations, etc.
-	void StartAbility(UAbilityHelpers::EAbilitySlot slot);
+	void StartAbility(EAbilitySlot slot);
 	//Triggered by animations, this is the actual ability start event. So when a spell is cast, a melee collision is activated, etc.
 	void TriggerAbility();
 	//Stops the ability. Clears up all timer handles, etc.
@@ -58,10 +59,12 @@ protected:
 
 private:
 	void TriggerOnAbilitiesUpdate();
+	void ProcessAbilityPair(TMap<EAbilitySlot, UAbilityData*>& abilityData, EAbilitySlot mainSlot, EAbilitySlot offSlot, const FString& label, APlayableGameMode* gameMode);
 
 public:
 	FOnAbilitiesUpdate OnAbilitiesUpdate;
-
+	FOnAbilityCooldown OnAbilityCooldown;
+	 
 private:
 	UPROPERTY()
 	TWeakObjectPtr<ABaseCharacter> m_Owner = nullptr;
