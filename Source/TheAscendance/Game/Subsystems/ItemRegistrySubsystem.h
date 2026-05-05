@@ -20,6 +20,8 @@ public:
     template<typename T>
     T* LoadItemData(const FGameplayTag& itemTag)
     {
+        static_assert(TIsDerivedFrom<T, UItemData>::Value, "T must derive from UItemData");
+
         const TSoftObjectPtr<UItemData>* item = m_ItemMap.Find(itemTag);
 
         if (item == nullptr)

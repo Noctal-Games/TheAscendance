@@ -31,81 +31,81 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 		return;
 	}
 
-	m_EnemyID = data->EnemyID;
+	//m_EnemyID = data->EnemyID;
 
-	TArray<FSoftObjectPath> assetPaths;
-	m_SkeletalMesh = data->EnemyMesh;
+	//TArray<FSoftObjectPath> assetPaths;
+	//m_SkeletalMesh = data->EnemyMesh;
 
-	if (m_SkeletalMesh.IsNull() == false)
-	{
-		assetPaths.Add(m_SkeletalMesh.ToSoftObjectPath());
-	}
-	else
-	{
-		LOG_ERROR("[BASE ENEMY] Tried to Init BaseEnemy with invalid EnemyMesh");
-	}
+	//if (m_SkeletalMesh.IsNull() == false)
+	//{
+	//	assetPaths.Add(m_SkeletalMesh.ToSoftObjectPath());
+	//}
+	//else
+	//{
+	//	LOG_ERROR("[BASE ENEMY] Tried to Init BaseEnemy with invalid EnemyMesh");
+	//}
 
-	m_AnimationBP = data->EnemyAnimationBP;
+	//m_AnimationBP = data->EnemyAnimationBP;
 
-	if (m_AnimationBP.IsNull() == false)
-	{
-		assetPaths.Add(m_AnimationBP.ToSoftObjectPath());
-	}
-	else
-	{
-		LOG_ERROR("[BASE ENEMY]Tried to Init BaseEnemy with invalid EnemyAnimationBP");
-	}
+	//if (m_AnimationBP.IsNull() == false)
+	//{
+	//	assetPaths.Add(m_AnimationBP.ToSoftObjectPath());
+	//}
+	//else
+	//{
+	//	LOG_ERROR("[BASE ENEMY]Tried to Init BaseEnemy with invalid EnemyAnimationBP");
+	//}
 
-	UStreamableFunctionLibrary::RequestAsyncLoad(assetPaths, [this]() { SetSkeletalMesh(); });
+	//UStreamableFunctionLibrary::RequestAsyncLoad(assetPaths, [this]() { SetSkeletalMesh(); });
 
-	const FEnemyStats& stats = data->EnemyData.EnemyStats;
-	
-	m_CharacterStatsComponent->SetStat(ECharacterStat::HEALTH, stats.Health);
-	m_CharacterStatsComponent->SetStat(ECharacterStat::WALK_SPEED, stats.WalkSpeed);
-	m_CharacterStatsComponent->SetStat(ECharacterStat::SPRINT_SPEED_BONUS, stats.SprintSpeedBonus);
-	//m_CharacterStatsComponent->SetStat(ECharacterStat::MAGIC_ATTACK, stats->MagicAttack);
-	//m_CharacterStatsComponent->SetStat(ECharacterStat::MAGIC_RESISTANCE, stats->MagicResistance);
-	//m_CharacterStatsComponent->SetStat(ECharacterStat::PHYSICAL_ATTACK, stats->PhysicalAttack);
-	//m_CharacterStatsComponent->SetStat(ECharacterStat::PHYSICAL_RESISTANCE, stats->PhysicalResistance);
-	m_CharacterStatsComponent->SetStat(ECharacterStat::MANA, 999999);
-	m_CharacterStatsComponent->SetStat(ECharacterStat::STAMINA, 999999);
+	//const FEnemyStats& stats = data->EnemyData.EnemyStats;
+	//
+	//m_CharacterStatsComponent->SetStat(ECharacterStat::HEALTH, stats.Health);
+	//m_CharacterStatsComponent->SetStat(ECharacterStat::WALK_SPEED, stats.WalkSpeed);
+	//m_CharacterStatsComponent->SetStat(ECharacterStat::SPRINT_SPEED_BONUS, stats.SprintSpeedBonus);
+	////m_CharacterStatsComponent->SetStat(ECharacterStat::MAGIC_ATTACK, stats->MagicAttack);
+	////m_CharacterStatsComponent->SetStat(ECharacterStat::MAGIC_RESISTANCE, stats->MagicResistance);
+	////m_CharacterStatsComponent->SetStat(ECharacterStat::PHYSICAL_ATTACK, stats->PhysicalAttack);
+	////m_CharacterStatsComponent->SetStat(ECharacterStat::PHYSICAL_RESISTANCE, stats->PhysicalResistance);
+	//m_CharacterStatsComponent->SetStat(ECharacterStat::MANA, 999999);
+	//m_CharacterStatsComponent->SetStat(ECharacterStat::STAMINA, 999999);
 
-	for (const FGameplayTag& immunity : stats.EffectImmunities)
-	{
-		AddImmunity(immunity);
-	}
+	//for (const FGameplayTag& immunity : stats.EffectImmunities)
+	//{
+	//	AddImmunity(immunity);
+	//}
 
-	for (const FGameplayTag& resistance : stats.EffectResistances)
-	{
-		AddResistance(resistance);
-	}
+	//for (const FGameplayTag& resistance : stats.EffectResistances)
+	//{
+	//	AddResistance(resistance);
+	//}
 
-	const FEnemyEquipmentData& equipment = data->EnemyData.EnemyEquipment;
+	//const FEnemyEquipmentData& equipment = data->EnemyData.EnemyEquipment;
 
-	TArray<FGameplayTag> spells;
-	spells.Add(equipment.MainHandSpells.PrimarySpell);
-	spells.Add(equipment.MainHandSpells.SecondarySpell);
-	spells.Add(equipment.OffHandSpells.PrimarySpell);
-	spells.Add(equipment.OffHandSpells.SecondarySpell);
+	//TArray<FGameplayTag> spells;
+	//spells.Add(equipment.MainHandSpells.PrimarySpell);
+	//spells.Add(equipment.MainHandSpells.SecondarySpell);
+	//spells.Add(equipment.OffHandSpells.PrimarySpell);
+	//spells.Add(equipment.OffHandSpells.SecondarySpell);
 
-	//m_LoadoutComponent->SetSpells(spells);
+	////m_LoadoutComponent->SetSpells(spells);
 
-	for (const FLoadoutSlotData& loadoutData : equipment.LoadoutData)
-	{
-		m_LoadoutComponent->EquipItem(loadoutData.EquippedPart, loadoutData.ItemTag);
-	}
+	//for (const FLoadoutSlotData& loadoutData : equipment.LoadoutData)
+	//{
+	//	m_LoadoutComponent->EquipItem(loadoutData.EquippedPart, loadoutData.ItemTag);
+	//}
 
-	if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))
-	{
-		m_Agent->RegisterComponent();
-		m_Agent->InitStats(stats.SightStrength, stats.HearingStrength, stats.PreferredRange, stats.PreferredRangeTolerance, stats.ReactionTimeMinimum, stats.ReactionTimeMaximum);
-		m_Agent->InitMeleeAttacks(data->EnemyData.AttackSet);
-		m_Agent->Init(this);
-	}
-	else
-	{
-		LOG_ERROR("[BASE ENEMY] Failed to initalise HSM_Agent");
-	}
+	//if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))
+	//{
+	//	m_Agent->RegisterComponent();
+	//	m_Agent->InitStats(stats.SightStrength, stats.HearingStrength, stats.PreferredRange, stats.PreferredRangeTolerance, stats.ReactionTimeMinimum, stats.ReactionTimeMaximum);
+	//	m_Agent->InitMeleeAttacks(data->EnemyData.AttackSet);
+	//	m_Agent->Init(this);
+	//}
+	//else
+	//{
+	//	LOG_ERROR("[BASE ENEMY] Failed to initalise HSM_Agent");
+	//}
 }
 
 void ABaseEnemy::SetSkeletalMesh()

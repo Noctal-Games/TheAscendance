@@ -9,6 +9,7 @@
 #include "TheAscendance/Abilities/Structs/AbilityModifierData.h"
 #include "TheAscendance/Abilities/Enums/AbilityType.h"
 #include "TheAscendance/Characters/Enums/CharacterStat.h"
+#include "TheAscendance/Abilities/Enums/AbilitySlot.h"	
 #include "AbilityData.generated.h"
 
 class UAnimMontage;

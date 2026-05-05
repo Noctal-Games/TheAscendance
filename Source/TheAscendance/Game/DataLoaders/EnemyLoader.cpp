@@ -51,33 +51,33 @@ ABaseEnemy* UEnemyLoader::CreateEnemyFromID(int enemyID)
 
 	static const FString contextString(TEXT("Enemy Context String"));
 
-	TArray<FEnemyTableData*> enemyStructs;
-	m_EnemyTable->GetAllRows(contextString, enemyStructs);
+	//TArray<FEnemyTableData*> enemyStructs;
+	//m_EnemyTable->GetAllRows(contextString, enemyStructs);
 
-	for (const auto data : enemyStructs)
-	{
-		if (data->EnemyID != enemyID)
-		{
-			continue;
-		}
+	//for (const auto data : enemyStructs)
+	//{
+		//if (data->EnemyID != enemyID)
+		//{
+		//	continue;
+		//}
 
-		if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
-		{
-			FActorSpawnParameters params;
-			params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-			params.bNoFail = true;
+		//if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
+		//{
+		//	FActorSpawnParameters params;
+		//	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		//	params.bNoFail = true;
 
-			ABaseEnemy* enemy = worldContext->SpawnActor<ABaseEnemy>(m_EnemyDefault, FVector::ZeroVector, FRotator::ZeroRotator, params);
+		//	ABaseEnemy* enemy = worldContext->SpawnActor<ABaseEnemy>(m_EnemyDefault, FVector::ZeroVector, FRotator::ZeroRotator, params);
 
-			if (enemy == nullptr)
-			{
-				return nullptr;
-			}
+		//	if (enemy == nullptr)
+		//	{
+		//		return nullptr;
+		//	}
 
-			enemy->Init(data);
-			return enemy;                                                                     
-		}
-	}
+		//	enemy->Init(data);
+		//	return enemy;                                                                     
+		//}
+	//}
 
 	LOG_ERROR("EnemyLoader failed to create Enemy for Enemy ID: %i", enemyID);
 	return nullptr;

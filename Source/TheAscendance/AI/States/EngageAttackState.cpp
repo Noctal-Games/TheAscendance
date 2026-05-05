@@ -18,37 +18,37 @@ void UEngageAttackState::StartState(UHSMAgentComponent* agent)
 		return;
 	}
 
-	const FAttackSetData* attackSetData = m_Agent->GetAttackSetData();
+	//const FAttackSetData* attackSetData = m_Agent->GetAttackSetData();
 
-	if(attackSetData == nullptr)
-	{
-		LOG_ERROR("EngageAttackState could not get AttackSetData from HSMAgentComponent");
-		return;
-	}
+	//if(attackSetData == nullptr)
+	//{
+	//	LOG_ERROR("EngageAttackState could not get AttackSetData from HSMAgentComponent");
+	//	return;
+	//}
 
-	//Attack decision logic would go here to pick which attack to use
+	////Attack decision logic would go here to pick which attack to use
 
-	if(const FQuickAttackData* attackData = &attackSetData->QuickAttackData)
-	{
-		m_AttackCombatState->m_CurrentTelegraphMontage = attackData->TelegraphMontage;
-		m_AttackCombatState->m_CurrentAttackMontage = attackData->AttackMontage;
+	//if(const FQuickAttackData* attackData = &attackSetData->QuickAttackData)
+	//{
+	//	m_AttackCombatState->m_CurrentTelegraphMontage = attackData->TelegraphMontage;
+	//	m_AttackCombatState->m_CurrentAttackMontage = attackData->AttackMontage;
 
-		if (m_AttackCombatState->m_CurrentTelegraphMontage.IsNull() == true)
-		{
-			LOG_ERROR("TelegraphMontage for QuickAttackData was invalid");
-			return;
-		}
+	//	if (m_AttackCombatState->m_CurrentTelegraphMontage.IsNull() == true)
+	//	{
+	//		LOG_ERROR("TelegraphMontage for QuickAttackData was invalid");
+	//		return;
+	//	}
 
-		UStreamableFunctionLibrary::RequestAsyncLoad(m_AttackCombatState->m_CurrentTelegraphMontage.ToSoftObjectPath(), [this, attackData]()
-			{
-				m_AttackCombatState->SetAttackState(EAttackState::TELEGRAPH);
-			}
-		);
-	}
-	else
-	{
-		LOG_ERROR("EngageAttackState could not get QuickAttackData from AttackSetData");
-	}
+	//	UStreamableFunctionLibrary::RequestAsyncLoad(m_AttackCombatState->m_CurrentTelegraphMontage.ToSoftObjectPath(), [this, attackData]()
+	//		{
+	//			m_AttackCombatState->SetAttackState(EAttackState::TELEGRAPH);
+	//		}
+	//	);
+	//}
+	//else
+	//{
+	//	LOG_ERROR("EngageAttackState could not get QuickAttackData from AttackSetData");
+	//}
 }
 
 void UEngageAttackState::Update(float deltaTime)

@@ -27,9 +27,9 @@ public:
 
 	void Init(ABaseEnemy* owner);
 	void InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance, float minReactionTime, float maxReactionTime);
-	void InitMeleeAttacks(const FAttackSetData& attackSet /*const TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>>& meleeAttacks*/);
+	//void InitMeleeAttacks(const FAttackSetData& attackSet /*const TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>>& meleeAttacks*/);
 
-	const FAttackSetData* GetAttackSetData() const;
+	//const FAttackSetData* GetAttackSetData() const;
 	//FAttackData* GetMeleeAttackData(EMeleeAttackType attackType) const;
 
 	void SetState(EState newState);
@@ -108,5 +108,5 @@ private:
 	bool m_HasLineOfSight = false;
 
 	//TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>> m_MeleeAttacks;
-	TSharedPtr<FAttackSetData> m_AttackSet = nullptr;
+	//TSharedPtr<FAttackSetData> m_AttackSet = nullptr;
 };

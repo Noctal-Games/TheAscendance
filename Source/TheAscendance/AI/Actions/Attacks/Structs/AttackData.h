@@ -7,52 +7,19 @@
 #include "AttackData.generated.h"
 
 class UAnimMontage;
+class UAbilityData;
 
 USTRUCT(BlueprintType)
-struct FAttackData
+struct FEnemyAbilityData
 {
 	GENERATED_BODY()
 
-	FAttackData() : AttackType(EMeleeAttackType::QUICK_ATTACK) {};
-	FAttackData(EMeleeAttackType attackType) : AttackType(attackType) {};
-
-	EMeleeAttackType AttackType;
-
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Higher weighted abilities will have a higher base priority. A higher SELF_HEAL ability will prioritise other SELF_ABILITIES"))
+	float Weight = 1.0f;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Goals used to help ability choice, HEAL_ALLY will take priority over DAMAGE if enemy stats align, as an example"))
+	TArray<EAbilityGoal> Goals;
 	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UAbilityData> AbilityData = nullptr;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Not necessary, will play before the Ability animations if set"))
 	TSoftObjectPtr<UAnimMontage> TelegraphMontage = nullptr;
-	UPROPERTY(EditDefaultsOnly)
-	TSoftObjectPtr<UAnimMontage> AttackMontage = nullptr;
-};
-
-USTRUCT(BlueprintType)
-struct FQuickAttackData : public FAttackData
-{
-	GENERATED_BODY()
-
-	FQuickAttackData() : FAttackData(EMeleeAttackType::QUICK_ATTACK) {};
-};
-
-USTRUCT(BlueprintType)
-struct FHeavyAttackData : public FAttackData
-{
-	GENERATED_BODY()
-
-	FHeavyAttackData() : FAttackData(EMeleeAttackType::HEAVY_ATTACK) {};
-};
-
-USTRUCT(BlueprintType)
-struct FLungeAttackData : public FAttackData
-{
-	GENERATED_BODY()
-
-	FLungeAttackData() : FAttackData(EMeleeAttackType::LUNGE_ATTACK) {};
-};
-
-USTRUCT(BlueprintType)
-struct FAttackSetData
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly)
-	FQuickAttackData QuickAttackData;
 };
