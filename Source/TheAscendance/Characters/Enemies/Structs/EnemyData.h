@@ -23,7 +23,7 @@ struct FFloatRangeCustom
 };
 
 UCLASS(BlueprintType)
-class THEASCENDANCE_API UClassData : public UPrimaryDataAsset
+class THEASCENDANCE_API UEnemyClassData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
@@ -140,7 +140,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta = (Categories = "Enemy", AssetRegistrySearchable))
 	FGameplayTag EnemyTag;
 	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UClassData> ClassData = nullptr;
+	TObjectPtr<UEnemyClassData> ClassData = nullptr;
 	UPROPERTY(EditDefaultsOnly)
 	FEnemyStats Stats;
 	UPROPERTY(EditDefaultsOnly)

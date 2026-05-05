@@ -23,8 +23,18 @@ void UEnemyData::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEv
         BehaviourSettings.ReactionTime.Max = BehaviourSettings.ReactionTime.Min;
     }
 
+    if(ClassData == nullptr)
+    {
+        return;
+	}
+
     for (const EAbilityGoal& goal : ClassData->ExpectedAbilityGoals)
     {
+        if (CombatSettings.GoalWeights.Contains(goal) == false)
+        {
+            CombatSettings.GoalWeights.Add(goal, 0.0f);
+        }
+
         bool goalFound = false;
 
         for (const FEnemyAbilityData& Ability : CombatSettings.Abilities)
