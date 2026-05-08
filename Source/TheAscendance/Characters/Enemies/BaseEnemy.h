@@ -59,7 +59,4 @@ private:
 	TObjectPtr<UHSMAgentComponent> m_Agent = nullptr;
 
 	FGameplayTag m_EnemyTag;
-	
-	UPROPERTY()
-	TArray<FEnemyLoadedAbilityData> m_AbilityData;
 };

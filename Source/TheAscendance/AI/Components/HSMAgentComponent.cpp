@@ -57,42 +57,18 @@ void UHSMAgentComponent::Init(ABaseEnemy* owner)
 	SetState(EState::IDLE);
 }
 
-void UHSMAgentComponent::InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance, float minReactionTime, float maxReactionTime)
+void UHSMAgentComponent::InitSettings(UEnemyClassData* classData, const FBehaviourSettings& behaviourSettings, const FPerceptionSettings& perceptionSettings)
 {
-	m_VisionStrength = visionStrength;
-	m_HearingStrength = hearingStrength;
-	m_PreferredDistanceFromTarget = preferredDistanceFromTarget;
-	m_PreferredDistanceTolerance = preferredDistanceTolerance;
-	m_CombatReactionTimeMin = minReactionTime;
-	m_CombatReactionTimeMax = maxReactionTime;
+	if (classData == nullptr)
+	{
+		LOG_ERROR("Tried to InitSettings of HSMAgentComponent with invalid class data");
+		return;
+	}
+
+	m_ClassData = classData;
+	m_BehaviourSettings = behaviourSettings;
+	m_PerceptionSettings = perceptionSettings;
 }
-
-//void UHSMAgentComponent::InitMeleeAttacks(const FAttackSetData& attackSet /*const TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>>& meleeAttacks*/)
-//{
-//	m_AttackSet = MakeShared<FAttackSetData>(attackSet);
-//	//m_MeleeAttacks = meleeAttacks;
-//}
-//
-//const FAttackSetData* UHSMAgentComponent::GetAttackSetData() const
-//{
-//	if(m_AttackSet.IsValid() == false)
-//	{
-//		LOG_ERROR("Tried to get attack set data with invalid attack set");
-//		return nullptr;
-//	}
-//
-//	return m_AttackSet.Get();
-//}
-
-//FAttackData* UHSMAgentComponent::GetMeleeAttackData(EMeleeAttackType attackType) const
-//{
-//	if(m_MeleeAttacks.Contains(attackType) && m_MeleeAttacks[attackType].IsValid())
-//	{
-//		return m_MeleeAttacks[attackType].Get();
-//	}
-//
-//	return nullptr;
-//}
 
 void UHSMAgentComponent::SetState(EState newState)
 {
@@ -189,18 +165,18 @@ bool UHSMAgentComponent::HasPath() const
 
 bool UHSMAgentComponent::IsTargetInActionableRange(const FVector& target) const
 {
-	if (m_Owner == nullptr)
+	if (m_Owner == nullptr || m_ClassData == nullptr)
 	{
 		return false;
 	}
 
-	return ((m_Owner->GetActorLocation() - target).Length() <= m_PreferredDistanceFromTarget + (m_PreferredDistanceTolerance * 2.0f));
+	return ((m_Owner->GetActorLocation() - target).Length() <= m_ClassData->PreferredEngagementRange + (m_ClassData->EngagementRangeTolerance * 2.0f));
 }
 
 void UHSMAgentComponent::GetPreferredDistanceValues(float& preferredDistanceFromTarget, float& preferredDistanceTolerance) const
 {
-	preferredDistanceFromTarget = m_PreferredDistanceFromTarget;
-	preferredDistanceTolerance = m_PreferredDistanceTolerance;
+	preferredDistanceFromTarget = m_ClassData->PreferredEngagementRange;
+	preferredDistanceTolerance = m_ClassData->EngagementRangeTolerance;
 }
 
 void UHSMAgentComponent::SetFocus(AActor* target)
@@ -251,29 +227,19 @@ AWaypointRoute* UHSMAgentComponent::GetWaypointRoute() const
 	return m_WaypointRoute.Get();
 }
 
-void UHSMAgentComponent::SetVisionStrength(float visionStrength)
-{
-	m_VisionStrength = visionStrength;
-}
-
 float UHSMAgentComponent::GetVisionStrength() const
 {
-	return m_VisionStrength;
-}
-
-void UHSMAgentComponent::SetHearingStrength(float hearingStrength)
-{
-	m_HearingStrength = hearingStrength;
+	return m_PerceptionSettings.SightStrength;
 }
 
 float UHSMAgentComponent::GetHearingStrength() const
 {
-	return m_HearingStrength;
+	return m_PerceptionSettings.HearingStrength;
 }
 
 float UHSMAgentComponent::GetRandomCombatReactionTime() const
 {
-	return FMath::RandRange(m_CombatReactionTimeMin, m_CombatReactionTimeMax);
+	return m_BehaviourSettings.ReactionTime.GetRandomValue();
 }
 
 bool UHSMAgentComponent::HasLineOfSight() const
@@ -294,12 +260,7 @@ void UHSMAgentComponent::SetHasLineOfSight(bool hasLineOfSight)
 
 bool UHSMAgentComponent::IsSoundHeard(float soundWeight) const
 {
-	LOG_ONSCREEN(-1, 2.0f, FColor::Yellow, "%f +++++++ %f", soundWeight, (1 - soundWeight));
-
-	FString string = (m_HearingStrength > (1 - soundWeight)) ? "HEARD" : "NOT HEARD";
-	LOG_ONSCREEN(-1, 2.0f, FColor::Yellow, "%s", *string);
-
-	return (m_HearingStrength > (1 - soundWeight));
+	return (m_PerceptionSettings.HearingStrength > (1 - soundWeight));
 }
 
 bool UHSMAgentComponent::IsInCombat() const
@@ -309,26 +270,31 @@ bool UHSMAgentComponent::IsInCombat() const
 
 bool UHSMAgentComponent::IsTargetTooClose(const FVector& target) const
 {
-	if(m_Owner.IsValid() == false)
+	if(m_Owner.IsValid() == false || m_ClassData == nullptr)
 	{
 		LOG_ERROR("Tried to check if target is too close with invalid owner");
 		return false;
 	}
 
 	FVector distance = target - m_Owner->GetActorLocation();
-	return distance.Length() <= (m_PreferredDistanceFromTarget - m_PreferredDistanceTolerance);
+	return distance.Length() <= (m_ClassData->PreferredEngagementRange - m_ClassData->EngagementRangeTolerance);
 }
 
 bool UHSMAgentComponent::IsTargetTooFar(const FVector& target) const
 {
-	if (m_Owner.IsValid() == false)
+	if (m_Owner.IsValid() == false || m_ClassData == nullptr)
 	{
 		LOG_ERROR("Tried to check if target is too fase with invalid owner");
 		return false;
 	}
 
 	FVector distance = target - m_Owner->GetActorLocation();
-	return distance.Length() > (m_PreferredDistanceFromTarget + m_PreferredDistanceTolerance);
+	return distance.Length() > (m_ClassData->PreferredEngagementRange + m_ClassData->EngagementRangeTolerance);
+}
+
+void UHSMAgentComponent::AddAbility(const FEnemyLoadedAbilityData& abilityData)
+{
+	m_AbilityData.Add(abilityData);
 }
 
 // Called when the game starts

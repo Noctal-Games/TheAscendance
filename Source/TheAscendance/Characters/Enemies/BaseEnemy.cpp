@@ -116,8 +116,7 @@ void ABaseEnemy::Init(const UEnemyData* data)
 	if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))
 	{
 		m_Agent->RegisterComponent();
-		//m_Agent->InitStats(stats, stats.HearingStrength, stats.PreferredRange, stats.PreferredRangeTolerance, stats.ReactionTimeMinimum, stats.ReactionTimeMaximum);
-		//m_Agent->InitMeleeAttacks(data->EnemyData.AttackSet);
+		m_Agent->InitSettings(data->ClassData, data->BehaviourSettings, data->PerceptionSettings);
 		m_Agent->Init(this);
 	}
 	else
@@ -299,5 +298,5 @@ void ABaseEnemy::InitAbilityData(const FEnemyAbilityData& abilityData)
 		loadedData.TelegraphMontage = montage;
 	}
 
-	m_AbilityData.Add(MoveTemp(loadedData));
+	//m_AbilityData.Add(MoveTemp(loadedData));
 }

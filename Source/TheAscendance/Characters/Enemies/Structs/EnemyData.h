@@ -15,6 +15,12 @@ struct FFloatRangeCustom
 {
 	GENERATED_BODY()
 
+
+	float GetRandomValue() const
+	{
+		return FMath::FRandRange(Min, Max);
+	}
+
 	UPROPERTY(EditDefaultsOnly)
 	float Min = 0.0f;
 
@@ -123,8 +129,8 @@ struct FEnemyMovementSettings
 	float WalkSpeed = 0.0f;
 	UPROPERTY(EditDefaultsOnly)
 	float SprintSpeed = 0.0f;
-	UPROPERTY(EditDefaultsOnly)
-	float ChargeSpeed = 0.0f;
+	//UPROPERTY(EditDefaultsOnly)
+	//float ChargeSpeed = 0.0f;
 };
 
 UCLASS(BlueprintType)

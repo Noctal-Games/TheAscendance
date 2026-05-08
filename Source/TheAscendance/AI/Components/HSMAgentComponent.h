@@ -7,6 +7,7 @@
 #include "TheAscendance/AI/Enums/State.h"
 #include "TheAscendance/AI/Actions/Attacks/Enums/AttackType.h"
 #include "TheAscendance/AI/Actions/Attacks/Structs/AttackData.h"
+#include "TheAscendance/Characters/Enemies/Structs/EnemyData.h"
 #include "HSMAgentComponent.generated.h"
 
 class ABaseEnemy;
@@ -14,7 +15,7 @@ class APlayerCharacter;
 class UAbstractState;
 class AWaypointRoute;
 class USightSensorComponent;
-struct FAttackData;
+class UEnemyClassData;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API UHSMAgentComponent : public UActorComponent
@@ -26,7 +27,7 @@ public:
 	UHSMAgentComponent();
 
 	void Init(ABaseEnemy* owner);
-	void InitStats(float visionStrength, float hearingStrength, float preferredDistanceFromTarget, float preferredDistanceTolerance, float minReactionTime, float maxReactionTime);
+	void InitSettings(UEnemyClassData* classData, const FBehaviourSettings& behaviourSettings, const FPerceptionSettings& perceptionSettings);
 	//void InitMeleeAttacks(const FAttackSetData& attackSet /*const TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>>& meleeAttacks*/);
 
 	//const FAttackSetData* GetAttackSetData() const;
@@ -55,10 +56,7 @@ public:
 	void SetWaypointRoute(AWaypointRoute* route);
 	AWaypointRoute* GetWaypointRoute() const;
 
-	void SetVisionStrength(float visionStrength);
 	float GetVisionStrength() const;
-
-	void SetHearingStrength(float hearingStrength);
 	float GetHearingStrength() const;
 
 	float GetRandomCombatReactionTime() const;
@@ -72,6 +70,8 @@ public:
 	bool IsTargetTooClose(const FVector& target) const;
 	bool IsTargetTooFar(const FVector& target) const;
 
+	void AddAbility(const FEnemyLoadedAbilityData& abilityData);
+
 	// Called every frame
 	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
 
@@ -83,10 +83,12 @@ private:
 	UPROPERTY()
 	TObjectPtr<USightSensorComponent> m_SightSensor = nullptr;
 
+	UPROPERTY()
 	TWeakObjectPtr<ABaseEnemy> m_Owner = nullptr;
+	UPROPERTY()
 	TWeakObjectPtr<APlayerCharacter> m_Player = nullptr;
 
-	//Temp until better setup
+	UPROPERTY()
 	TWeakObjectPtr<AWaypointRoute> m_WaypointRoute = nullptr;
 
 	UPROPERTY()
@@ -96,17 +98,14 @@ private:
 
 	FVector m_LocationToInvestigate = FVector::ZeroVector;
 
-	float m_VisionStrength = 0.0f;
-	float m_HearingStrength = 0.0f;
+	UPROPERTY()
+	TObjectPtr<UEnemyClassData> m_ClassData = nullptr;
 
-	float m_PreferredDistanceFromTarget = 0.0f;
-	float m_PreferredDistanceTolerance = 0.0f;
-
-	float m_CombatReactionTimeMin = 0.0f;
-	float m_CombatReactionTimeMax = 0.0f;
+	FBehaviourSettings m_BehaviourSettings;
+	FPerceptionSettings m_PerceptionSettings;
 
 	bool m_HasLineOfSight = false;
 
-	//TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>> m_MeleeAttacks;
-	//TSharedPtr<FAttackSetData> m_AttackSet = nullptr;
+	UPROPERTY()
+	TArray<FEnemyLoadedAbilityData> m_AbilityData;
 };
