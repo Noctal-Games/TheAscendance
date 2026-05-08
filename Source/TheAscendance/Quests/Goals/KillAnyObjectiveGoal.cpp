@@ -29,7 +29,7 @@ void UKillAnyObjectiveGoal::Deactivate()
 	}
 }
 
-void UKillAnyObjectiveGoal::OnEnemyKilled(int id)
+void UKillAnyObjectiveGoal::OnEnemyKilled(const FGameplayTag& enemyTag)
 {
 	if (IsComplete() == true)
 	{

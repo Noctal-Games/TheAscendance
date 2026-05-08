@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Characters/BaseCharacter.h"
+#include "TheAscendance/AI/Actions/Attacks/Structs/AttackData.h"
 #include "BaseEnemy.generated.h"
 
 class ATAAIController;
@@ -11,7 +12,8 @@ class UHSMAgentComponent;
 class USkeletalMesh;
 class UAnimInstance;
 class AWaypointRoute;
-struct FEnemyTableData;
+class UEnemyData;
+struct FEnemyAbilityData;
 
 UCLASS()
 class THEASCENDANCE_API ABaseEnemy : public ABaseCharacter
@@ -21,7 +23,7 @@ class THEASCENDANCE_API ABaseEnemy : public ABaseCharacter
 public:
 	ABaseEnemy();
 
-	void Init(FEnemyTableData* data);
+	void Init(const UEnemyData* data);
 	void SetSkeletalMesh();
 
 	virtual void Damage(int amount, bool triggerOnHit) override;
@@ -43,16 +45,21 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	void InitAbilityData(const FEnemyAbilityData& abilityData);
+
 private:
 	UPROPERTY()
-	TSoftObjectPtr<USkeletalMesh> m_SkeletalMesh;
+	TSoftObjectPtr<USkeletalMesh> m_SkeletalMesh = nullptr;
 	UPROPERTY()
-	TSoftClassPtr<UAnimInstance> m_AnimationBP;
+	TSoftClassPtr<UAnimInstance> m_AnimationBP = nullptr;
 
 	TWeakObjectPtr<ATAAIController> m_Controller = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<UHSMAgentComponent> m_Agent = nullptr;
 
-	int m_EnemyID = 0;
+	FGameplayTag m_EnemyTag;
+	
+	UPROPERTY()
+	TArray<FEnemyLoadedAbilityData> m_AbilityData;
 };

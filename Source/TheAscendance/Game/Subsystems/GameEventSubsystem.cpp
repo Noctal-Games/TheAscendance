@@ -18,10 +18,10 @@ void UGameEventSubsystem::NotifyItemPickup(const FGameplayTag& itemTag, int amou
 	OnItemPickupBP.Broadcast(itemTag, amount);
 }
 
-void UGameEventSubsystem::NotifyEnemyKilled(int id)
+void UGameEventSubsystem::NotifyEnemyKilled(const FGameplayTag& enemyTag)
 {
-	OnEnemyKilled.Broadcast(id);
-	OnEnemyKilledBP.Broadcast(id);
+	OnEnemyKilled.Broadcast(enemyTag);
+	OnEnemyKilledBP.Broadcast(enemyTag);
 }
 
 void UGameEventSubsystem::NotifyLocationEnterred(const FGameplayTag& locationTag)

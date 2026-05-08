@@ -10,7 +10,7 @@
 
 void UKillTypeObjectiveGoal::Init(const FKillTypeGoal& data)
 {
-	m_TargetID = data.EnemyID;
+	m_TargetTag = data.TargetTag;
 	m_ToKill = data.Amount;
 }
 
@@ -30,9 +30,9 @@ void UKillTypeObjectiveGoal::Deactivate()
 	}
 }
 
-void UKillTypeObjectiveGoal::OnEnemyKilled(int id)
+void UKillTypeObjectiveGoal::OnEnemyKilled(const FGameplayTag& enemyTag)
 {
-	if (id != m_TargetID || IsComplete() == true)
+	if (enemyTag != m_TargetTag || IsComplete() == true)
 	{
 		return;
 	}

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BaseObjectiveGoal.h"
+#include "GameplayTags.h"
 #include "KillTypeObjectiveGoal.generated.h"
 
 struct FKillTypeGoal;
@@ -20,10 +21,10 @@ public:
 	virtual void Deactivate() override;
 
 protected:
-	void OnEnemyKilled(int id);
+	void OnEnemyKilled(const FGameplayTag& enemyTag);
 
 private:
-	int m_TargetID = 0;
+	FGameplayTag m_TargetTag;
 	int m_ToKill = 0;
 	int m_CurrentAmount = 0;
 

@@ -12,6 +12,7 @@
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
 #include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
 #include "Structs/EnemyData.h"
+#include "TheAscendance/Abilities/Components/AbilityComponent.h"
 
 #include "Components/CapsuleComponent.h"
 
@@ -21,7 +22,7 @@ ABaseEnemy::ABaseEnemy() : ABaseCharacter()
 	GetCapsuleComponent()->bHiddenInGame = false;
 }
 
-void ABaseEnemy::Init(FEnemyTableData* data)
+void ABaseEnemy::Init(const UEnemyData* data)
 {
 	m_AnimTest = true;
 
@@ -31,81 +32,98 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 		return;
 	}
 
-	//m_EnemyID = data->EnemyID;
+	m_EnemyTag = data->EnemyTag;
 
-	//TArray<FSoftObjectPath> assetPaths;
-	//m_SkeletalMesh = data->EnemyMesh;
+	const FEnemyStats& stats = data->Stats;
+	m_CharacterStatsComponent->SetStat(ECharacterStat::HEALTH, stats.Health);
+	m_CharacterStatsComponent->SetStat(ECharacterStat::MAGIC_ATTACK, stats.MagicAttack);
+	m_CharacterStatsComponent->SetStat(ECharacterStat::MAGIC_RESISTANCE, stats.MagicResistance);
+	m_CharacterStatsComponent->SetStat(ECharacterStat::PHYSICAL_ATTACK, stats.PhysicalAttack);
+	m_CharacterStatsComponent->SetStat(ECharacterStat::PHYSICAL_RESISTANCE, stats.PhysicalResistance);
+	m_CharacterStatsComponent->SetStat(ECharacterStat::MANA, 999999);
+	m_CharacterStatsComponent->SetStat(ECharacterStat::STAMINA, 999999);
 
-	//if (m_SkeletalMesh.IsNull() == false)
-	//{
-	//	assetPaths.Add(m_SkeletalMesh.ToSoftObjectPath());
-	//}
-	//else
-	//{
-	//	LOG_ERROR("[BASE ENEMY] Tried to Init BaseEnemy with invalid EnemyMesh");
-	//}
+	for (const FGameplayTag& immunity : stats.EffectImmunities)
+	{
+		AddImmunity(immunity);
+	}
 
-	//m_AnimationBP = data->EnemyAnimationBP;
+	for (const FGameplayTag& resistance : stats.EffectResistances)
+	{
+		AddResistance(resistance);
+	}
 
-	//if (m_AnimationBP.IsNull() == false)
-	//{
-	//	assetPaths.Add(m_AnimationBP.ToSoftObjectPath());
-	//}
-	//else
-	//{
-	//	LOG_ERROR("[BASE ENEMY]Tried to Init BaseEnemy with invalid EnemyAnimationBP");
-	//}
+	const FEnemyMovementSettings& movementStats = data->MovementSettings;
+	m_CharacterStatsComponent->SetStat(ECharacterStat::WALK_SPEED, movementStats.WalkSpeed);
+	m_CharacterStatsComponent->SetStat(ECharacterStat::SPRINT_SPEED_BONUS, movementStats.SprintSpeed - movementStats.WalkSpeed);
 
-	//UStreamableFunctionLibrary::RequestAsyncLoad(assetPaths, [this]() { SetSkeletalMesh(); });
+	TArray<FSoftObjectPath> assetPaths;
+	m_SkeletalMesh = data->EnemyMesh;
 
-	//const FEnemyStats& stats = data->EnemyData.EnemyStats;
-	//
-	//m_CharacterStatsComponent->SetStat(ECharacterStat::HEALTH, stats.Health);
-	//m_CharacterStatsComponent->SetStat(ECharacterStat::WALK_SPEED, stats.WalkSpeed);
-	//m_CharacterStatsComponent->SetStat(ECharacterStat::SPRINT_SPEED_BONUS, stats.SprintSpeedBonus);
-	////m_CharacterStatsComponent->SetStat(ECharacterStat::MAGIC_ATTACK, stats->MagicAttack);
-	////m_CharacterStatsComponent->SetStat(ECharacterStat::MAGIC_RESISTANCE, stats->MagicResistance);
-	////m_CharacterStatsComponent->SetStat(ECharacterStat::PHYSICAL_ATTACK, stats->PhysicalAttack);
-	////m_CharacterStatsComponent->SetStat(ECharacterStat::PHYSICAL_RESISTANCE, stats->PhysicalResistance);
-	//m_CharacterStatsComponent->SetStat(ECharacterStat::MANA, 999999);
-	//m_CharacterStatsComponent->SetStat(ECharacterStat::STAMINA, 999999);
+	if (m_SkeletalMesh.IsNull() == false)
+	{
+		assetPaths.AddUnique(m_SkeletalMesh.ToSoftObjectPath());
+	}
+	else
+	{
+		LOG_ERROR("[BASE ENEMY] Tried to Init BaseEnemy with invalid EnemyMesh");
+	}
 
-	//for (const FGameplayTag& immunity : stats.EffectImmunities)
-	//{
-	//	AddImmunity(immunity);
-	//}
+	m_AnimationBP = data->EnemyAnimationBP;
 
-	//for (const FGameplayTag& resistance : stats.EffectResistances)
-	//{
-	//	AddResistance(resistance);
-	//}
+	if (m_AnimationBP.IsNull() == false)
+	{
+		assetPaths.AddUnique(m_AnimationBP.ToSoftObjectPath());
+	}
+	else
+	{
+		LOG_ERROR("[BASE ENEMY]Tried to Init BaseEnemy with invalid EnemyAnimationBP");
+	}
 
-	//const FEnemyEquipmentData& equipment = data->EnemyData.EnemyEquipment;
+	const FCombatSettings& combatSettings = data->CombatSettings;
 
-	//TArray<FGameplayTag> spells;
-	//spells.Add(equipment.MainHandSpells.PrimarySpell);
-	//spells.Add(equipment.MainHandSpells.SecondarySpell);
-	//spells.Add(equipment.OffHandSpells.PrimarySpell);
-	//spells.Add(equipment.OffHandSpells.SecondarySpell);
+	for (const FEnemyAbilityData& ability : combatSettings.Abilities)
+	{
+		if (ability.AbilityData.IsNull() == false)
+		{
+			assetPaths.AddUnique(ability.AbilityData.ToSoftObjectPath());
+		}
 
-	////m_LoadoutComponent->SetSpells(spells);
+		if (ability.TelegraphMontage.IsNull() == false)
+		{
+			assetPaths.AddUnique(ability.TelegraphMontage.ToSoftObjectPath());
+		}
+	}
 
-	//for (const FLoadoutSlotData& loadoutData : equipment.LoadoutData)
-	//{
-	//	m_LoadoutComponent->EquipItem(loadoutData.EquippedPart, loadoutData.ItemTag);
-	//}
+	TWeakObjectPtr<ABaseEnemy> weakThis(this);
+	TArray<FEnemyAbilityData> abilities = combatSettings.Abilities;
 
-	//if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))
-	//{
-	//	m_Agent->RegisterComponent();
-	//	m_Agent->InitStats(stats.SightStrength, stats.HearingStrength, stats.PreferredRange, stats.PreferredRangeTolerance, stats.ReactionTimeMinimum, stats.ReactionTimeMaximum);
-	//	m_Agent->InitMeleeAttacks(data->EnemyData.AttackSet);
-	//	m_Agent->Init(this);
-	//}
-	//else
-	//{
-	//	LOG_ERROR("[BASE ENEMY] Failed to initalise HSM_Agent");
-	//}
+	UStreamableFunctionLibrary::RequestAsyncLoad(assetPaths, [weakThis, abilities]()
+		{
+			if (weakThis.IsValid() == false)
+			{
+				return;
+			}
+
+			weakThis->SetSkeletalMesh();
+
+			for (const FEnemyAbilityData& ability : abilities)
+			{
+				weakThis->InitAbilityData(ability);
+			}
+		});
+
+	if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))
+	{
+		m_Agent->RegisterComponent();
+		//m_Agent->InitStats(stats, stats.HearingStrength, stats.PreferredRange, stats.PreferredRangeTolerance, stats.ReactionTimeMinimum, stats.ReactionTimeMaximum);
+		//m_Agent->InitMeleeAttacks(data->EnemyData.AttackSet);
+		m_Agent->Init(this);
+	}
+	else
+	{
+		LOG_ERROR("[BASE ENEMY] Failed to initalise HSM_Agent");
+	}
 }
 
 void ABaseEnemy::SetSkeletalMesh()
@@ -149,7 +167,7 @@ void ABaseEnemy::Damage(int amount, bool triggerOnHit)
 
 	if (UGameEventSubsystem* gameEvent = GetWorld()->GetGameInstance()->GetSubsystem<UGameEventSubsystem>())
 	{
-		gameEvent->NotifyEnemyKilled(m_EnemyID);
+		gameEvent->NotifyEnemyKilled(m_EnemyTag);
 	}
 }
 
@@ -244,4 +262,42 @@ void ABaseEnemy::BeginPlay()
 	OwnedTags.AddTag(CHARACTER_ENEMY);
 
 	m_Controller = Cast<ATAAIController>(GetController());
+}
+
+void ABaseEnemy::InitAbilityData(const FEnemyAbilityData& abilityData)
+{
+	FEnemyLoadedAbilityData loadedData;
+
+	if(UAbilityData* ability = abilityData.AbilityData.Get())
+	{
+		if (m_AbilityComponent == nullptr)
+		{
+			LOG_ERROR("[BASE ENEMY] Tried to init ability data with invalid AbilityComponent");
+			return;
+		}
+
+		if(m_AbilityComponent->AddAbilityFromData(ability) == false)
+		{
+			LOG_ERROR("[BASE ENEMY] Failed to add ability from data with tag %s", *ability->AbilityTag.ToString());
+			return;
+		}
+
+		loadedData.AbilityTag = ability->AbilityTag;
+	}
+	else
+	{
+		LOG_ERROR("[BASE ENEMY] Tried to init ability data with invalid AbilityData");
+		return;
+	}
+
+	loadedData.Weight = abilityData.Weight;
+	loadedData.Goals = abilityData.Goals;
+
+	//Failure isn't logged as a telegraph montage isn't needed. Checks can be set in future as abilities are setup
+	if(UAnimMontage* montage = abilityData.TelegraphMontage.Get())
+	{
+		loadedData.TelegraphMontage = montage;
+	}
+
+	m_AbilityData.Add(MoveTemp(loadedData));
 }

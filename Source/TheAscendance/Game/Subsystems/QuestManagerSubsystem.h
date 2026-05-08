@@ -18,7 +18,7 @@ struct FObjectiveTypeData;
 struct FObjectiveGoalData;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnQuestItemPickup, const FGameplayTag& /*itemTag*/, int /*amount*/);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnQuestEnemyKilled, int /*id*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnQuestEnemyKilled, const FGameplayTag& /*enemyTag*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnQuestLocationEnterred, const FGameplayTag& /*locationTag*/);
 
 UCLASS()
@@ -46,7 +46,7 @@ protected:
 
 private:
 	void HandleItemPickup(const FGameplayTag& itemTag, int amount);
-	void HandleEnemyKilled(int id);
+	void HandleEnemyKilled(const FGameplayTag& enemyTag);
 	void HandleLocationEnterred(const FGameplayTag& locationTag);
 
 protected:

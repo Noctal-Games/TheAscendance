@@ -23,3 +23,18 @@ struct FEnemyAbilityData
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Not necessary, will play before the Ability animations if set"))
 	TSoftObjectPtr<UAnimMontage> TelegraphMontage = nullptr;
 };
+
+USTRUCT()
+struct FEnemyLoadedAbilityData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	float Weight = 1.0f;
+	UPROPERTY()
+	FGameplayTag AbilityTag;
+	UPROPERTY()
+	TArray<EAbilityGoal> Goals;
+	UPROPERTY()
+	TObjectPtr<UAnimMontage> TelegraphMontage = nullptr;
+};

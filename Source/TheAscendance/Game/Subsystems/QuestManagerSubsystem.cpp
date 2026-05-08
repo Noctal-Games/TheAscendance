@@ -137,9 +137,9 @@ void UQuestManagerSubsystem::HandleItemPickup(const FGameplayTag& itemTag, int a
 	OnItemPickupEvent.Broadcast(itemTag, amount);
 }
 
-void UQuestManagerSubsystem::HandleEnemyKilled(int id)
+void UQuestManagerSubsystem::HandleEnemyKilled(const FGameplayTag& enemyTag)
 {
-	OnEnemyKilledEvent.Broadcast(id);
+	OnEnemyKilledEvent.Broadcast(enemyTag);
 }
 
 void UQuestManagerSubsystem::HandleLocationEnterred(const FGameplayTag& locationTag)

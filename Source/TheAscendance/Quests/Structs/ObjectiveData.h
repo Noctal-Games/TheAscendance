@@ -50,7 +50,7 @@ struct FKillTypeGoal : public FObjectiveGoalData
 	FKillTypeGoal() : FObjectiveGoalData(EObjectiveGoalType::KILL_TYPE) {};
 
 	UPROPERTY(EditDefaultsOnly)
-	int EnemyID = -1;
+	FGameplayTag TargetTag;
 	UPROPERTY(EditDefaultsOnly)
 	int Amount = 0;
 };
