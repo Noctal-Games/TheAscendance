@@ -75,21 +75,25 @@ USTRUCT(BlueprintType)
 struct FPerceptionSettings
 {
 	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Higher value for stronger vision", ClampMin = 0.0f, ClampMax = 1.0f))
+	
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Vision"))
+	float SightMaxDistance = 5000.0f;
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Vision", ToolTip = "How strongly distance affects vision as it reaches SightMaxDistance"))
+	TObjectPtr<UCurveFloat> DistanceVisibilityCurve;
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Vision", ToolTip = "Higher value for stronger vision", ClampMin = 0.0f, ClampMax = 1.0f))
 	float SightStrength = 1.0f;
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Vision", ToolTip = "Higher value for stronger vision", ClampMin = 0, ClampMax = 360))
+	int FOV = 90;
+
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Higher value for stronger hearing", ClampMin = 0.0f, ClampMax = 1.0f))
 	float HearingStrength = 1.0f;
 
-	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "The threshold in which the enemy detects the target", ClampMin = 1.0f))
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "The threshold in which the enemy detects the target", ClampMin = 0.0f, ClampMax = 1.0f))
 	float DetectionThreshold = 1.0f;
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "How fast the enemy can detect a target. Added per tick with Line of Sight.", ClampMin = 0.01f, ClampMax = 1.0f))
 	float DetectionGainRate = 0.01f;
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "How fast the enemy can lose track of a target. Negated per tick without Line of Sight", ClampMin = 0.01f, ClampMax = 1.0f))
 	float DetectionLossRate = 0.01f;
-
-	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "The duration that the enemy will remember where the player was when detection was lost"))
-	float DetectionMemoryDuration = 1.0f;
 };
 
 USTRUCT(BlueprintType)
@@ -97,14 +101,16 @@ struct FBehaviourSettings
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "An Aggression of 1.0 will mean the enemy will always advance on the player. Also means damage abilities are prioritised over self healing, for example.", ClampMin = 0.1f, ClampMax = 1.0f))
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "An Aggression of 1.0 will mean the enemy will always advance on the target. Also means damage abilities are prioritised over self healing, for example.", ClampMin = 0.1f, ClampMax = 1.0f))
 	float Aggression = 0.0f;
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "An Selflessness of 1.0 will mean the enemy will always prioritise abilites that support allies when possible.", ClampMin = 0.1f, ClampMax = 1.0f))
 	float Selflessness = 0.0f;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "How often the agent reacts to the information it has and makes a decision."))
 	FFloatRangeCustom ReactionTime;
 
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "The duration that the enemy will remember where the target was when detection was lost"))
+	float DetectionMemoryDuration = 1.0f;
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "A random modifier for weighted decisions, to add variety to behaviour"))
 	float DecisionRandomnessVariance = 0.0f;
 };

@@ -14,7 +14,7 @@ class ABaseEnemy;
 class APlayerCharacter;
 class UAbstractState;
 class AWaypointRoute;
-class USightSensorComponent;
+class UPerceptionComponent;
 class UEnemyClassData;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -56,15 +56,11 @@ public:
 	void SetWaypointRoute(AWaypointRoute* route);
 	AWaypointRoute* GetWaypointRoute() const;
 
-	float GetVisionStrength() const;
-	float GetHearingStrength() const;
-
 	float GetRandomCombatReactionTime() const;
 
 	bool HasLineOfSight() const;
-	void SetHasLineOfSight(bool hasLineOfSight);
 
-	bool IsSoundHeard(float soundWeight) const;
+	bool IsSoundHeard(const float soundWeight) const;
 	bool IsInCombat() const;
 
 	bool IsTargetTooClose(const FVector& target) const;
@@ -81,7 +77,7 @@ protected:
 
 private:
 	UPROPERTY()
-	TObjectPtr<USightSensorComponent> m_SightSensor = nullptr;
+	TObjectPtr<UPerceptionComponent> m_PerceptionComponent = nullptr;
 
 	UPROPERTY()
 	TWeakObjectPtr<ABaseEnemy> m_Owner = nullptr;
@@ -102,9 +98,6 @@ private:
 	TObjectPtr<UEnemyClassData> m_ClassData = nullptr;
 
 	FBehaviourSettings m_BehaviourSettings;
-	FPerceptionSettings m_PerceptionSettings;
-
-	bool m_HasLineOfSight = false;
 
 	UPROPERTY()
 	TArray<FEnemyLoadedAbilityData> m_AbilityData;

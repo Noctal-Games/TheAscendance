@@ -6,6 +6,8 @@
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
+#include "TheAscendance/Characters/Enemies/Structs/EnemyData.h"
+#include "TheAscendance/Game/Subsystems/NPCRegistrySubsystem.h"
 
 // Sets default values
 AInstancedEnemySpawner::AInstancedEnemySpawner()
@@ -19,30 +21,88 @@ void AInstancedEnemySpawner::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (EnemyID == 0)
+	if (EnemyTag.IsValid() == false)
 	{
-		LOG_WARNING("InstancedEnemySpawner has EnemyID of 0");
+		LOG_WARNING("[INSTANCED ENEMY SPAWNER] EnemyTag is invalid");
 		return;
 	}
 
-	if (APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode())
-	{
-		ABaseEnemy* enemy = gameMode->CreateEnemyFromID(EnemyID);
+	UWorld* world = UCoreFunctionLibrary::GetGameWorld();
 
-		if (enemy == nullptr)
+	if (world == nullptr)
+	{
+		LOG_ERROR("[INSTANCED ENEMY SPAWNER] Failed to get World reference");
+		return;
+	}
+
+	if (UNPCRegistrySubsystem* registry = world->GetGameInstance()->GetSubsystem<UNPCRegistrySubsystem>())
+	{
+		if (const TSoftObjectPtr<UEnemyData>* enemyRef = registry->GetEnemyRef(EnemyTag))
 		{
-			LOG_ERROR("InstancedEnemySpawner failed to load enemy for ID: %i", EnemyID);
+			m_EnemyDataAsset = *enemyRef;
+
+			TWeakObjectPtr<AInstancedEnemySpawner> weakThis(this);
+
+			UStreamableFunctionLibrary::RequestAsyncLoad(m_EnemyDataAsset.ToSoftObjectPath(), [weakThis]()
+				{
+					if (weakThis.IsValid())
+					{
+						weakThis->SpawnEnemy();
+					}
+				}
+			);
+		}
+		else
+		{
+			LOG_ERROR("[INSTANCED ENEMY SPAWNER] Failed to find EnemyData asset for tag: %s", *EnemyTag.ToString());
 			return;
 		}
 
-		enemy->SetActorLocation(GetActorLocation());
-		enemy->SetActorRotation(GetActorRotation());
-
-		if(PatrolRoute != nullptr)
-		{
-			enemy->SetWaypointRoute(PatrolRoute);
-		}
-
-		LOG_INFO("InstancedEnemySpawner successfully loaded enemy with ID: %i", EnemyID);
 	}
+}
+
+void AInstancedEnemySpawner::SpawnEnemy()
+{
+	if(m_EnemyDataAsset.IsValid() == false)
+	{
+		LOG_ERROR("[INSTANCED ENEMY SPAWNER] Tried to spawn enemy with invalid EnemyData asset: %s", *EnemyTag.ToString());
+		return;
+	}
+
+	if (EnemyDefault == nullptr)
+	{
+		LOG_ERROR("[INSTANCED ENEMY SPAWNER] EnemyDefault is invalid");
+		return;
+	}
+
+	UWorld* world = UCoreFunctionLibrary::GetGameWorld();
+
+	if (world == nullptr)
+	{
+		LOG_ERROR("[INSTANCED ENEMY SPAWNER] Failed to get World reference");
+		return;
+	}
+
+	FActorSpawnParameters params;
+	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	params.bNoFail = true;
+
+	ABaseEnemy* enemy = world->SpawnActor<ABaseEnemy>(EnemyDefault, FVector::ZeroVector, FRotator::ZeroRotator, params);
+
+	if (enemy == nullptr)
+	{
+		return;
+	}
+
+	enemy->Init(m_EnemyDataAsset.Get());  
+
+	enemy->SetActorLocation(GetActorLocation());
+	enemy->SetActorRotation(GetActorRotation());
+
+	if (PatrolRoute != nullptr)
+	{
+		enemy->SetWaypointRoute(PatrolRoute);
+	}
+
+	LOG_INFO("[INSTANCED ENEMY SPAWNER] Successfully loaded enemy: %s", *EnemyTag.ToString());
 }

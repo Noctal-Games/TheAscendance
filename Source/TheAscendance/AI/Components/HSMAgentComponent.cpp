@@ -7,7 +7,7 @@
 #include "TheAscendance/AI/States/IdleState.h"
 #include "TheAscendance/AI/States/InvestigateState.h"
 #include "TheAscendance/AI/States/CombatState.h"
-#include "TheAscendance/AI/Components/SightSensorComponent.h"
+#include "TheAscendance/AI/Components/PerceptionComponent.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 
@@ -43,11 +43,10 @@ void UHSMAgentComponent::Init(ABaseEnemy* owner)
 	m_States.Add(EState::INVESTIGATE, NewObject<UInvestigateState>());
 	m_States.Add(EState::COMBAT, NewObject<UCombatState>());
 
-	m_SightSensor = NewObject<USightSensorComponent>(m_Owner.Get(), TEXT("SIGHT SENSOR"));
-	m_SightSensor->RegisterComponent();
-	m_SightSensor->Init(this);
-	m_SightSensor->SetTarget(m_Player.Get());
-	m_SightSensor->SetIsActive(true);
+	m_PerceptionComponent = NewObject<UPerceptionComponent>(m_Owner.Get(), TEXT("SIGHT SENSOR"));
+	m_PerceptionComponent->RegisterComponent();
+	m_PerceptionComponent->SetTarget(m_Player.Get());
+	m_PerceptionComponent->SetIsActive(false);
 
 	if (m_States.Num() != (int32)EState::MAX)
 	{
@@ -62,12 +61,15 @@ void UHSMAgentComponent::InitSettings(UEnemyClassData* classData, const FBehavio
 	if (classData == nullptr)
 	{
 		LOG_ERROR("Tried to InitSettings of HSMAgentComponent with invalid class data");
-		return;
+		//return;
 	}
 
-	m_ClassData = classData;
+	//m_ClassData = classData;
 	m_BehaviourSettings = behaviourSettings;
-	m_PerceptionSettings = perceptionSettings;
+	//m_PerceptionSettings = perceptionSettings;
+
+	m_PerceptionComponent->Init(perceptionSettings);
+	m_PerceptionComponent->SetIsActive(true);
 }
 
 void UHSMAgentComponent::SetState(EState newState)
@@ -227,16 +229,6 @@ AWaypointRoute* UHSMAgentComponent::GetWaypointRoute() const
 	return m_WaypointRoute.Get();
 }
 
-float UHSMAgentComponent::GetVisionStrength() const
-{
-	return m_PerceptionSettings.SightStrength;
-}
-
-float UHSMAgentComponent::GetHearingStrength() const
-{
-	return m_PerceptionSettings.HearingStrength;
-}
-
 float UHSMAgentComponent::GetRandomCombatReactionTime() const
 {
 	return m_BehaviourSettings.ReactionTime.GetRandomValue();
@@ -244,23 +236,24 @@ float UHSMAgentComponent::GetRandomCombatReactionTime() const
 
 bool UHSMAgentComponent::HasLineOfSight() const
 {
-	return m_HasLineOfSight;
-}
-
-void UHSMAgentComponent::SetHasLineOfSight(bool hasLineOfSight)
-{
-	if (m_HasLineOfSight == hasLineOfSight || m_Player.IsValid() == false)
+	if(m_PerceptionComponent == nullptr)
 	{
-		return;
+		LOG_ERROR("Tried to get HasLineOfSight with invalid perception component");
+		return false;
 	}
 
-	m_HasLineOfSight = hasLineOfSight;
-	m_HasLineOfSight ? m_Owner->SetFocus(m_Player.Get()) : m_Owner->ClearFocus();
+	return m_PerceptionComponent->HasLineOfSight();
 }
 
-bool UHSMAgentComponent::IsSoundHeard(float soundWeight) const
+bool UHSMAgentComponent::IsSoundHeard(const float soundWeight) const
 {
-	return (m_PerceptionSettings.HearingStrength > (1 - soundWeight));
+	if (m_PerceptionComponent == nullptr)
+	{
+		LOG_ERROR("Tried to get HasLineOfSight with invalid perception component");
+		return false;
+	}
+
+	return m_PerceptionComponent->IsSoundHeard(soundWeight);
 }
 
 bool UHSMAgentComponent::IsInCombat() const
