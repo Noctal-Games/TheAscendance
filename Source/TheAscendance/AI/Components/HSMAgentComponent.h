@@ -26,8 +26,7 @@ public:
 	// Sets default values for this component's properties
 	UHSMAgentComponent();
 
-	void Init(ABaseEnemy* owner);
-	void InitSettings(UEnemyClassData* classData, const FBehaviourSettings& behaviourSettings, const FPerceptionSettings& perceptionSettings);
+	void Init(ABaseEnemy* owner, UEnemyClassData* classData, const FBehaviourSettings& behaviourSettings, const FPerceptionSettings& perceptionSettings);
 	//void InitMeleeAttacks(const FAttackSetData& attackSet /*const TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>>& meleeAttacks*/);
 
 	//const FAttackSetData* GetAttackSetData() const;
@@ -58,6 +57,7 @@ public:
 
 	float GetRandomCombatReactionTime() const;
 
+	bool IsTargetDetected() const;
 	bool HasLineOfSight() const;
 
 	bool IsSoundHeard(const float soundWeight) const;
@@ -67,6 +67,10 @@ public:
 	bool IsTargetTooFar(const FVector& target) const;
 
 	void AddAbility(const FEnemyLoadedAbilityData& abilityData);
+
+	bool TryConsumeReaction();
+
+	const FBehaviourSettings& GetBehaviourSettings();
 
 	// Called every frame
 	virtual void TickComponent(float deltaTime, ELevelTick tickType, FActorComponentTickFunction* thisTickFunction) override;
@@ -101,4 +105,7 @@ private:
 
 	UPROPERTY()
 	TArray<FEnemyLoadedAbilityData> m_AbilityData;
+
+	float m_LastReactionTime = 0.0f;
+	float m_CurrentReactionTime = 0.0f;
 };

@@ -60,6 +60,11 @@ void UEngageAttackState::EndState()
 	UAbstractState::EndState();
 }
 
+const FString UEngageAttackState::GetStateToString() const
+{
+	return FString("ENGAGE ATTACK STATE");
+}
+
 //if(FQuickAttackData* attackData = StaticCast<FQuickAttackData*>(m_Agent->GetMeleeAttackData(EMeleeAttackType::QUICK_ATTACK)))
 //{
 //	m_AttackCombatState->m_CurrentTelegraphMontage = attackData->TelegraphMontage;

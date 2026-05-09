@@ -18,4 +18,6 @@ public:
 	virtual void StartState(UHSMAgentComponent* agent) override;
 	virtual void Update(float deltaTime) override;
 	virtual void EndState() override;
+
+	virtual const FString GetStateToString() const override;
 };

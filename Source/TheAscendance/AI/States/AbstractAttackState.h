@@ -14,4 +14,6 @@ class THEASCENDANCE_API UAbstractAttackState : public UAbstractState
 {
 	GENERATED_BODY()
 	
+public:
+	virtual const FString GetStateToString() const;
 };

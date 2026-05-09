@@ -19,6 +19,8 @@ public:
 	virtual void Update(float deltaTime) override;
 	virtual void EndState() override;
 
+	virtual const FString GetStateToString() const override;
+
 private:
 	TWeakObjectPtr<UNavigationSystemV1> m_NavSystem = nullptr;
 	float m_Timer = 0.0f;

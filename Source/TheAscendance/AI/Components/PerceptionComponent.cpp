@@ -55,6 +55,7 @@ void UPerceptionComponent::SetIsActive(bool isActive)
 
 bool UPerceptionComponent::IsTargetDetected() const
 {
+	LOG_ONSCREEN(3, 1.0f, FColor::Yellow, "%f", m_CurrentDetection)
 	return m_IsTargetDetected;
 }
 
@@ -89,7 +90,7 @@ void UPerceptionComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 		m_CurrentDetection += m_PerceptionSettings.DetectionGainRate * DeltaTime;
 	}
 
-	FMath::Clamp(m_CurrentDetection, 0.0f, 1.0f);
+	m_CurrentDetection = FMath::Clamp(m_CurrentDetection, 0.0f, 1.0f);
 	m_IsTargetDetected = m_CurrentDetection >= m_PerceptionSettings.DetectionThreshold;
 }
 

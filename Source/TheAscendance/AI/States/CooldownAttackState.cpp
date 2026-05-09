@@ -14,3 +14,8 @@ void UCooldownAttackState::Update(float deltaTime)
 void UCooldownAttackState::EndState()
 {
 }
+
+const FString UCooldownAttackState::GetStateToString() const
+{
+    return FString("COOLDOWN ATTACK STATE");
+}

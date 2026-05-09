@@ -24,7 +24,8 @@ public:
 	virtual void EndState() override;
 
 	void SetAttackState(EAttackState newState);
-	
+	virtual const FString GetStateToString() const override;
+
 protected:
 	friend class UAbstractAttackState;
 	friend class UEngageAttackState;

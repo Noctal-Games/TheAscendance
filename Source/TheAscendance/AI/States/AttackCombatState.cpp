@@ -85,3 +85,13 @@ void UAttackCombatState::SetAttackState(EAttackState newState)
 	m_AttackStates[m_CurrentAttackState]->SetAttackCombatState(this);
 	m_AttackStates[m_CurrentAttackState]->StartState(m_Agent.Get());
 }
+
+const FString UAttackCombatState::GetStateToString() const
+{
+	if (m_AttackStates.Contains(m_CurrentAttackState) && m_AttackStates[m_CurrentAttackState] != nullptr)
+	{
+		return m_AttackStates[m_CurrentAttackState]->GetStateToString();
+	}
+
+	return FString("INVALID ATTACK STATE");
+}

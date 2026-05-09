@@ -21,20 +21,28 @@ UHSMAgentComponent::UHSMAgentComponent()
 	// ...
 }
 
-void UHSMAgentComponent::Init(ABaseEnemy* owner)
+void UHSMAgentComponent::Init(ABaseEnemy* owner, UEnemyClassData* classData, const FBehaviourSettings& behaviourSettings, const FPerceptionSettings& perceptionSettings)
 {
 	if (owner == nullptr)
 	{
-		LOG_ERROR("Tried to Init HSMAgentComponent with invalid owner");
+		LOG_ERROR("[HSM AGENT COMPONENT] Tried to Init with invalid owner");
 		return;
 	}
+
+	if (classData == nullptr)
+	{
+		LOG_ERROR("[HSM AGENT COMPONENT] Tried to Init with invalid class data");
+		//return;
+	}
+
+	m_ClassData = classData;
 
 	m_Owner = owner;
 	m_Player = UCoreFunctionLibrary::GetPlayerCharacter();
 
 	if(m_Player.IsValid() == false)
 	{
-		LOG_ERROR("Tried to Init HSMAgentComponent with invalid player reference");
+		LOG_ERROR("[HSM AGENT COMPONENT] Failed to get valid player reference");
 		return;
 	}
 
@@ -46,7 +54,10 @@ void UHSMAgentComponent::Init(ABaseEnemy* owner)
 	m_PerceptionComponent = NewObject<UPerceptionComponent>(m_Owner.Get(), TEXT("SIGHT SENSOR"));
 	m_PerceptionComponent->RegisterComponent();
 	m_PerceptionComponent->SetTarget(m_Player.Get());
-	m_PerceptionComponent->SetIsActive(false);
+	m_PerceptionComponent->Init(perceptionSettings);
+	m_PerceptionComponent->SetIsActive(true);
+
+	m_BehaviourSettings = behaviourSettings;
 
 	if (m_States.Num() != (int32)EState::MAX)
 	{
@@ -54,22 +65,6 @@ void UHSMAgentComponent::Init(ABaseEnemy* owner)
 	}
 
 	SetState(EState::IDLE);
-}
-
-void UHSMAgentComponent::InitSettings(UEnemyClassData* classData, const FBehaviourSettings& behaviourSettings, const FPerceptionSettings& perceptionSettings)
-{
-	if (classData == nullptr)
-	{
-		LOG_ERROR("Tried to InitSettings of HSMAgentComponent with invalid class data");
-		//return;
-	}
-
-	//m_ClassData = classData;
-	m_BehaviourSettings = behaviourSettings;
-	//m_PerceptionSettings = perceptionSettings;
-
-	m_PerceptionComponent->Init(perceptionSettings);
-	m_PerceptionComponent->SetIsActive(true);
 }
 
 void UHSMAgentComponent::SetState(EState newState)
@@ -234,11 +229,23 @@ float UHSMAgentComponent::GetRandomCombatReactionTime() const
 	return m_BehaviourSettings.ReactionTime.GetRandomValue();
 }
 
+bool UHSMAgentComponent::IsTargetDetected() const
+{
+	if (m_PerceptionComponent == nullptr)
+	{
+		LOG_ERROR("[HSM AGENT COMPONENT] Tried to get HasLineOfSight with invalid perception component");
+		return false;
+	}
+
+	return m_PerceptionComponent->IsTargetDetected();
+}
+
+
 bool UHSMAgentComponent::HasLineOfSight() const
 {
 	if(m_PerceptionComponent == nullptr)
 	{
-		LOG_ERROR("Tried to get HasLineOfSight with invalid perception component");
+		LOG_ERROR("[HSM AGENT COMPONENT] Tried to get HasLineOfSight with invalid perception component");
 		return false;
 	}
 
@@ -249,7 +256,7 @@ bool UHSMAgentComponent::IsSoundHeard(const float soundWeight) const
 {
 	if (m_PerceptionComponent == nullptr)
 	{
-		LOG_ERROR("Tried to get HasLineOfSight with invalid perception component");
+		LOG_ERROR("[HSM AGENT COMPONENT] Tried to get HasLineOfSight with invalid perception component");
 		return false;
 	}
 
@@ -265,7 +272,7 @@ bool UHSMAgentComponent::IsTargetTooClose(const FVector& target) const
 {
 	if(m_Owner.IsValid() == false || m_ClassData == nullptr)
 	{
-		LOG_ERROR("Tried to check if target is too close with invalid owner");
+		LOG_ERROR("[HSM AGENT COMPONENT] Tried to check IsTargetTooClose with invalid owner");
 		return false;
 	}
 
@@ -290,6 +297,33 @@ void UHSMAgentComponent::AddAbility(const FEnemyLoadedAbilityData& abilityData)
 	m_AbilityData.Add(abilityData);
 }
 
+bool UHSMAgentComponent::TryConsumeReaction()
+{
+	UWorld* world = UCoreFunctionLibrary::GetGameWorld();
+
+	if (world == nullptr)
+	{
+		return false;
+	}
+
+	const float currentTime = world->GetTimeSeconds();
+	bool canReact = (currentTime - m_LastReactionTime) >= m_CurrentReactionTime;
+
+	if (canReact == false)
+	{
+		return false;
+	}
+
+	m_LastReactionTime = currentTime;
+	m_CurrentReactionTime = m_BehaviourSettings.ReactionTime.GetRandomValue();
+	return true;
+}
+
+const FBehaviourSettings& UHSMAgentComponent::GetBehaviourSettings()
+{
+	return m_BehaviourSettings;
+}
+
 // Called when the game starts
 void UHSMAgentComponent::BeginPlay()
 {
@@ -306,6 +340,7 @@ void UHSMAgentComponent::TickComponent(float deltaTime, ELevelTick tickType, FAc
 		return;
 	}
 
+	LOG_ONSCREEN(4, 2.0f, FColor::Yellow, "CURRENT STATE: %s", *m_States[m_CurrentState]->GetStateToString());
 	m_States[m_CurrentState]->Update(deltaTime);
 }
 

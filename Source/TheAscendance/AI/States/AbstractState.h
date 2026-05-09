@@ -20,6 +20,7 @@ public:
 	virtual void EndState();
 
 	void SetAttackCombatState(UAttackCombatState* attackCombatState);
+	virtual const FString GetStateToString() const;
 
 protected:
 	TWeakObjectPtr<UHSMAgentComponent> m_Agent = nullptr;

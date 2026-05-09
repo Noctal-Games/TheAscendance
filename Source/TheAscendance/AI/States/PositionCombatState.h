@@ -18,6 +18,7 @@ public:
 	virtual void Update(float deltaTime) override;
 	virtual void EndState() override;
 
+	virtual const FString GetStateToString() const override;
 private:
 	TWeakObjectPtr<AActor> m_Target = nullptr;
 

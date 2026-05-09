@@ -2,6 +2,7 @@
 
 
 #include "PositionCombatState.h"
+#include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/AI/Components/HSMAgentComponent.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 
@@ -31,12 +32,10 @@ void UPositionCombatState::Update(float deltaTime)
 		return;
 	}
 
-	//Uncomment when action logic is setup
-	//if(m_PlayerActionReactionTimer > 0.0f)
-	//{
-	//	m_PlayerActionReactionTimer -= deltaTime;
-	//	return;
-	//}
+	if (m_Agent->TryConsumeReaction() == false)
+	{
+		return;
+	}
 
 	FVector targetLocation = m_Target->GetActorLocation();
 
@@ -89,4 +88,9 @@ void UPositionCombatState::Update(float deltaTime)
 
 void UPositionCombatState::EndState()
 {
+}
+
+const FString UPositionCombatState::GetStateToString() const
+{
+	return FString("POSITION COMBAT STATE");
 }

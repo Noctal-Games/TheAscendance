@@ -116,8 +116,7 @@ void ABaseEnemy::Init(const UEnemyData* data)
 	if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))
 	{
 		m_Agent->RegisterComponent();
-		m_Agent->Init(this);
-		m_Agent->InitSettings(data->ClassData, data->BehaviourSettings, data->PerceptionSettings);
+		m_Agent->Init(this, data->ClassData, data->BehaviourSettings, data->PerceptionSettings);
 	}
 	else
 	{

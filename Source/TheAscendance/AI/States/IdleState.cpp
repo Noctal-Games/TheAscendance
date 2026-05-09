@@ -33,13 +33,23 @@ void UIdleState::StartState(UHSMAgentComponent* agent)
 
 void UIdleState::Update(float deltaTime)
 {
-	if (m_Agent->HasLineOfSight() == true)
+	if (m_Agent == nullptr)
+	{
+		return;
+	}
+
+	if (m_Agent->IsTargetDetected() == true)
 	{
 		m_Agent->SetState(EState::COMBAT);
 		return;
 	}
 
 	if (m_Agent->HasPath() == true || m_UsingWaypointRoute == true)
+	{
+		return;
+	}
+
+	if (m_Agent->TryConsumeReaction() == false)
 	{
 		return;
 	}
@@ -67,4 +77,9 @@ void UIdleState::EndState()
 
 	m_UsingWaypointRoute = false;
 	UAbstractState::EndState();
+}
+
+const FString UIdleState::GetStateToString() const
+{
+	return FString("IDLE");
 }

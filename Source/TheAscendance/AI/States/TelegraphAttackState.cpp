@@ -58,6 +58,11 @@ void UTelegraphAttackState::EndState()
 	UAbstractState::EndState();
 }
 
+const FString UTelegraphAttackState::GetStateToString() const
+{
+	return FString("TELEPGRAPH ATTACK STATE");
+}
+
 void UTelegraphAttackState::EndTelegraph()
 {
 	if(m_AttackCombatState.IsValid() == false)

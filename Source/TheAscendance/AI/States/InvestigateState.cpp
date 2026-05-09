@@ -17,6 +17,7 @@ void UInvestigateState::StartState(UHSMAgentComponent* owningAgent)
 	}
 
 	m_Agent->SetDestination(m_Agent->GetLocationToInvestigate());
+	m_InvestigationTimer = m_Agent->GetBehaviourSettings().DetectionMemoryDuration;
 
 	if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
 	{
@@ -28,7 +29,7 @@ void UInvestigateState::StartState(UHSMAgentComponent* owningAgent)
 
 void UInvestigateState::Update(float deltaTime)
 {
-	if (m_Agent->HasLineOfSight() == true)
+	if (m_Agent->IsTargetDetected() == true)
 	{
 		m_Agent->SetState(EState::COMBAT);
 		return;
@@ -69,4 +70,9 @@ void UInvestigateState::EndState()
 	m_Agent->SetLocationToInvestigate(FVector::ZeroVector);
 
 	UAbstractState::EndState();
+}
+
+const FString UInvestigateState::GetStateToString() const
+{
+	return FString("INVESTIGATE");
 }

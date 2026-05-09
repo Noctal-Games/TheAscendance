@@ -79,7 +79,7 @@ struct FPerceptionSettings
 	UPROPERTY(EditDefaultsOnly, meta = (Category = "Vision"))
 	float SightMaxDistance = 5000.0f;
 	UPROPERTY(EditDefaultsOnly, meta = (Category = "Vision", ToolTip = "How strongly distance affects vision as it reaches SightMaxDistance"))
-	TObjectPtr<UCurveFloat> DistanceVisibilityCurve;
+	TObjectPtr<UCurveFloat> DistanceVisibilityCurve = nullptr;
 	UPROPERTY(EditDefaultsOnly, meta = (Category = "Vision", ToolTip = "Higher value for stronger vision", ClampMin = 0.0f, ClampMax = 1.0f))
 	float SightStrength = 1.0f;
 	UPROPERTY(EditDefaultsOnly, meta = (Category = "Vision", ToolTip = "Higher value for stronger vision", ClampMin = 0, ClampMax = 360))
@@ -90,10 +90,10 @@ struct FPerceptionSettings
 
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "The threshold in which the enemy detects the target", ClampMin = 0.0f, ClampMax = 1.0f))
 	float DetectionThreshold = 1.0f;
-	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "How fast the enemy can detect a target. Added per tick with Line of Sight.", ClampMin = 0.01f, ClampMax = 1.0f))
-	float DetectionGainRate = 0.01f;
-	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "How fast the enemy can lose track of a target. Negated per tick without Line of Sight", ClampMin = 0.01f, ClampMax = 1.0f))
-	float DetectionLossRate = 0.01f;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "How fast the enemy can detect a target. Added per tick with Line of Sight.", ClampMin = 0.1f, ClampMax = 2.0f))
+	float DetectionGainRate = 0.1f;
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "How fast the enemy can lose track of a target. Negated per tick without Line of Sight", ClampMin = 0.1f, ClampMax = 1.0f))
+	float DetectionLossRate = 0.1f;
 };
 
 USTRUCT(BlueprintType)

@@ -16,6 +16,7 @@ public:
 	virtual void Update(float deltaTime) override;
 	virtual void EndState() override;
 
+	virtual const FString GetStateToString() const override;
 private:
 	void EndAttack();
 

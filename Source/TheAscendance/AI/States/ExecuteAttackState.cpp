@@ -43,6 +43,11 @@ void UExecuteAttackState::EndState()
 	UAbstractState::EndState();
 }
 
+const FString UExecuteAttackState::GetStateToString() const
+{
+	return FString("EXECUTE ATTACK STATE");
+}
+
 void UExecuteAttackState::EndAttack()
 {
 	if (m_AttackCombatState.IsValid() == false)

@@ -21,6 +21,7 @@ public:
 
 	void SetCombatState(ECombatState newState);
 
+	virtual const FString GetStateToString() const override;
 private:
 	UPROPERTY()
 	TMap<ECombatState, TObjectPtr<UAbstractState>> m_CombatStates;

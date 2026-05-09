@@ -27,7 +27,7 @@ void UChaseCombatState::Update(float deltaTime)
 		return;
 	}
 
-	if (m_Agent->HasLineOfSight() == false)
+	if (m_Agent->IsTargetDetected() == false)
 	{
 		m_ChaseTimer -= deltaTime;
 
@@ -68,4 +68,9 @@ void UChaseCombatState::EndState()
 	}
 
 	UAbstractState::EndState();
+}
+
+const FString UChaseCombatState::GetStateToString() const
+{
+	return FString("CHASE");
 }

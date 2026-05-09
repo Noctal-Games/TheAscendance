@@ -29,3 +29,8 @@ void UAbstractState::SetAttackCombatState(UAttackCombatState* attackCombatState)
 {
 	m_AttackCombatState = attackCombatState;
 }
+
+const FString UAbstractState::GetStateToString() const
+{
+	return FString("ABSTRACT STATE - IMPLEMENT STATE OVERRIDE");
+}

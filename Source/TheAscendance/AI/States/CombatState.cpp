@@ -90,3 +90,13 @@ void UCombatState::SetCombatState(ECombatState newState)
 
 	m_CombatStates[m_CurrentCombatState]->StartState(m_Agent.Get());
 }
+
+const FString UCombatState::GetStateToString() const
+{
+	if (m_CombatStates.Contains(m_CurrentCombatState) && m_CombatStates[m_CurrentCombatState] != nullptr)
+	{
+		return m_CombatStates[m_CurrentCombatState]->GetStateToString();
+	}
+
+	return FString("INVALID COMBAT STATE");
+}
