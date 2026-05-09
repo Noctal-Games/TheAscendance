@@ -27,7 +27,7 @@ void UCombatState::StartState(UHSMAgentComponent* owningAgent)
 
 	if (m_CombatStates.Num() != (int32)EState::MAX)
 	{
-		LOG_ERROR("CombatStates count does not match ECombatState length");
+		LOG_ERROR("[COMBAT STATE] CombatStates count does not match ECombatState length");
 	}
 
 	SetCombatState(ECombatState::CHASE);
@@ -77,7 +77,7 @@ void UCombatState::SetCombatState(ECombatState newState)
 	}
 	else if (m_CombatStates.Contains(newState) == false || m_CombatStates[newState] == nullptr)
 	{
-		LOG_ERROR("Tried to set CombatState to an invalid state");
+		LOG_ERROR("[COMBAT STATE] Tried to set CombatState to an invalid state");
 		return;
 	}
 

@@ -37,7 +37,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Checks whether the enemy has abilities that fulfil these goals. A warning will be logged otherwise"))
 	TArray<EAbilityGoal> ExpectedAbilityGoals;
 
-	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "The range at which the enemy prefers to engage"))
+	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "The range at which the enemy prefers to engage, the enemy will try to stay at this distance where possible"))
 	float PreferredEngagementRange = 0.0f;
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "The maximum range at which the enemy can engage"))
 	float MaxEngagementRange = 0.0f;
@@ -151,6 +151,12 @@ public:
 public:
 	UPROPERTY(EditDefaultsOnly, meta = (Categories = "Enemy", AssetRegistrySearchable))
 	FGameplayTag EnemyTag;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<class USkeletalMesh> EnemyMesh = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftClassPtr<class UAnimInstance> EnemyAnimationBP = nullptr;
+
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UEnemyClassData> ClassData = nullptr;
 	UPROPERTY(EditDefaultsOnly)
@@ -163,10 +169,4 @@ public:
 	FCombatSettings CombatSettings;
 	UPROPERTY(EditDefaultsOnly)
 	FEnemyMovementSettings MovementSettings;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSoftObjectPtr<class USkeletalMesh> EnemyMesh = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSoftClassPtr<class UAnimInstance> EnemyAnimationBP = nullptr;
 };
