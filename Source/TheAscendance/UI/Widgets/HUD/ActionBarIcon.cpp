@@ -4,87 +4,63 @@
 #include "ActionBarIcon.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Items/Structs/ItemData.h"
-#include "TheAscendance/Spells//Structs/SpellData.h"
+#include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
+#include "ActionCooldownWidget.h"
 
 #include "Components/Image.h"
 
-void UActionBarIcon::UpdateIcon()
+void UActionBarIcon::LoadAbility(const FGameplayTag& abilityTag, const TSoftObjectPtr<UTexture2D>& icon)
 {
-	APlayableGameMode* gameMode = UCoreFunctionLibrary::GetPlayableGameMode();
-
-	if(gameMode == nullptr)
+	if (m_AbilityTag != abilityTag && m_CooldownWidget != nullptr)
 	{
-		LOG_ERROR("[ACTION BAR ICON] Failed to update icon - GameMode was invalid");
+		m_CooldownWidget->StartCooldown(0.0f, 0.0f);
+	}
+
+	m_AbilityTag = abilityTag;
+	m_Texture = icon;
+
+	if (m_Texture.IsNull() == false)
+	{
+		UStreamableFunctionLibrary::RequestAsyncLoad(m_Texture.ToSoftObjectPath(), [this]() { SetIcon(); });
 		return;
 	}
 
-	if(m_EquipmentTag.IsValid() && m_EquipmentTag != FGameplayTag::EmptyTag)
-	{
-		if (FWeaponData* weaponData = gameMode->GetWeaponData(m_EquipmentTag))
-		{
-			if(const FWeaponTypeData* weaponTypeData = gameMode->GetWeaponTypeData(weaponData->WeaponType))
-			{
-				if(weaponTypeData->CastsSpell == false)
-				{
-					if (FItemData* itemData = gameMode->GetItemData(m_EquipmentTag))
-					{
-						m_Texture = itemData->ItemIcon;
-
-						if (m_Texture.IsNull() == false)
-						{
-							UCoreFunctionLibrary::RequestAsyncLoad(m_Texture.ToSoftObjectPath(), [this]() { SetIcon(); });
-							return;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	if(m_SpellTag.IsValid() && m_SpellTag != FGameplayTag::EmptyTag)
-	{
-		if (const FSpellTableData* spellData = gameMode->GetSpellTableData(m_SpellTag))
-		{
-			m_Texture = spellData->SpellIcon;
-
-			if (m_Texture.IsNull() == false)
-			{
-				UCoreFunctionLibrary::RequestAsyncLoad(m_Texture.ToSoftObjectPath(), [this]() { SetIcon(); });
-				return;
-			}
-		}
-	}
-
-	m_ActionIconImage->SetBrushFromTexture(EmptyActionIcon);
+	LOG_ERROR("[ACTION BAR ICON] Failed to load icon - Texture was invalid. Using default");
+	ClearAbilityIcon();
 }
 
-void UActionBarIcon::SetSpellTag(const FGameplayTag& spellTag)
+void UActionBarIcon::OnCooldownTriggered(const FGameplayTag& abilityTag, float remaining, float max)
 {
-	if(m_SpellTag != spellTag)
+	if (m_AbilityTag != abilityTag)
 	{
-		m_SpellTag = spellTag;
-		UpdateIcon();
+		return;
+	}
+
+	if(m_CooldownWidget != nullptr)
+	{
+		m_CooldownWidget->StartCooldown(remaining, max);
 	}
 }
 
-void UActionBarIcon::SetEquipmentTag(const FGameplayTag& equipmentTag)
+void UActionBarIcon::ClearAbility()
 {
-	LOG_ONSCREEN(-1, 5.0f, FColor::Green, "%s", *equipmentTag.ToString());
-
-	if(m_EquipmentTag != equipmentTag)
+	if (m_CooldownWidget != nullptr)
 	{
-		m_EquipmentTag = equipmentTag;
-		UpdateIcon();
+		m_CooldownWidget->StartCooldown(0.0f, 0.0f);
 	}
+
+	m_AbilityTag = FGameplayTag();
+	ClearAbilityIcon();
 }
 
 void UActionBarIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	m_ActionIconImage->SetBrushFromTexture(EmptyActionIcon);
+	ClearAbilityIcon();
 }
 
 void UActionBarIcon::NativeDestruct()
@@ -101,6 +77,11 @@ void UActionBarIcon::SetIcon()
 	else
 	{
 		LOG_ERROR("[ACTION BAR ICON] Failed to set icon - Texture was invalid. Using default");
-		m_ActionIconImage->SetBrushFromTexture(EmptyActionIcon);
+		ClearAbilityIcon();
 	}
+}
+
+void UActionBarIcon::ClearAbilityIcon()
+{
+	m_ActionIconImage->SetBrushFromTexture(EmptyActionIcon);
 }

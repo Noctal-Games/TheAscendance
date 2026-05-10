@@ -9,6 +9,7 @@
 #include "ItemLoader.generated.h"
 
 struct FItemData;
+struct FEquippableItemData;
 struct FWeaponData;
 
 UCLASS()
@@ -20,12 +21,15 @@ public:
 	void Init();
 
 	FItemData* GetItemData(const FGameplayTag& itemTag);
+	FEquippableItemData* GetEquipmentData(const FGameplayTag& itemTag);
 	FWeaponData* GetWeaponData(const FGameplayTag& itemTag);
 	const FWeaponTypeData* GetWeaponTypeData(EWeaponType type);
 
 private:
 	UPROPERTY()
 	TObjectPtr<UDataTable> m_ItemTable = nullptr;
+	UPROPERTY()
+	TObjectPtr<UDataTable> m_EquipmentTable = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<UDataTable> m_WeaponTable = nullptr;

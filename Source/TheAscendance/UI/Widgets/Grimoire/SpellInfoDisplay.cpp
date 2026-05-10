@@ -4,7 +4,8 @@
 #include "SpellInfoDisplay.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
-#include "TheAscendance/Spells/Structs/SpellData.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
+#include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
 #include "TheAscendance/UI/Data/SpellDataEntryObject.h"
 
 #include "Components/TextBlock.h"
@@ -32,7 +33,7 @@ void USpellInfoDisplay::Init(const USpellDataEntryObject* spellDataEntry)
 
 	if (m_SpellData.IsNull() == false)
 	{
-		UCoreFunctionLibrary::RequestAsyncLoad(m_SpellData.ToSoftObjectPath(), [this]() { DisplaySpellData(); });
+		UStreamableFunctionLibrary::RequestAsyncLoad(m_SpellData.ToSoftObjectPath(), [this]() { DisplaySpellData(); });
 	}
 }
 
@@ -47,7 +48,7 @@ void USpellInfoDisplay::DisplaySpellData()
 
 	FString cooldownString;
 	cooldownString.Append("Cooldown: ");
-	cooldownString.Append(FString::SanitizeFloat(m_SpellData->SpellCooldown));
+	cooldownString.Append(FString::SanitizeFloat(m_SpellData->Cooldown));
 	cooldownString.Append("s");
 
 	m_SpellCooldown->SetText(FText::FromString(cooldownString));

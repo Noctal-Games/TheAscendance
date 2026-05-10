@@ -4,6 +4,7 @@
 #include "AudioManagerSubsystem.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 
@@ -14,13 +15,13 @@ void UAudioManagerSubsystem::LoadSoundAsset(TSoftObjectPtr<USoundBase> softSound
 {
 	if (playSoundAfterLoad == false)
 	{
-		UCoreFunctionLibrary::RequestAsyncLoad(softSound.ToSoftObjectPath());
+		UStreamableFunctionLibrary::RequestAsyncLoad(softSound.ToSoftObjectPath());
 		return;
 	}
 
 	FSoftObjectPath path = softSound.ToSoftObjectPath();
 
-	UCoreFunctionLibrary::RequestAsyncLoad(path, [this, path, location, volume]()
+	UStreamableFunctionLibrary::RequestAsyncLoad(path, [this, path, location, volume]()
 		{ 
 			if (USoundBase* sound = Cast<USoundBase>(path.ResolveObject()))
 			{

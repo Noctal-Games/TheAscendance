@@ -4,6 +4,7 @@
 #include "TelegraphAttackState.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "AttackCombatState.h"
 #include "TheAscendance/AI/Components/HSMAgentComponent.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
@@ -36,7 +37,7 @@ void UTelegraphAttackState::StartState(UHSMAgentComponent* agent)
 		}
 		else
 		{
-			UCoreFunctionLibrary::RequestAsyncLoad(m_AttackCombatState->m_CurrentAttackMontage.ToSoftObjectPath());
+			UStreamableFunctionLibrary::RequestAsyncLoad(m_AttackCombatState->m_CurrentAttackMontage.ToSoftObjectPath());
 		}
 
 		if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())

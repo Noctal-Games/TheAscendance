@@ -12,29 +12,29 @@ void UItemLoader::Init()
 {
 	if (UDataHandlerSubsystem* dataHandler = UCoreFunctionLibrary::GetDataHandlerSubsystem())
 	{
-		 m_ItemTable = dataHandler->LoadData(EDataGroup::ITEMS);
+		// m_ItemTable = dataHandler->LoadData(EDataGroup::ITEMS);
 
-		if (m_ItemTable == nullptr)
-		{
-			LOG_ERROR("[ITEM LOADER] Failed to load Item DataTable");
-		}
-		else
-		{
-			LOG_INFO("[ITEM LOADER] Succeeded to load Item DataTable");
-		}
+		//if (m_ItemTable == nullptr)
+		//{
+		//	LOG_ERROR("[ITEM LOADER] Failed to load Item DataTable");
+		//}
+		//else
+		//{
+		//	LOG_INFO("[ITEM LOADER] Succeeded to load Item DataTable");
+		//}
 
-		m_WeaponTable = dataHandler->LoadData(EDataGroup::WEAPONS);
+		//m_WeaponTable = dataHandler->LoadData(EDataGroup::WEAPONS);
 
-		if (m_WeaponTable == nullptr)
-		{
-			LOG_ERROR("[ITEM LOADER] Failed to load Weapon DataTable");
-		}
-		else
-		{
-			LOG_INFO("[ITEM LOADER] Succeeded to load Weapon DataTable");
-		}
+		//if (m_WeaponTable == nullptr)
+		//{
+		//	LOG_ERROR("[ITEM LOADER] Failed to load Weapon DataTable");
+		//}
+		//else
+		//{
+		//	LOG_INFO("[ITEM LOADER] Succeeded to load Weapon DataTable");
+		//}
 
-		m_WeaponTypeData = &dataHandler->GetWeaponTypeMap();
+		//m_WeaponTypeData = &dataHandler->GetWeaponTypeMap();
 	}
 }
 
@@ -48,18 +48,22 @@ FItemData* UItemLoader::GetItemData(const FGameplayTag& itemTag)
 
 	static const FString contextString(TEXT("Item Context String"));
 
-	TArray<FItemData*> itemStructs;
-	m_ItemTable->GetAllRows(contextString, itemStructs);
+	//Check Equipment Table as well since some items have their data there instead of the item table
+	LOG_ERROR("[ITEM LOADER] Could not load ItemData for Item: %s", *itemTag.ToString());
+	return nullptr;
+}
 
-	for (const auto data : itemStructs)
+FEquippableItemData* UItemLoader::GetEquipmentData(const FGameplayTag& itemTag)
+{
+	if (m_EquipmentTable == nullptr)
 	{
-		if (data->ItemTag == itemTag)
-		{
-			return data;
-		}
+		LOG_ERROR("[ITEM LOADER] Tried to load EquipmentData without a valid EquipmentTable");
+		return nullptr;
 	}
 
-	LOG_ERROR("[ITEM LOADER] Could not load ItemData for Item: %s", *itemTag.ToString());
+	static const FString contextString(TEXT("Equipment Context String"));
+
+	LOG_ERROR("[ITEM LOADER] Could not load EquipmentData for Item: %s", *itemTag.ToString());
 	return nullptr;
 }
 

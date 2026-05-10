@@ -9,8 +9,8 @@
 #include "Interfaces/Susceptible.h"
 #include "Enums/CharacterStat.h"
 #include "TheAscendance/Items/Enums/WeaponType.h"
-#include "TheAscendance/Spells/Interfaces/SpellCaster.h"
 #include "Enums/EquippablePart.h"
+#include "TheAscendance/Abilities/Enums/AbilitySlot.h"
 #include "BaseCharacter.generated.h"
 
 class UCharacterStatsComponent;
@@ -18,7 +18,8 @@ class UEffectHandlerComponent;
 class AHeldItem;
 class UCharacterTrajectoryComponent;
 class ULoadoutComponent;
-class USpellCasterComponent;
+class UEquipmentManagerComponent;
+class UAbilityComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterDeath, ABaseCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTakeDamage);
@@ -28,7 +29,7 @@ DECLARE_DELEGATE_RetVal(const FVector, FGetCastStart);
 DECLARE_DELEGATE_RetVal(const FVector, FGetCastForward);
 
 UCLASS()
-class THEASCENDANCE_API ABaseCharacter : public ACharacter, public ISusceptible, public ISpellCaster, public IGameplayTagAssetInterface
+class THEASCENDANCE_API ABaseCharacter : public ACharacter, public ISusceptible, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 
@@ -51,10 +52,7 @@ public:
 	virtual bool HasImmunity(const FGameplayTag& immunity) const override;
 	virtual bool HasResistance(const FGameplayTag& resistance) const override;
 
-	bool MainHandPrimaryAttack();
-	bool MainHandSecondaryAttack();
-	bool OffHandPrimaryAttack();
-	bool OffHandSecondaryAttack();
+	bool Attack(EAbilitySlot abilitySlot);
 
 	UFUNCTION(BlueprintCallable)
 	bool IsAttacking()
@@ -82,12 +80,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EndOffHandAttack();
 
-	virtual AActor* GetActor() override;
-	const virtual FVector GetSpellOwnerLocation() override;
-	const virtual FVector GetSpellOwnerForward() override;
-	const virtual FVector GetCastStartLocation() override;
-	const virtual FVector GetCastStartForward() override;
-
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const override;
 	virtual bool HasMatchingGameplayTag(FGameplayTag tagToCheck) const override;
 	virtual bool HasAllMatchingGameplayTags(const FGameplayTagContainer& tagContainer) const override;
@@ -102,9 +94,15 @@ public:
 	void TurnTowards(const FRotator& targetRotation);
 
 	FVector GetSocketLocation(FName socketName);
+	virtual FVector GetSocketLocationFromPart(EEquippablePart part);
+	FName GetSocketNameFromPart(EEquippablePart part);
+
+	virtual USkeletalMeshComponent* GetEquipmentMesh();
 
 	virtual float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None);
 
+	UFUNCTION(BlueprintCallable)
+	virtual void TriggerAbility();
 	UFUNCTION(BlueprintCallable)
 	virtual void StopAbility();
 
@@ -114,9 +112,6 @@ protected:
 	friend class ULoadoutComponent;
 	friend class UPlayerHUD;
 	friend class UGrimoire;
-
-	bool EquipItem(EEquippablePart part, const FGameplayTag& itemTag);
-	void UnEquipItem(EEquippablePart part);
 
 	UCharacterStatsComponent* GetCharacterStatsComponent();
 	ULoadoutComponent* GetLoadoutComponent() const;
@@ -151,12 +146,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<ULoadoutComponent> m_LoadoutComponent = nullptr;
 	UPROPERTY()
-	TObjectPtr<USpellCasterComponent> m_SpellCasterComponent = nullptr;
-
-	UPROPERTY()
-	TObjectPtr<AHeldItem> m_MainHandItem = nullptr;
-	UPROPERTY()
-	TObjectPtr<AHeldItem> m_OffHandItem = nullptr;
+	TObjectPtr<UAbilityComponent> m_AbilityComponent = nullptr;
 
 	UPROPERTY()
 	FGameplayTagContainer m_EffectImmunities;
@@ -164,6 +154,8 @@ protected:
 	FGameplayTagContainer m_EffectResistances;
 
 	bool m_TestEquipToggle = false;
+	bool m_TestEquipToggle2 = false;
+
 	bool m_AnimTest = false;
 
 	bool m_IsSprinting = false;

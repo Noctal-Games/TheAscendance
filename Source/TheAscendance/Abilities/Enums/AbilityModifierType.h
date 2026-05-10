@@ -12,6 +12,11 @@ enum class EAbilityModifierType : uint8
 	NONE,
 
 	CHARGED UMETA(DisplayName = "Charged"),
+	AOE UMETA(DisplayName = "Area of Effect"),
+	APPLY_EFFECT UMETA(DisplayName = "Apply Effect"),
+	KNOCKBACK UMETA(DisplayName = "Knockback"),
+	APPLY_USER_EFFECT UMETA(DisplayName = "Apply User Effect"),
+	SPAWN_EFFECT UMETA(DisplayName = "Spawn Effect"),
 
 	MAX UMETA(Hidden)
 };
