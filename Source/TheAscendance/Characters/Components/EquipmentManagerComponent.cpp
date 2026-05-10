@@ -219,6 +219,41 @@ void UEquipmentManagerComponent::UnEquipItem(EEquippablePart part)
 	UpdateAbilities();
 }
 
+bool UEquipmentManagerComponent::IsHoldingTwoHandedItem()
+{
+	if (AHeldEquippableItem* heldItem = m_Equipment[EEquippablePart::LEFT_HAND])
+	{
+		if (const UEquippableItemData* itemData = heldItem->GetItemData())
+		{
+			if (itemData->EquipmentSlotUsed == EEquipmentSlot::TWO_HAND)
+			{
+				return true;
+			}
+		}
+	}
+	else
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] EquipmentManager does not hold a reference to a valid Item Object for: %s", *UEnum::GetValueAsString(EEquippablePart::LEFT_HAND));
+	}
+
+	if (AHeldEquippableItem* heldItem = m_Equipment[EEquippablePart::RIGHT_HAND])
+	{
+		if (const UEquippableItemData* itemData = heldItem->GetItemData())
+		{
+			if (itemData->EquipmentSlotUsed == EEquipmentSlot::TWO_HAND)
+			{
+				return true;
+			}
+		}
+	}
+	else
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] EquipmentManager does not hold a reference to a valid Item Object for: %s", *UEnum::GetValueAsString(EEquippablePart::RIGHT_HAND));
+	}
+
+	return false;
+}
+
 void UEquipmentManagerComponent::UpdateAbilities()
 {
 	if(m_AbilityComponent == nullptr)

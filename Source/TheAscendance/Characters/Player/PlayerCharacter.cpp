@@ -57,6 +57,17 @@ void APlayerCharacter::Interact()
 	m_InteractTarget->Interact(this);
 }
 
+bool APlayerCharacter::IsHoldingTwoHandedItem()
+{
+	if(m_EquipmentManagerComponent == nullptr)
+	{
+		LOG_ERROR("[PLAYER CHARACTER] Tried to check if holding two handed item but EquipmentManagerComponent was null");
+		return false;
+	}
+
+	return m_EquipmentManagerComponent->IsHoldingTwoHandedItem();
+}
+
 bool APlayerCharacter::PickupItem(const FGameplayTag& itemTag, int amount)
 {
 	if (UGameEventSubsystem* gameEvent = UCoreFunctionLibrary::GetGameEventSubsystem())
@@ -331,6 +342,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	ABaseCharacter::Tick(DeltaTime);
 
+	LOG_ONSCREEN(6, 1, FColor::Green, "[PLAYER CHARACTER] USING TWO HANDED: %s", IsHoldingTwoHandedItem() ? TEXT("TRUE") : TEXT("FALSE"));
 	LOG_ONSCREEN(0, 1, FColor::Yellow, "[PLAYER CHARACTER] USING ANIMATIONS: %s", m_AnimTest ? TEXT("TRUE") : TEXT("FALSE"));
 
 	HandleLookAtInteractions();

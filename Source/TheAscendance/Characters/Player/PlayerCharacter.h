@@ -33,6 +33,9 @@ public:
 	void Interact();
 
 	UFUNCTION(BlueprintCallable)
+	bool IsHoldingTwoHandedItem();
+
+	UFUNCTION(BlueprintCallable)
 	bool PickupItem(const FGameplayTag& itemTag, int amount);
 
 	void SetIsSprinting(bool val);
