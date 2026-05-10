@@ -5,7 +5,7 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "SpellInventoryEntry.h"
 #include "TheAscendance/UI/Data/SpellDataEntryObject.h"
-#include "TheAscendance/Spells/Structs/SpellData.h"
+#include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
 
 void USpellInventoryGrid::PopulateList(const TArray<TSharedPtr<FSpellTableData>>& spellList)
 {

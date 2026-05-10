@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "TheAscendance/Abilities/Enums/AbilitySlot.h"
+#include "TheAscendance/Characters/Enums/CharacterStat.h"
+#include "TheAscendance/Abilities/Structs/AbilityInfo.h"
 #include "GameplayTagContainer.h"
 // Test
 #include "TheAscendance/Abilities/AbilityFactory.h"
@@ -14,6 +17,10 @@ class IAbility;
 class ABaseCharacter;
 class UAnimMontage;
 class UAbilityData;
+class APlayableGameMode;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnAbilitiesUpdate, const TArray<FAbilityInfo>&);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnAbilityCooldown, const FGameplayTag& /*abilityTag*/, float /*remaining*/, float /*max*/);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API UAbilityComponent : public UActorComponent
@@ -24,16 +31,24 @@ public:
 	// Sets default values for this component's properties
 	UAbilityComponent();
 
-	void SetAbilities(const TArray<FGameplayTag>& abilityTags);
-	void TestSetAbilities(const TArray<TObjectPtr<UAbilityData>>& abilities);
+	void SetAbilities(const TMap<EAbilitySlot, FGameplayTag>& abilityTags);
 
-	void StartAbility(int slot);
+	//Starts the overall ability. Charging, animations, etc.
+	void StartAbility(EAbilitySlot slot);
+	//Triggered by animations, this is the actual ability start event. So when a spell is cast, a melee collision is activated, etc.
+	void TriggerAbility();
+	//Stops the ability. Clears up all timer handles, etc.
 	void StopAbility();
 
 	void OnInputReleased();
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	FVector GetCastLocation();
+	FVector GetCastForward();
+
+	void AffectOwnerStat(ECharacterStat stat, int amount);
+	float GetOwnerStat(ECharacterStat stat);
 
 protected:
 	friend class UBaseAbility;
@@ -41,9 +56,15 @@ protected:
 	virtual void BeginPlay() override;
 
 	float PlayAnimMontageOnOwner(UAnimMontage* animation);
-public:
-	static constexpr int MaxAbilities = 4;
 
+private:
+	void TriggerOnAbilitiesUpdate();
+	void ProcessAbilityPair(TMap<EAbilitySlot, UAbilityData*>& abilityData, EAbilitySlot mainSlot, EAbilitySlot offSlot, const FString& label, APlayableGameMode* gameMode);
+
+public:
+	FOnAbilitiesUpdate OnAbilitiesUpdate;
+	FOnAbilityCooldown OnAbilityCooldown;
+	 
 private:
 	UPROPERTY()
 	TWeakObjectPtr<ABaseCharacter> m_Owner = nullptr;

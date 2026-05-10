@@ -13,7 +13,9 @@ class UProjectile : public UInterface
 	GENERATED_BODY()
 };
 
-class ISpell;
+class IAbility;
+class UProjectileSpellData;
+class UNiagaraSystem;
 
 class THEASCENDANCE_API IProjectile
 {
@@ -21,7 +23,13 @@ class THEASCENDANCE_API IProjectile
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	virtual void Init(IAbility* ability, UProjectileSpellData* spellData) {};
 	virtual void SetDecoratedSelf(IProjectile* decoratedSelf) {};
+
+	virtual void SetNiagara(UNiagaraSystem* niagaraSystem) {};
+
+	virtual void SetIsActive(bool isActive) {};
+	virtual void ApplyForce(const FVector& unitDirection) {};
 
 	virtual void HandleOnHit(UPrimitiveComponent* hitComp, AActor* otherActor, UPrimitiveComponent* otherComp, FVector normalImpulse, const FHitResult& hit) {};
 	virtual void HandleOnOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult) {};
@@ -29,7 +37,9 @@ public:
 
 	virtual void ProcessOverlapDamage(int& damage) {};
 
-	virtual ISpell* GetSpell() { return nullptr; };
+	virtual void AddIgnoreActor(AActor* toIgnore) {};
+
+	virtual IAbility* GetAbility() { return nullptr; };
 
 	virtual AActor* GetProjectileActor() { return nullptr; };
 	virtual FVector GetProjectileLocation() { return FVector::Zero(); };

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ProjectileDecorator.h"
-#include "TheAscendance/Spells/Structs/SpellModifierData.h"
+#include "TheAscendance/Actors/Projectile/Structs/ProjectileModifierData.h"
 #include "PenetrationProjectileDecorator.generated.h"
 
 UCLASS()
@@ -15,10 +15,11 @@ class THEASCENDANCE_API UPenetrationProjectileDecorator : public UProjectileDeco
 public:
 	class THEASCENDANCE_API Builder
 	{
+		UPROPERTY()
 		TWeakObjectPtr<UPenetrationProjectileDecorator> m_Decorator = nullptr;
 
 	public:
-		Builder(IProjectile* decorator, const FPenetrationSpellModifier& modifierData)
+		Builder(IProjectile* decorator, const FPenetrationProjectileModifier& modifierData)
 		{
 			m_Decorator = NewObject<UPenetrationProjectileDecorator>();
 			m_Decorator->Decorate(decorator);
