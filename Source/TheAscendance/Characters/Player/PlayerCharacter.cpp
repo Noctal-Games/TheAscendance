@@ -46,6 +46,17 @@ ACustomPlayerController* APlayerCharacter::GetPlayerController()
 	return m_PlayerController;
 }
 
+EIdleType APlayerCharacter::GetIdleType()
+{
+	if (m_EquipmentManagerComponent == nullptr)
+	{
+		LOG_ERROR("[PLAYER CHARACTER] Tried to GetIdleType but EquipmentManagerComponent was null");
+		return EIdleType::NO_ITEMS;
+	}
+
+	return m_EquipmentManagerComponent->GetIdleType();
+}
+
 void APlayerCharacter::Interact()
 {
 	if (m_InteractTarget == nullptr)
@@ -342,7 +353,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	ABaseCharacter::Tick(DeltaTime);
 
-	LOG_ONSCREEN(6, 1, FColor::Green, "[PLAYER CHARACTER] USING TWO HANDED: %s", IsHoldingTwoHandedItem() ? TEXT("TRUE") : TEXT("FALSE"));
+	EIdleType idleType = GetIdleType();
+	LOG_ONSCREEN(6, 1, FColor::Green, "[PLAYER CHARACTER] IDLE TYPE: %s", *UEnum::GetValueAsString(idleType));
 	LOG_ONSCREEN(0, 1, FColor::Yellow, "[PLAYER CHARACTER] USING ANIMATIONS: %s", m_AnimTest ? TEXT("TRUE") : TEXT("FALSE"));
 
 	HandleLookAtInteractions();
@@ -371,14 +383,14 @@ void APlayerCharacter::TestFunction2()
 
 	if (m_TestEquipToggle == false)
 	{
-		if (EquipItem(EEquippablePart::RIGHT_HAND, ITEM_EQUIPMENT_GREATSWORD) == false)
+		if (EquipItem(EEquippablePart::LEFT_HAND, ITEM_EQUIPMENT_GREATSWORD) == false)
 		{
 			return;
 		}
 	}
 	else
 	{
-		UnEquipItem(EEquippablePart::RIGHT_HAND);
+		UnEquipItem(EEquippablePart::LEFT_HAND);
 	}
 
 	m_TestEquipToggle = !m_TestEquipToggle;
@@ -390,14 +402,14 @@ void APlayerCharacter::TestFunction3()
 
 	if (m_TestEquipToggle2 == false)
 	{
-		if (EquipItem(EEquippablePart::LEFT_HAND, ITEM_EQUIPMENT_SWORD) == false)
+		if (EquipItem(EEquippablePart::RIGHT_HAND, ITEM_EQUIPMENT_SWORD) == false)
 		{
 			return;
 		}
 	}
 	else
 	{
-		UnEquipItem(EEquippablePart::LEFT_HAND);
+		UnEquipItem(EEquippablePart::RIGHT_HAND);
 	}
 
 	m_TestEquipToggle2 = !m_TestEquipToggle2;

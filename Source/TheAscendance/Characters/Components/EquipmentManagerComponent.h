@@ -28,6 +28,7 @@ public:
 	bool EquipItem(const FGameplayTag& itemTag, EEquippablePart part);
 	void UnEquipItem(EEquippablePart part);
 
+	EIdleType GetIdleType();
 	bool IsHoldingTwoHandedItem();
 
 protected:

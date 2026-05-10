@@ -219,6 +219,54 @@ void UEquipmentManagerComponent::UnEquipItem(EEquippablePart part)
 	UpdateAbilities();
 }
 
+EIdleType UEquipmentManagerComponent::GetIdleType()
+{
+	EIdleType type = EIdleType::NO_ITEMS;
+
+	if (AHeldEquippableItem* heldItem = m_Equipment[EEquippablePart::LEFT_HAND])
+	{
+		if (const UEquippableItemData* itemData = heldItem->GetItemData())
+		{
+			if (itemData->EquipmentSlotUsed == EEquipmentSlot::TWO_HAND)
+			{
+				return EIdleType::EQUIPPED_TWOHANDED;
+			}
+
+			type = EIdleType::EQUIPPED_OFFHAND;
+		}
+	}
+	else
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] EquipmentManager does not hold a reference to a valid Item Object for: %s", *UEnum::GetValueAsString(EEquippablePart::LEFT_HAND));
+	}
+
+	if (AHeldEquippableItem* heldItem = m_Equipment[EEquippablePart::RIGHT_HAND])
+	{
+		if (const UEquippableItemData* itemData = heldItem->GetItemData())
+		{
+			if (itemData->EquipmentSlotUsed == EEquipmentSlot::TWO_HAND)
+			{
+				return EIdleType::EQUIPPED_TWOHANDED;
+			}
+
+			if(type == EIdleType::EQUIPPED_OFFHAND)
+			{
+				type = EIdleType::EQUIPPED_BOTHHANDS;
+			}
+			else
+			{
+				type = EIdleType::EQUIPPED_MAINHAND;
+			}
+		}
+	}
+	else
+	{
+		LOG_ERROR("[EQUIPMENT MANAGER COMPONENT] EquipmentManager does not hold a reference to a valid Item Object for: %s", *UEnum::GetValueAsString(EEquippablePart::RIGHT_HAND));
+	}
+
+	return type;
+}
+
 bool UEquipmentManagerComponent::IsHoldingTwoHandedItem()
 {
 	if (AHeldEquippableItem* heldItem = m_Equipment[EEquippablePart::LEFT_HAND])
@@ -270,12 +318,12 @@ void UEquipmentManagerComponent::UpdateAbilities()
 		{
 			if (itemData->PrimaryAbility.DoesSpellOverride == false)
 			{
-				abilities[EAbilitySlot::MAINHAND_PRIMARY] = itemData->PrimaryAbility.AbilityTag;
+				abilities.FindOrAdd(EAbilitySlot::MAINHAND_PRIMARY) = itemData->PrimaryAbility.AbilityTag;
 			}
 
 			if (itemData->AltAbility.DoesSpellOverride == false)
 			{
-				abilities[EAbilitySlot::MAINHAND_ALT] = itemData->AltAbility.AbilityTag;
+				abilities.FindOrAdd(EAbilitySlot::MAINHAND_ALT) = itemData->AltAbility.AbilityTag;
 			}
 		}
 	}
@@ -286,12 +334,12 @@ void UEquipmentManagerComponent::UpdateAbilities()
 		{
 			if (itemData->PrimaryAbility.DoesSpellOverride == false)
 			{
-				abilities[EAbilitySlot::OFFHAND_PRIMARY] = itemData->PrimaryAbility.AbilityTag;
+				abilities.FindOrAdd(EAbilitySlot::OFFHAND_PRIMARY) = itemData->PrimaryAbility.AbilityTag;
 			}
 
 			if (itemData->AltAbility.DoesSpellOverride == false)
 			{
-				abilities[EAbilitySlot::OFFHAND_ALT] = itemData->AltAbility.AbilityTag;
+				abilities.FindOrAdd(EAbilitySlot::OFFHAND_ALT) = itemData->AltAbility.AbilityTag;
 			}
 		}
 	}

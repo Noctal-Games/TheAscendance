@@ -6,6 +6,7 @@
 #include "TheAscendance/Characters/BaseCharacter.h"
 #include "TheAscendance/Abilities/Enums/AbilitySlot.h"
 #include "TheAscendance/Actors/Interaction/Enums/InteractType.h"
+#include "TheAscendance/Characters/Enums/EquippablePart.h"
 #include "PlayerCharacter.generated.h"
 
 class UPlayerMovementComponent;
@@ -15,6 +16,7 @@ class ISpell;
 class USoundBase;
 class IInteractable;
 class UEquipmentManagerComponent;
+
 
 DECLARE_DELEGATE_OneParam(FOnInteractTargetChanged, EInteractType);
 
@@ -29,6 +31,9 @@ public:
 
 	void SetPlayerController(ACustomPlayerController* PlayerController);
 	ACustomPlayerController* GetPlayerController();
+
+	UFUNCTION(BlueprintCallable)
+	EIdleType GetIdleType();
 
 	void Interact();
 
