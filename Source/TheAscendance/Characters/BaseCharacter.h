@@ -58,24 +58,9 @@ public:
 	bool IsAttacking();
 
 	UFUNCTION(BlueprintCallable)
-	bool IsMainHandAttacking() { return m_IsMainHandAttacking; };
-	UFUNCTION(BlueprintCallable)
-	bool IsOffHandAttacking() { return m_IsOffHandAttacking; };
-
-	UFUNCTION(BlueprintCallable)
-	bool IsMainHandPrimaryAttacking();
-	UFUNCTION(BlueprintCallable)
-	bool IsOffHandPrimaryAttacking();
-
-	UFUNCTION(BlueprintCallable)
 	EWeaponType MainHandWeaponType();
 	UFUNCTION(BlueprintCallable)
 	EWeaponType OffHandWeaponType();
-
-	UFUNCTION(BlueprintCallable)
-	void EndMainHandAttack();
-	UFUNCTION(BlueprintCallable)
-	void EndOffHandAttack();
 
 	virtual void GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const override;
 	virtual bool HasMatchingGameplayTag(FGameplayTag tagToCheck) const override;
@@ -152,8 +137,6 @@ protected:
 
 	bool m_TestEquipToggle = false;
 	bool m_TestEquipToggle2 = false;
-
-	bool m_AnimTest = false;
 
 	bool m_IsSprinting = false;
 	bool m_IsCrouching = false;

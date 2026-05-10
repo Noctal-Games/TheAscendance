@@ -29,8 +29,6 @@ ABaseEnemy::ABaseEnemy() : ABaseCharacter()
 
 void ABaseEnemy::Init(const UEnemyData* data)
 {
-	m_AnimTest = true;
-
 	if (data == nullptr)
 	{
 		LOG_ERROR("[BASE ENEMY] Tried to Init BaseEnemy with invalid EnemyTableData")

@@ -331,16 +331,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	ABaseCharacter::Tick(DeltaTime);
 
-	LOG_ONSCREEN(0, 1, FColor::Yellow, "[PLAYER CHARACTER] USING ANIMATIONS: %s", m_AnimTest ? TEXT("TRUE") : TEXT("FALSE"));
-
 	HandleLookAtInteractions();
 }
 
 void APlayerCharacter::TestFunction1()
 {
-	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "[PLAYER CHARACTER] TEST 1");
-	m_AnimTest = !m_AnimTest;
-
 	if (m_TestSound != nullptr)
 	{
 		if(UWorld* world = UCoreFunctionLibrary::GetGameWorld())

@@ -178,16 +178,6 @@ bool ABaseCharacter::HasResistance(const FGameplayTag& resistance) const
 	return m_EffectResistances.HasTag(resistance);
 }
 
-bool ABaseCharacter::IsMainHandPrimaryAttacking()
-{
-	return false;
-}
-
-bool ABaseCharacter::IsOffHandPrimaryAttacking()
-{
-	return false;
-}
-
 EWeaponType ABaseCharacter::MainHandWeaponType()
 {
 	return EWeaponType::HAND;
@@ -196,18 +186,6 @@ EWeaponType ABaseCharacter::MainHandWeaponType()
 EWeaponType ABaseCharacter::OffHandWeaponType()
 {
 	return EWeaponType::HAND;
-}
-
-void ABaseCharacter::EndMainHandAttack()
-{
-	m_IsMainHandAttacking = false;
-	return;
-}
-
-void ABaseCharacter::EndOffHandAttack()
-{
-	m_IsOffHandAttacking = false;
-	return;
 }
 
 void ABaseCharacter::GetOwnedGameplayTags(FGameplayTagContainer& tagContainer) const
@@ -374,25 +352,6 @@ void ABaseCharacter::Tick(float deltaTime)
 {
 	Super::Tick(deltaTime);
 
-	if (m_AnimTest == false && IsAttacking() == true)
-	{
-		m_AttackTimer -= deltaTime;
-
-		if (m_AttackTimer > 0)
-		{
-			return;
-		}
-
-		if (m_IsMainHandAttacking == true)
-		{
-			EndMainHandAttack();
-		}
-		else
-		{
-			EndOffHandAttack();
-		}
-	}
-
 	if (m_IsTurning == true)
 	{
 		FRotator rotation = GetActorRotation();
@@ -418,31 +377,6 @@ void ABaseCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	m_EffectHandlerComponent->Init(this);
-
-	//if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
-	//{
-	//	if (m_MainHandItem = world->SpawnActor<AHeldItem>(AHeldItem::StaticClass()))
-	//	{
-	//		m_MainHandItem->SetItemOwner(this);
-	//		m_MainHandItem->UnEquip();
-
-	//		m_MainHandItem->SetActorLocation(GetMesh()->GetSocketLocation("WeaponSocket_r"));
-	//		m_MainHandItem->K2_AttachToComponent(GetMesh(), "WeaponSocket_r", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
-
-	//		m_MainHandItem->m_IsOffHand = false;
-	//	}
-
-	//	if (m_OffHandItem = world->SpawnActor<AHeldItem>(AHeldItem::StaticClass()))
-	//	{
-	//		m_OffHandItem->SetItemOwner(this);
-	//		m_OffHandItem->UnEquip();
-
-	//		m_OffHandItem->SetActorLocation(GetMesh()->GetSocketLocation("WeaponSocket_l"));
-	//		m_OffHandItem->K2_AttachToComponent(GetMesh(), "WeaponSocket_l", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
-
-	//		m_MainHandItem->m_IsOffHand = true;
-	//	}
-	//}
 
 	m_CharacterStatsComponent->OnStatChanged.AddLambda([this](ECharacterStat stat, float walkSpeed, float ignore) 
 		{ 
