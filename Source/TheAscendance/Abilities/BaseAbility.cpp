@@ -62,12 +62,27 @@ void UBaseAbility::SetDecoratedSelf(IAbility* decoratedSelf)
 
 void UBaseAbility::Start()
 {
+	if (m_OwnerComponent != nullptr)
+	{
+		m_OwnerComponent->IsCasting = true;
+	}
+
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: STARTED", *GetAbilityTag().ToString());
 	Execute();
 }
 
 void UBaseAbility::Stop()
 {
+	if (m_OwnerComponent != nullptr)
+	{
+		m_OwnerComponent->IsCasting = false;
+
+		if (m_OwnerComponent->OnAbilityFinished.IsBound() == true)
+		{
+			m_OwnerComponent->OnAbilityFinished.Broadcast();
+		}
+	}
+
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: STOP", *GetAbilityTag().ToString());
 
 	if (m_AbilityDurationHandle.IsValid())
@@ -107,6 +122,11 @@ void UBaseAbility::TriggerAbility()
 
 void UBaseAbility::OnInputReleased()
 {
+	if (m_OwnerComponent != nullptr)
+	{
+		m_OwnerComponent->IsCasting = false;
+	}
+
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: RELEASED", *GetAbilityTag().ToString());
 }
 

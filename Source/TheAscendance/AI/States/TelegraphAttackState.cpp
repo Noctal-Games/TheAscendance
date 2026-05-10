@@ -19,7 +19,7 @@ void UTelegraphAttackState::StartState(UHSMAgentComponent* agent)
 		return;
 	}
 
-	const FEnemyLoadedAbilityData* ability = m_AttackCombatState->m_CurrentAbilityData;
+	const FLoadedAbilityData* ability = nullptr;// m_AttackCombatState->m_CurrentAbilityData;
 
 	if (ability == nullptr)
 	{
@@ -71,5 +71,5 @@ void UTelegraphAttackState::EndTelegraph()
 		return;
 	}
 
-	m_AttackCombatState->SetAttackState(EAttackState::EXECUTE);
+	//m_AttackCombatState->SetAttackState(EAttackState::EXECUTE);
 }

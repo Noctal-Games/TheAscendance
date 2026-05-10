@@ -13,7 +13,10 @@ class USkeletalMesh;
 class UAnimInstance;
 class AWaypointRoute;
 class UEnemyData;
+class UCombatAIComponent;
+class UEnemyClassData;
 struct FEnemyAbilityData;
+struct FLoadedAbilityData;
 
 UCLASS()
 class THEASCENDANCE_API ABaseEnemy : public ABaseCharacter
@@ -41,11 +44,17 @@ public:
 	bool IsSoundHeard(float soundWeight) const;
 	bool IsInCombat() const;
 
+	void StartAbility(const FGameplayTag& abilityTag);
+	bool IsAbilityOnCooldown(const FGameplayTag& abilityTag);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void InitAbilityData(const FEnemyAbilityData& abilityData);
+
+private:
+	void InitCombatAIComponent(const TArray<FEnemyAbilityData>& abilities, const UEnemyClassData* classData, const TMap<EAbilityGoal, float>& goalWeights);
+	FLoadedAbilityData ProcessLoadedAbilityData(const FEnemyAbilityData& abilityData);
 
 private:
 	UPROPERTY()
@@ -56,7 +65,7 @@ private:
 	TWeakObjectPtr<ATAAIController> m_Controller = nullptr;
 
 	UPROPERTY()
-	TObjectPtr<UHSMAgentComponent> m_Agent = nullptr;
+	TObjectPtr<UCombatAIComponent> m_CombatAgent = nullptr;
 
 	FGameplayTag m_EnemyTag;
 };

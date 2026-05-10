@@ -20,12 +20,10 @@ struct FEnemyAbilityData
 	TArray<EAbilityGoal> Goals;
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UAbilityData> AbilityData = nullptr;
-	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Not necessary, will play before the Ability animations if set"))
-	TSoftObjectPtr<UAnimMontage> TelegraphMontage = nullptr;
 };
 
 USTRUCT()
-struct FEnemyLoadedAbilityData
+struct FLoadedAbilityData
 {
 	GENERATED_BODY()
 
@@ -45,7 +43,14 @@ struct FLoadedCombatSettings
 	GENERATED_BODY()
 
 	UPROPERTY()
-	TArray<FEnemyLoadedAbilityData> Abilities;
+	TArray<FLoadedAbilityData> Abilities;
 	UPROPERTY()
 	TMap<EAbilityGoal, float> GoalWeights;
+
+	UPROPERTY()
+	float PreferredEngagementRange = 0.0f;
+	UPROPERTY()
+	float MaxEngagementRange = 0.0f;
+	UPROPERTY()
+	float EngagementRangeTolerance = 0.1f;
 };

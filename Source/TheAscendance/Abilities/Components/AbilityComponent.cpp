@@ -345,6 +345,28 @@ void UAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	}
 }
 
+bool UAbilityComponent::IsAbilityOnCooldown(const FGameplayTag& abilityTag)
+{
+	for (const auto& ability : m_Abilities)
+	{
+		if (ability == nullptr)
+		{
+			continue;
+		}
+
+		const FAbilityInfo& info = ability->GetAbilityInfo();
+
+		if (info.Tag != abilityTag)
+		{
+			continue;
+		}
+
+		return !ability->CanStart();
+	}
+
+	return true;
+}
+
 //void UAbilityComponent::SetAbilities(const TMap<EAbilitySlot, FGameplayTag>& abilityTags)
 //{
 //	if (m_Owner == nullptr)

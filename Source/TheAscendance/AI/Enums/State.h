@@ -19,6 +19,12 @@ enum class EState : uint8
 UENUM(BlueprintType)
 enum class ECombatState : uint8
 {
+	IDLE,
+	APPROACH, 
+
+	SUPPORT, 
+	PRESERVE_SELF,
+
 	CHASE UMETA(DisplayName = "Chase"),
 	POSITION UMETA(DisplayName = "Position"),
 	ATTACK UMETA(DisplayName = "Attack"),

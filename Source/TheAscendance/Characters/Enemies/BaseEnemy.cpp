@@ -13,6 +13,8 @@
 #include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
 #include "Structs/EnemyData.h"
 #include "TheAscendance/Abilities/Components/AbilityComponent.h"
+#include "TheAscendance/AI/Combat/Components/CombatAIComponent.h"	
+#include "TheAscendance/AI/Actions/Attacks/Structs/AttackData.h"
 
 #include "Components/CapsuleComponent.h"
 
@@ -20,6 +22,9 @@ ABaseEnemy::ABaseEnemy() : ABaseCharacter()
 {
 	GetCapsuleComponent()->SetVisibility(true);
 	GetCapsuleComponent()->bHiddenInGame = false;
+
+	m_CombatAgent = CreateDefaultSubobject<UCombatAIComponent>(TEXT("Combat Agent Component"));
+	checkf(m_CombatAgent, TEXT("Combat Agent Component failed to initialise"));
 }
 
 void ABaseEnemy::Init(const UEnemyData* data)
@@ -88,11 +93,6 @@ void ABaseEnemy::Init(const UEnemyData* data)
 		{
 			assetPaths.AddUnique(ability.AbilityData.ToSoftObjectPath());
 		}
-
-		if (ability.TelegraphMontage.IsNull() == false)
-		{
-			assetPaths.AddUnique(ability.TelegraphMontage.ToSoftObjectPath());
-		}
 	}
 
 	TWeakObjectPtr<ABaseEnemy> weakThis(this);
@@ -107,24 +107,8 @@ void ABaseEnemy::Init(const UEnemyData* data)
 			}
 
 			weakThis->SetSkeletalMesh();
-
-			for (const FEnemyAbilityData& ability : abilities)
-			{
-				weakThis->InitAbilityData(ability);
-			}
-
-			if (weakThis->m_Agent = NewObject<UHSMAgentComponent>(weakThis.Get(), "HSM_AGENT"))
-			{
-				weakThis->m_Agent->RegisterComponent();
-				weakThis->m_Agent->Init(weakThis.Get(), data->ClassData, data->BehaviourSettings, data->PerceptionSettings, data->CombatSettings);
-			}
-			else
-			{
-				LOG_ERROR("[BASE ENEMY] Failed to initalise HSM_Agent");
-			}
+			weakThis->InitCombatAIComponent(abilities, data->ClassData, data->CombatSettings.GoalWeights);
 		});
-
-
 }
 
 void ABaseEnemy::SetSkeletalMesh()
@@ -185,12 +169,12 @@ void ABaseEnemy::SetDestination(const FVector& destination)
 
 void ABaseEnemy::SetLocationToInvestigate(const FVector& location)
 {
-	if (m_Agent == nullptr)
-	{
-		return;
-	}
+	//if (m_Agent == nullptr)
+	//{
+	//	return;
+	//}
 
-	return m_Agent->SetLocationToInvestigate(location);
+	//return m_Agent->SetLocationToInvestigate(location);
 }
 
 bool ABaseEnemy::HasPath() const
@@ -206,12 +190,12 @@ bool ABaseEnemy::HasPath() const
 
 void ABaseEnemy::SetWaypointRoute(AWaypointRoute* route)
 {
-	if (route == nullptr || m_Agent == nullptr)
-	{
-		return;
-	}
+	//if (route == nullptr || m_Agent == nullptr)
+	//{
+	//	return;
+	//}
 
-	m_Agent->SetWaypointRoute(route);
+	//m_Agent->SetWaypointRoute(route);
 }
 
 void ABaseEnemy::SetFocus(AActor* target)
@@ -238,22 +222,39 @@ void ABaseEnemy::ClearFocus()
 
 bool ABaseEnemy::IsSoundHeard(float soundWeight) const
 {
-	if (m_Agent == nullptr)
-	{
-		return true;
-	}
-
-	return m_Agent->IsSoundHeard(soundWeight);
+	return false;// m_Agent->IsSoundHeard(soundWeight);
 }
 
 bool ABaseEnemy::IsInCombat() const
 {
-	if (m_Agent == nullptr)
+	//if (m_Agent == nullptr)
+	//{
+	//	return true;
+	//}
+
+	return false;// m_Agent->IsInCombat();
+}
+
+void ABaseEnemy::StartAbility(const FGameplayTag& abilityTag)
+{
+	if (m_AbilityComponent == nullptr)
 	{
-		return true;
+		LOG_ERROR("[BASE ENEMY] AbilityComponent is invalid")
+		return;
 	}
 
-	return m_Agent->IsInCombat();
+	m_AbilityComponent->StartAbility(abilityTag);
+}
+
+bool ABaseEnemy::IsAbilityOnCooldown(const FGameplayTag& abilityTag)
+{
+	if (m_AbilityComponent == nullptr)
+	{
+		LOG_ERROR("[BASE ENEMY] AbilityComponent is invalid")
+		return false;
+	}
+
+	return m_AbilityComponent->IsAbilityOnCooldown(abilityTag);
 }
 
 void ABaseEnemy::BeginPlay()
@@ -265,45 +266,70 @@ void ABaseEnemy::BeginPlay()
 	m_Controller = Cast<ATAAIController>(GetController());
 }
 
-void ABaseEnemy::InitAbilityData(const FEnemyAbilityData& abilityData)
+void ABaseEnemy::InitCombatAIComponent(const TArray<FEnemyAbilityData>& abilities, const UEnemyClassData* classData, const TMap<EAbilityGoal, float>& goalWeights)
 {
-	if (m_Agent == nullptr)
+	if (m_CombatAgent == nullptr)
 	{
+		LOG_ERROR("[BASE ENEMY] Tried to InitCombatAIComponent with invalid CombatAgent");
 		return;
 	}
 
-	FEnemyLoadedAbilityData loadedData;
+	if(classData == nullptr)
+	{
+		LOG_ERROR("[BASE ENEMY] Tried to InitCombatAIComponent with invalid EnemyClassData");
+		return;
+	}
 
-	if(UAbilityData* ability = abilityData.AbilityData.Get())
+	FLoadedCombatSettings combatSettings;
+
+	for (const FEnemyAbilityData& abilityData : abilities)
+	{
+		FLoadedAbilityData loadedData = ProcessLoadedAbilityData(abilityData);
+		
+		if (loadedData.AbilityTag.IsValid() == false)
+		{
+			continue;
+		}
+
+		combatSettings.Abilities.Add(MoveTemp(loadedData));
+	}
+
+	combatSettings.GoalWeights = goalWeights;
+	combatSettings.MaxEngagementRange = classData->MaxEngagementRange;
+	combatSettings.PreferredEngagementRange = classData->PreferredEngagementRange;
+	combatSettings.EngagementRangeTolerance = classData->EngagementRangeTolerance;
+
+	m_CombatAgent->Init(combatSettings, m_AbilityComponent);
+}
+
+FLoadedAbilityData ABaseEnemy::ProcessLoadedAbilityData(const FEnemyAbilityData& abilityData)
+{
+	FLoadedAbilityData loadedData;
+
+	if (UAbilityData* ability = abilityData.AbilityData.Get())
 	{
 		if (m_AbilityComponent == nullptr)
 		{
-			LOG_ERROR("[BASE ENEMY] Tried to init ability data with invalid AbilityComponent");
-			return;
+			LOG_ERROR("[BASE ENEMY] Tried to ProcessAbilityData with invalid AbilityComponent");
+			return loadedData;
 		}
 
-		if(m_AbilityComponent->AddAbilityFromData(ability) == false)
+		if (m_AbilityComponent->AddAbilityFromData(ability) == false)
 		{
 			LOG_ERROR("[BASE ENEMY] Failed to add ability from data with tag %s", *ability->AbilityTag.ToString());
-			return;
+			return loadedData;
 		}
 
 		loadedData.AbilityTag = ability->AbilityTag;
 	}
 	else
 	{
-		LOG_ERROR("[BASE ENEMY] Tried to init ability data with invalid AbilityData");
-		return;
+		LOG_ERROR("[BASE ENEMY] Tried to ProcessAbilityData with invalid AbilityData");
+		return loadedData;
 	}
 
 	loadedData.Weight = abilityData.Weight;
 	loadedData.Goals = abilityData.Goals;
 
-	//Failure isn't logged as a telegraph montage isn't needed. Checks can be set in future as abilities are setup
-	if(UAnimMontage* montage = abilityData.TelegraphMontage.Get())
-	{
-		loadedData.TelegraphMontage = montage;
-	}
-
-	m_Agent->AddAbility(MoveTemp(loadedData));
+	return loadedData;
 }

@@ -300,7 +300,7 @@ bool UHSMAgentComponent::IsTargetTooFar(const FVector& target) const
 	return distance.Length() > (m_ClassData->PreferredEngagementRange + m_ClassData->EngagementRangeTolerance);
 }
 
-void UHSMAgentComponent::AddAbility(const FEnemyLoadedAbilityData& abilityData)
+void UHSMAgentComponent::AddAbility(const FLoadedAbilityData& abilityData)
 {
 	m_AbilityData.Add(abilityData);
 }

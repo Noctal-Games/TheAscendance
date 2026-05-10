@@ -55,10 +55,7 @@ public:
 	bool Attack(EAbilitySlot abilitySlot);
 
 	UFUNCTION(BlueprintCallable)
-	bool IsAttacking()
-	{
-		return m_IsMainHandAttacking == true || m_IsOffHandAttacking == true;
-	}
+	bool IsAttacking();
 
 	UFUNCTION(BlueprintCallable)
 	bool IsMainHandAttacking() { return m_IsMainHandAttacking; };

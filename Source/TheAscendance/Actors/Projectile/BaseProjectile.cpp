@@ -131,7 +131,6 @@ void ABaseProjectile::HandleOnUpdate(float deltaTime)
 
 	if (distance.Length() >= m_MaxTravelDistance)
 	{
-		LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "RANGE")
 		Destroy();
 	}
 }

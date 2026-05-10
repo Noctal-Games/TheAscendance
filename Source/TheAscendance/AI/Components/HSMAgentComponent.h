@@ -66,7 +66,7 @@ public:
 	bool IsTargetTooClose(const FVector& target) const;
 	bool IsTargetTooFar(const FVector& target) const;
 
-	void AddAbility(const FEnemyLoadedAbilityData& abilityData);
+	void AddAbility(const FLoadedAbilityData& abilityData);
 
 	bool TryConsumeReaction();
 
@@ -104,7 +104,7 @@ private:
 	FBehaviourSettings m_BehaviourSettings;
 
 	UPROPERTY()
-	TArray<FEnemyLoadedAbilityData> m_AbilityData;
+	TArray<FLoadedAbilityData> m_AbilityData;
 
 	float m_LastReactionTime = 0.0f;
 	float m_CurrentReactionTime = 0.0f;

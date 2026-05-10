@@ -28,7 +28,7 @@ void UCombatState::StartState(UHSMAgentComponent* owningAgent)
 	m_CurrentCombatState = ECombatState::MAX;
 	m_CombatStates.Add(ECombatState::CHASE, NewObject<UChaseCombatState>());
 	m_CombatStates.Add(ECombatState::POSITION, NewObject<UPositionCombatState>());
-	m_CombatStates.Add(ECombatState::ATTACK, NewObject<UAttackCombatState>());
+	//m_CombatStates.Add(ECombatState::ATTACK, NewObject<UAttackCombatState>());
 
 	if (m_CombatStates.Num() != (int32)EState::MAX)
 	{
@@ -118,13 +118,13 @@ const FString UCombatState::GetStateToString() const
 	return FString("INVALID COMBAT STATE");
 }
 
-void UCombatState::SetCurrentAbilityData(const FEnemyLoadedAbilityData* abilityData)
+void UCombatState::SetCurrentAbilityData(const FLoadedAbilityData* abilityData)
 {
 	if (UAbstractState* state = m_CombatStates[ECombatState::ATTACK])
 	{
-		if (UAttackCombatState* attackState = Cast<UAttackCombatState>(state))
-		{
-			attackState->SetCurrentAbilityData(abilityData);
-		}
+		//if (UAttackCombatState* attackState = Cast<UAttackCombatState>(state))
+		//{
+		//	//attackState->SetCurrentAbilityData(abilityData);
+		//}
 	}
 }

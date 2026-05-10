@@ -19,18 +19,18 @@ void UExecuteAttackState::StartState(UHSMAgentComponent* agent)
 
 	if (ABaseEnemy* enemy = m_Agent->GetAgentOwner())
 	{
-		if (m_AttackCombatState->m_CurrentAttackMontage.IsValid() == false)
-		{
-			LOG_ERROR("ExecuteAttackState received invalid AttackMontage");
-			return;
-		}
+		//if (m_AttackCombatState->m_CurrentAttackMontage.IsValid() == false)
+		//{
+		//	LOG_ERROR("ExecuteAttackState received invalid AttackMontage");
+		//	return;
+		//}
 
-		float attackTimer = enemy->PlayAnimationMontage(m_AttackCombatState->m_CurrentAttackMontage.Get());
+		//float attackTimer = enemy->PlayAnimationMontage(m_AttackCombatState->m_CurrentAttackMontage.Get());
 
-		if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
-		{
-			worldContext->GetTimerManager().SetTimer(m_ExecuteTimerHandle, this, &UExecuteAttackState::EndAttack, attackTimer, true);
-		}
+		//if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
+		//{
+		//	worldContext->GetTimerManager().SetTimer(m_ExecuteTimerHandle, this, &UExecuteAttackState::EndAttack, attackTimer, true);
+		//}
 	}
 }
 

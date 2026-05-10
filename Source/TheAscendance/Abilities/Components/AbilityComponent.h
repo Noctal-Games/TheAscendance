@@ -22,6 +22,7 @@ class APlayableGameMode;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnAbilitiesUpdate, const TArray<FAbilityInfo>&);
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnAbilityCooldown, const FGameplayTag& /*abilityTag*/, float /*remaining*/, float /*max*/);
+DECLARE_MULTICAST_DELEGATE(FOnAbilityFinished);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API UAbilityComponent : public UActorComponent
@@ -58,6 +59,8 @@ public:
 	void AffectOwnerStat(ECharacterStat stat, int amount);
 	float GetOwnerStat(ECharacterStat stat);
 
+	bool IsAbilityOnCooldown(const FGameplayTag& abilityTag);
+
 protected:
 	friend class UBaseAbility;
 	// Called when the game starts
@@ -74,7 +77,10 @@ private:
 public:
 	FOnAbilitiesUpdate OnAbilitiesUpdate;
 	FOnAbilityCooldown OnAbilityCooldown;
-	 
+	FOnAbilityFinished OnAbilityFinished;
+
+	bool IsCasting = false;
+
 private:
 	UPROPERTY()
 	TWeakObjectPtr<ABaseCharacter> m_Owner = nullptr;

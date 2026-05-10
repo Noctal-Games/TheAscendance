@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TheAscendance/AI/Combat/States/AbstractCombatState.h"
-#include "AttackCombatState.generated.h"
+#include "AbstractCombatState.h"
+#include "ApproachCombatState.generated.h"
 
+/**
+ * 
+ */
 UCLASS()
-class THEASCENDANCE_API UAttackCombatState : public UAbstractCombatState
+class THEASCENDANCE_API UApproachCombatState : public UAbstractCombatState
 {
 	GENERATED_BODY()
 	

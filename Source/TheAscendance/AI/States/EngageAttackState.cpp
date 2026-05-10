@@ -18,7 +18,7 @@ void UEngageAttackState::StartState(UHSMAgentComponent* agent)
 		return;
 	}
 
-	m_AttackCombatState->SetAttackState(EAttackState::TELEGRAPH);
+	//m_AttackCombatState->SetAttackState(EAttackState::TELEGRAPH);
 
 	//const FAttackSetData* attackSetData = m_Agent->GetAttackSetData();
 

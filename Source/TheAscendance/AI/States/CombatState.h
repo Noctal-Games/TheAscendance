@@ -27,7 +27,7 @@ public:
 	virtual const FString GetStateToString() const override;
 
 private:
-	void SetCurrentAbilityData(const FEnemyLoadedAbilityData* abilityData);
+	void SetCurrentAbilityData(const FLoadedAbilityData* abilityData);
 
 private:
 	UPROPERTY()

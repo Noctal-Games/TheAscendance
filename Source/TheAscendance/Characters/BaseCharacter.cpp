@@ -325,6 +325,16 @@ bool ABaseCharacter::Attack(EAbilitySlot abilitySlot)
 	return true;
 }
 
+bool ABaseCharacter::IsAttacking()
+{
+	if (m_AbilityComponent == nullptr)
+	{
+		return false;
+	}
+
+	return m_AbilityComponent->IsCasting;
+}
+
 void ABaseCharacter::TriggerAbility()
 {
 	if (m_AbilityComponent == nullptr)
