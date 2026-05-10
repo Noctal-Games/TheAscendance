@@ -38,3 +38,14 @@ struct FEnemyLoadedAbilityData
 	UPROPERTY()
 	TObjectPtr<UAnimMontage> TelegraphMontage = nullptr;
 };
+
+USTRUCT()
+struct FLoadedCombatSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TArray<FEnemyLoadedAbilityData> Abilities;
+	UPROPERTY()
+	TMap<EAbilityGoal, float> GoalWeights;
+};

@@ -26,7 +26,7 @@ public:
 	// Sets default values for this component's properties
 	UHSMAgentComponent();
 
-	void Init(ABaseEnemy* owner, UEnemyClassData* classData, const FBehaviourSettings& behaviourSettings, const FPerceptionSettings& perceptionSettings);
+	void Init(ABaseEnemy* owner, UEnemyClassData* classData, const FBehaviourSettings& behaviourSettings, const FPerceptionSettings& perceptionSettings, const FCombatSettings& combatSettings);
 	//void InitMeleeAttacks(const FAttackSetData& attackSet /*const TMap<EMeleeAttackType, TWeakObjectPtr<FAttackData>>& meleeAttacks*/);
 
 	//const FAttackSetData* GetAttackSetData() const;

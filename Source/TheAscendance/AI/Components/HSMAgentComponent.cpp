@@ -21,7 +21,7 @@ UHSMAgentComponent::UHSMAgentComponent()
 	// ...
 }
 
-void UHSMAgentComponent::Init(ABaseEnemy* owner, UEnemyClassData* classData, const FBehaviourSettings& behaviourSettings, const FPerceptionSettings& perceptionSettings)
+void UHSMAgentComponent::Init(ABaseEnemy* owner, UEnemyClassData* classData, const FBehaviourSettings& behaviourSettings, const FPerceptionSettings& perceptionSettings, const FCombatSettings& combatSettings)
 {
 	if (owner == nullptr)
 	{
@@ -49,7 +49,15 @@ void UHSMAgentComponent::Init(ABaseEnemy* owner, UEnemyClassData* classData, con
 	m_CurrentState = EState::MAX;
 	m_States.Add(EState::IDLE, NewObject<UIdleState>());
 	m_States.Add(EState::INVESTIGATE, NewObject<UInvestigateState>());
-	m_States.Add(EState::COMBAT, NewObject<UCombatState>());
+
+	if (UCombatState* combatState = NewObject<UCombatState>())
+	{
+		FLoadedCombatSettings  loadedCombatSettings;
+		loadedCombatSettings.Abilities = m_AbilityData;
+		loadedCombatSettings.GoalWeights = combatSettings.GoalWeights;
+		combatState->Init(loadedCombatSettings);
+		m_States.Add(EState::COMBAT, combatState);
+	}
 
 	m_PerceptionComponent = NewObject<UPerceptionComponent>(m_Owner.Get(), TEXT("SIGHT SENSOR"));
 	m_PerceptionComponent->RegisterComponent();

@@ -19,26 +19,26 @@ void UTelegraphAttackState::StartState(UHSMAgentComponent* agent)
 		return;
 	}
 
+	const FEnemyLoadedAbilityData* ability = m_AttackCombatState->m_CurrentAbilityData;
+
+	if (ability == nullptr)
+	{
+		LOG_ERROR("[TELEGRAPH ATTACK STATE] Started with invalid ability data");
+		return;
+	}
+
+	if (ability->TelegraphMontage == nullptr)
+	{
+		//Not necessary if no telegraph is expected
+		EndTelegraph();
+		return;
+	}
+
 	if (ABaseEnemy* enemy = m_Agent->GetAgentOwner())
 	{
-		if (m_AttackCombatState->m_CurrentTelegraphMontage.IsValid() == false)
-		{
-			LOG_ERROR("TelegraphAttackState received invalid TelegraphMontage");
-			return;
-		}
-
 		//m_Agent->SetFocus(m_Agent->GetTargetPlayer());
 
-		m_TelegraphTimer = enemy->PlayAnimationMontage(m_AttackCombatState->m_CurrentTelegraphMontage.Get());
-
-		if (m_AttackCombatState->m_CurrentAttackMontage.IsNull() == true)
-		{
-			LOG_ERROR("AttackMontage for QuickAttackData was invalid");
-		}
-		else
-		{
-			UStreamableFunctionLibrary::RequestAsyncLoad(m_AttackCombatState->m_CurrentAttackMontage.ToSoftObjectPath());
-		}
+		m_TelegraphTimer = enemy->PlayAnimationMontage(ability->TelegraphMontage);
 
 		if (UWorld* worldContext = UCoreFunctionLibrary::GetGameWorld())
 		{
@@ -49,6 +49,7 @@ void UTelegraphAttackState::StartState(UHSMAgentComponent* agent)
 
 void UTelegraphAttackState::Update(float deltaTime)
 {
+	UAbstractState::Update(deltaTime);
 }
 
 void UTelegraphAttackState::EndState()

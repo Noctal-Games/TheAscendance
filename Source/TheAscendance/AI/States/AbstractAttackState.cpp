@@ -2,6 +2,12 @@
 
 
 #include "AbstractAttackState.h"
+#include "TheAscendance/Core/CoreMacros.h"
+
+void UAbstractAttackState::SetAttackCombatState(UAttackCombatState* attackCombatState)
+{
+	m_AttackCombatState = attackCombatState;
+}
 
 const FString UAbstractAttackState::GetStateToString() const
 {

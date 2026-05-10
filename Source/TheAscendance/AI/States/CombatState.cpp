@@ -9,6 +9,11 @@
 #include "PositionCombatState.h"
 #include "AttackCombatState.h"
 
+void UCombatState::Init(const FLoadedCombatSettings& combatSettings)
+{
+	m_CombatSettings = combatSettings;
+}
+
 void UCombatState::StartState(UHSMAgentComponent* owningAgent)
 {
 	UAbstractState::StartState(owningAgent);
@@ -28,6 +33,18 @@ void UCombatState::StartState(UHSMAgentComponent* owningAgent)
 	if (m_CombatStates.Num() != (int32)EState::MAX)
 	{
 		LOG_ERROR("[COMBAT STATE] CombatStates count does not match ECombatState length");
+	}
+
+	for(const auto& abilityData : m_CombatSettings.Abilities)
+	{
+		if(abilityData.AbilityTag.IsValid() == false)
+		{
+			LOG_ERROR("[COMBAT STATE] Invalid ability data found in combat settings");
+			continue;
+		}
+
+		//Temp, replace with choice logic elsewhere
+		SetCurrentAbilityData(&abilityData);
 	}
 
 	SetCombatState(ECombatState::CHASE);
@@ -99,4 +116,15 @@ const FString UCombatState::GetStateToString() const
 	}
 
 	return FString("INVALID COMBAT STATE");
+}
+
+void UCombatState::SetCurrentAbilityData(const FEnemyLoadedAbilityData* abilityData)
+{
+	if (UAbstractState* state = m_CombatStates[ECombatState::ATTACK])
+	{
+		if (UAttackCombatState* attackState = Cast<UAttackCombatState>(state))
+		{
+			attackState->SetCurrentAbilityData(abilityData);
+		}
+	}
 }

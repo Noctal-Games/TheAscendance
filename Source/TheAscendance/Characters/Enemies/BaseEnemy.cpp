@@ -98,10 +98,11 @@ void ABaseEnemy::Init(const UEnemyData* data)
 	TWeakObjectPtr<ABaseEnemy> weakThis(this);
 	TArray<FEnemyAbilityData> abilities = combatSettings.Abilities;
 
-	UStreamableFunctionLibrary::RequestAsyncLoad(assetPaths, [weakThis, abilities]()
+	UStreamableFunctionLibrary::RequestAsyncLoad(assetPaths, [weakThis, abilities, data]()
 		{
 			if (weakThis.IsValid() == false)
 			{
+				LOG_WARNING("[BASE ENEMY] BaseEnemy was destroyed before assets finished loading, cancelling setup");
 				return;
 			}
 
@@ -111,17 +112,19 @@ void ABaseEnemy::Init(const UEnemyData* data)
 			{
 				weakThis->InitAbilityData(ability);
 			}
+
+			if (weakThis->m_Agent = NewObject<UHSMAgentComponent>(weakThis.Get(), "HSM_AGENT"))
+			{
+				weakThis->m_Agent->RegisterComponent();
+				weakThis->m_Agent->Init(weakThis.Get(), data->ClassData, data->BehaviourSettings, data->PerceptionSettings, data->CombatSettings);
+			}
+			else
+			{
+				LOG_ERROR("[BASE ENEMY] Failed to initalise HSM_Agent");
+			}
 		});
 
-	if(m_Agent = NewObject<UHSMAgentComponent>(this, "HSM_AGENT"))
-	{
-		m_Agent->RegisterComponent();
-		m_Agent->Init(this, data->ClassData, data->BehaviourSettings, data->PerceptionSettings);
-	}
-	else
-	{
-		LOG_ERROR("[BASE ENEMY] Failed to initalise HSM_Agent");
-	}
+
 }
 
 void ABaseEnemy::SetSkeletalMesh()
@@ -264,6 +267,11 @@ void ABaseEnemy::BeginPlay()
 
 void ABaseEnemy::InitAbilityData(const FEnemyAbilityData& abilityData)
 {
+	if (m_Agent == nullptr)
+	{
+		return;
+	}
+
 	FEnemyLoadedAbilityData loadedData;
 
 	if(UAbilityData* ability = abilityData.AbilityData.Get())
@@ -297,5 +305,5 @@ void ABaseEnemy::InitAbilityData(const FEnemyAbilityData& abilityData)
 		loadedData.TelegraphMontage = montage;
 	}
 
-	//m_AbilityData.Add(MoveTemp(loadedData));
+	m_Agent->AddAbility(MoveTemp(loadedData));
 }

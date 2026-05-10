@@ -12,6 +12,7 @@ class UAbstractAttackState;
 class UEngageAttackState;
 class UTelegraphAttackState;
 class UAnimMontage;
+struct FEnemyLoadedAbilityData;
 
 UCLASS()
 class THEASCENDANCE_API UAttackCombatState : public UAbstractState
@@ -19,6 +20,8 @@ class THEASCENDANCE_API UAttackCombatState : public UAbstractState
 	GENERATED_BODY()
 	
 public:
+	void SetCurrentAbilityData(const FEnemyLoadedAbilityData* abilityData);
+
 	virtual void StartState(UHSMAgentComponent* owningAgent) override;
 	virtual void Update(float deltaTime) override;
 	virtual void EndState() override;
@@ -37,6 +40,7 @@ protected:
 	UPROPERTY()
 	TSoftObjectPtr<UAnimMontage> m_CurrentAttackMontage;
 
+	const FEnemyLoadedAbilityData* m_CurrentAbilityData = nullptr;
 private:
 	UPROPERTY()
 	TMap<EAttackState, TObjectPtr<UAbstractAttackState>> m_AttackStates;

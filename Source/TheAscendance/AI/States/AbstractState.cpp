@@ -25,11 +25,6 @@ void UAbstractState::EndState()
 	//m_Agent->SetDestination(agent->GetActorLocation());
 }
 
-void UAbstractState::SetAttackCombatState(UAttackCombatState* attackCombatState)
-{
-	m_AttackCombatState = attackCombatState;
-}
-
 const FString UAbstractState::GetStateToString() const
 {
 	return FString("ABSTRACT STATE - IMPLEMENT STATE OVERRIDE");

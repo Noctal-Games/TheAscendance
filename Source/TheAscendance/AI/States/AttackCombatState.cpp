@@ -10,6 +10,11 @@
 #include "ExecuteAttackState.h"
 #include "CooldownAttackState.h"
 
+void UAttackCombatState::SetCurrentAbilityData(const FEnemyLoadedAbilityData* abilityData)
+{
+	m_CurrentAbilityData = abilityData;
+}
+
 void UAttackCombatState::StartState(UHSMAgentComponent* owningAgent)
 {
 	UAbstractState::StartState(owningAgent);
@@ -32,12 +37,12 @@ void UAttackCombatState::StartState(UHSMAgentComponent* owningAgent)
 		LOG_ERROR("AttackStates count does not match EAttackState length");
 	}
 
-	SetAttackState(EAttackState::ENGAGE);
+	SetAttackState(EAttackState::TELEGRAPH);
 }
 
 void UAttackCombatState::Update(float deltaTime)
 {
-	if (m_AttackStates.IsEmpty() == true || m_AttackStates.Contains(m_CurrentAttackState) == false|| m_AttackStates[m_CurrentAttackState] == nullptr)
+	if (m_AttackStates.IsEmpty() == true || m_AttackStates.Contains(m_CurrentAttackState) == false|| m_AttackStates[m_CurrentAttackState])
 	{
 		return;
 	}
