@@ -3,8 +3,10 @@
 
 #include "LoadoutComponent.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/Core/AbilityHelpers.h"
 #include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Characters/BaseCharacter.h"
+#include "TheAscendance/Abilities/Components/AbilityComponent.h"
 
 // Sets default values for this component's properties
 ULoadoutComponent::ULoadoutComponent()
@@ -13,95 +15,71 @@ ULoadoutComponent::ULoadoutComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
+	m_SpellTags.SetNum(UAbilityHelpers::MaxAbilities);
 	// ...
 }
 
 void ULoadoutComponent::EquipItem(EEquippablePart part, const FGameplayTag& itemTag)
 {
-	FGameplayTag equipmentTag = FGameplayTag::RequestGameplayTag(TEXT("Item.Equipment"));
-
-	if (itemTag.MatchesTag(equipmentTag) == false)
+	if (Contains(part))
 	{
-		LOG_ERROR("[LOADOUT COMPONENT] Tried to equip non-equipment Item");
-		return;
-	}
-
-	if (m_Owner.IsValid() == false)
-	{
-		m_Owner = Cast<ABaseCharacter>(GetOwner());
-
-		if(m_Owner.IsValid() == false)
+		for (auto& data : m_Loadout)
 		{
-			LOG_ERROR("[LOADOUT COMPONENT] LoadoutComponent has invalid owner");
-			return;
-		}
-	}
-
-	UnEquipItem(part);
-
-	if(m_Owner->EquipItem(part, itemTag) == false)
-	{
-		LOG_ERROR("[LOADOUT COMPONENT] %s failed to equip item %s", *m_Owner->GetName(), *itemTag.ToString());
-		return;
-	}
-
-	m_Loadout.Add(MakeShared<FLoadoutSlotData>(itemTag, part));
-	LOG_INFO("[LOADOUT COMPONENT] %s equipped item %s", *m_Owner->GetName(), *itemTag.ToString());
-
-	if (OnEquipmentUpdated.IsBound())
-	{
-		FEquipmentMap newMap;
-
-		for (const auto& data : m_Loadout)
-		{
-			if (data.IsValid() == false)
+			if (data.EquippedPart == part)
 			{
-				continue;
+				data.ItemTag = itemTag;
+				break;
 			}
-
-			newMap.Map.Add(data->EquippedPart, data->ItemTag);
 		}
+	}
+	else
+	{
+		m_Loadout.Add(FLoadoutSlotData(itemTag, part));
+	}
+}
 
-		OnEquipmentUpdated.Broadcast(newMap);
+void ULoadoutComponent::BlockEquipItem(EEquippablePart part)
+{
+	FGameplayTag blockedTag = FGameplayTag::RequestGameplayTag(TEXT("Equipment.Slot.Blocked"));
+
+	if (Contains(part))
+	{
+		for (auto& data : m_Loadout)
+		{
+			if (data.EquippedPart == part)
+			{
+				//EmptyTag used to block equipping an item in this slot, instead of using an invalid tag, to avoid confusion with unequipped slots (used for two-handed items, etc)
+				data.ItemTag = blockedTag;
+				break;
+			}
+		}
+	}
+	else
+	{
+		m_Loadout.Add(FLoadoutSlotData(blockedTag, part));
 	}
 }
 
 void ULoadoutComponent::UnEquipItem(EEquippablePart part)
 {
-	bool loadoutChanged = false;
-
-	for (const auto data : m_Loadout)
+	for (auto& data : m_Loadout)
 	{
-		if (data->EquippedPart == part)
+		if (data.EquippedPart == part)
 		{
-			LOG_INFO("[LOADOUT COMPONENT] %s unequipped item %s", *m_Owner->GetName(), *data->ItemTag.ToString());
-			m_Owner->UnEquipItem(part);
-			m_Loadout.Remove(data);
-			loadoutChanged = true;
+			data.ItemTag = FGameplayTag();
 			break;
 		}
-	}
-
-	if (loadoutChanged == true && OnEquipmentUpdated.IsBound())
-	{
-		FEquipmentMap newMap;
-
-		for (const auto& data : m_Loadout)
-		{
-			if (data.IsValid() == false)
-			{
-				continue;
-			}
-
-			newMap.Map.Add(data->EquippedPart, data->ItemTag);
-		}
-
-		OnEquipmentUpdated.Broadcast(newMap);
 	}
 }
 
 void ULoadoutComponent::SetSpells(const TArray<FGameplayTag>& spellTags)
 {
+	if(spellTags.Num() != UAbilityHelpers::MaxAbilities)
+	{
+		LOG_ERROR("[LOADOUT COMPONENT] SetSpells was given an array of size %d but expected size is %d", spellTags.Num(), UAbilityHelpers::MaxAbilities)
+		return;
+	}
+
 	if (m_SpellTags == spellTags)
 	{
 		LOG_INFO("[LOADOUT COMPONENT] SetSpells made no changes")
@@ -110,10 +88,42 @@ void ULoadoutComponent::SetSpells(const TArray<FGameplayTag>& spellTags)
 
 	m_SpellTags = spellTags;
 
-	if (OnSpellsUpdated.IsBound())
+	for(int i = 0; i < spellTags.Num(); i++)
 	{
-		OnSpellsUpdated.Broadcast(spellTags);
+		const UEnum* abilityEnum = StaticEnum<EAbilitySlot>();
+
+		if (abilityEnum->IsValidEnumValue(i))
+		{
+			EAbilitySlot slot = static_cast<EAbilitySlot>(i);
+			m_TestSpellTags.Add(slot, spellTags[i]);
+		}
+		else
+		{
+			LOG_WARNING("Invalid enum value: %d", i);
+		}
 	}
+
+	if (OnSpellsUpdate.IsBound())
+	{
+		OnSpellsUpdate.Broadcast();
+	}
+}
+
+bool ULoadoutComponent::IsPartEquipped(const EEquippablePart& part)
+{
+	for (const auto data : m_Loadout)
+	{
+		if (data.EquippedPart != part)
+		{
+			continue;
+		}
+
+		bool isValid = data.ItemTag.IsValid();
+		return isValid;
+	}
+
+	LOG_WARNING("[LOADOUT COMPONENT] IsPartEquipped was called for part %s but it was not found in the loadout", *UEnum::GetValueAsString(part));
+	return false;
 }
 
 const TArray<FGameplayTag>& ULoadoutComponent::GetSpellTags() const
@@ -121,21 +131,20 @@ const TArray<FGameplayTag>& ULoadoutComponent::GetSpellTags() const
 	return m_SpellTags;
 }
 
+TMap<EAbilitySlot, FGameplayTag> ULoadoutComponent::GetSpellsCopy() const
+{
+	return m_TestSpellTags;
+}
+
 bool ULoadoutComponent::Contains(EEquippablePart part)
 {
 	for (const auto data : m_Loadout)
 	{
-		if (data->EquippedPart == part)
+		if (data.EquippedPart == part)
 		{
 			return true;
 		}
 	}
 
 	return false;
-}
-
-// Called when the game starts
-void ULoadoutComponent::BeginPlay()
-{
-	Super::BeginPlay();
 }

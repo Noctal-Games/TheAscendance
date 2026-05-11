@@ -3,9 +3,20 @@
 
 #include "ChargedAbilityDecorator.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
+#include "TheAscendance/Abilities/Structs/AbilityInfo.h"
+#include "TheAscendance/Abilities/Enums/AbilitySlot.h"
 
 void UChargedAbilityDecorator::Start()
 {
+	const FAbilityInfo& info = m_DecoratedAbility->GetAbilityInfo();
+
+	if (info.SlotsUsed.Contains(EAbilitySlot::MAINHAND_PRIMARY) || info.SlotsUsed.Contains(EAbilitySlot::OFFHAND_PRIMARY))
+	{
+		LOG_ERROR("[CHARGED ABILITY DECORATOR] Ability - %s: Is charged and using a primary slot, the ability is unchargeable due to input setup.", *GetAbilityTag().ToString());
+		return;
+	}
+
 	m_IsCharged = false;
 
 	if (m_ChargingAnimation.IsValid() == false)
@@ -71,7 +82,7 @@ void UChargedAbilityDecorator::LoadAnimation()
 		return;
 	}
 
-	UCoreFunctionLibrary::RequestAsyncLoad(m_ChargingAnimation.ToSoftObjectPath());
+	UStreamableFunctionLibrary::RequestAsyncLoad(m_ChargingAnimation.ToSoftObjectPath());
 }
 
 void UChargedAbilityDecorator::SetToCharged()

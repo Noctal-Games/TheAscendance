@@ -4,6 +4,7 @@
 #include "Item.h"
 #include "Structs/ItemData.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 
@@ -23,7 +24,7 @@ AItem::AItem()
 	m_MeshComponent->SetSimulatePhysics(true);
 }
 
-void AItem::Init(FItemData* itemData)
+void AItem::Init(UItemData* itemData)
 {
 	if (itemData == nullptr)
 	{
@@ -31,13 +32,12 @@ void AItem::Init(FItemData* itemData)
 		return;
 	}
 
-	m_ItemData = MakeShared<FItemData>(*itemData);
-
+	m_ItemData = itemData;
 	m_Mesh = m_ItemData->ItemMesh;
 
 	if (m_Mesh.IsNull() == false)
 	{
-		UCoreFunctionLibrary::RequestAsyncLoad(m_Mesh.ToSoftObjectPath(), [this]() { SetStaticMesh(); });
+		UStreamableFunctionLibrary::RequestAsyncLoad(m_Mesh.ToSoftObjectPath(), [this]() { SetStaticMesh(); });
 	}
 }
 
@@ -51,7 +51,7 @@ void AItem::SetStaticMesh()
 
 void AItem::Interact(APlayerCharacter* player)
 {
-	Super::Interact(player);
+	ABaseInteractableActor::Interact(player);
 
 	if (player == nullptr || m_ItemData == nullptr)
 	{

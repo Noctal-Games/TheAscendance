@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/Characters/BaseCharacter.h"
+#include "TheAscendance/Abilities/Enums/AbilitySlot.h"
 #include "TheAscendance/Actors/Interaction/Enums/InteractType.h"
+#include "TheAscendance/Characters/Enums/EquippablePart.h"
 #include "PlayerCharacter.generated.h"
 
 class UPlayerMovementComponent;
@@ -13,8 +15,8 @@ class ACustomPlayerController;
 class ISpell;
 class USoundBase;
 class IInteractable;
-class UAbilityComponent;
-class UAbilityData;
+class UEquipmentManagerComponent;
+
 
 DECLARE_DELEGATE_OneParam(FOnInteractTargetChanged, EInteractType);
 
@@ -30,7 +32,13 @@ public:
 	void SetPlayerController(ACustomPlayerController* PlayerController);
 	ACustomPlayerController* GetPlayerController();
 
+	UFUNCTION(BlueprintCallable)
+	EIdleType GetIdleType();
+
 	void Interact();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsHoldingTwoHandedItem();
 
 	UFUNCTION(BlueprintCallable)
 	bool PickupItem(const FGameplayTag& itemTag, int amount);
@@ -51,22 +59,17 @@ public:
 	virtual void OnMovementModeChanged(EMovementMode prevMovementMode, uint8 previousCustomMode) override;
 
 	UCameraComponent* GetCamera();
-
-	const virtual FVector GetCastStartForward() override;
+	UAbilityComponent* GetAbilityComponent();
 
 	virtual float PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate = 1.0f, FName startSection = NAME_None) override;
-
-	virtual void StopAbility() override;
 
 	void TestFunction1();
 	void TestFunction2();
 	void TestFunction3();
 
-	bool TestMainHandPrimaryAttack();
-	bool TestMainHandSecondaryAttack();
-	bool TestOffHandPrimaryAttack();
-	bool TestOffHandSecondaryAttack();
-	void TestEndAttack();
+	virtual FVector GetSocketLocationFromPart(EEquippablePart part) override;
+
+	virtual USkeletalMeshComponent* GetEquipmentMesh() override;
 
 	void AttackInputRelease();
 
@@ -78,6 +81,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 protected:
+	bool EquipItem(EEquippablePart part, const FGameplayTag& itemTag);
+	void UnEquipItem(EEquippablePart part);
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
@@ -93,10 +99,10 @@ public:
 	float InteractRange = 500.0f;
 
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FGameplayTag> TestAbilityTags;
+	TMap<EAbilitySlot ,FGameplayTag> TestAbilityTags;
 
-	UPROPERTY(EditAnywhere)
-	TArray<TObjectPtr<UAbilityData>> TestAbilities;
+	UPROPERTY(EditDefaultsOnly, meta = (Category = "Ability.Spell"))
+	TArray<FGameplayTag> TestSpellTags;
 protected:
 	friend class UPlayerHUD;
 
@@ -110,6 +116,8 @@ private:
 	TObjectPtr<UPlayerMovementComponent> m_MovementComponent = nullptr;
 	UPROPERTY()
 	TObjectPtr<ACustomPlayerController> m_PlayerController = nullptr;
+	UPROPERTY()
+	TObjectPtr<UEquipmentManagerComponent> m_EquipmentManagerComponent = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<USkeletalMeshComponent> m_HandsMesh = nullptr;
@@ -122,10 +130,6 @@ private:
 	//Test
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USoundBase> m_TestSound = nullptr;
-
-
-	UPROPERTY()
-	TObjectPtr<UAbilityComponent> m_AbilityComponent = nullptr;
 
 	bool m_IsAttacking = false;
 };

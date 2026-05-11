@@ -5,7 +5,7 @@
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/GameplayTagHelpers.h"
 #include "TheAscendance/Game/DataLoaders/ItemLoader.h"
-#include "TheAscendance/Game/DataLoaders/SpellLoader.h"
+#include "TheAscendance/Game/DataLoaders/AbilityLoader.h"
 #include "TheAscendance/Game/DataLoaders/EnemyLoader.h"
 #include "TheAscendance/Game/DataLoaders/EffectLoader.h"
 
@@ -53,6 +53,17 @@ FItemData* APlayableGameMode::GetItemData(const FGameplayTag& itemTag) const
 	return m_ItemLoader->GetItemData(itemTag);
 }
 
+FEquippableItemData* APlayableGameMode::GetEquipmentData(const FGameplayTag& itemTag) const
+{
+	if (m_ItemLoader == nullptr)
+	{
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid ItemLoader");
+		return nullptr;
+	}
+
+	return nullptr;
+}
+
 FWeaponData* APlayableGameMode::GetWeaponData(const FGameplayTag& itemTag) const
 {
 	if (m_ItemLoader == nullptr)
@@ -75,37 +86,48 @@ const FWeaponTypeData* APlayableGameMode::GetWeaponTypeData(EWeaponType type) co
 	return m_ItemLoader->GetWeaponTypeData(type);
 }
 
-ISpell* APlayableGameMode::CreateSpellFromTag(const FGameplayTag& spellTag, ISpellCaster* spellOwner) const
-{
-	if (m_SpellLoader == nullptr)
-	{
-		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
-		return nullptr;
-	}
-
-	return m_SpellLoader->CreateSpellFromTag(spellTag, spellOwner);
-}
-
 const FSpellTableData* APlayableGameMode::GetSpellTableData(const FGameplayTag& spellTag) const
 {
-	if (m_SpellLoader == nullptr)
-	{
-		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
-		return nullptr;
-	}
-
-	return m_SpellLoader->GetSpellTableDataFromTag(spellTag);
-}
-
-IAbility* APlayableGameMode::CreateAbilityFromTag(const FGameplayTag& abilityTag) const
-{
-	if (m_SpellLoader == nullptr)
+	if (m_AbilityLoader == nullptr)
 	{
 		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid AbilityLoader");
 		return nullptr;
 	}
 
-	return nullptr;
+	return m_AbilityLoader->GetSpellTableDataFromTag(spellTag);
+}
+
+IAbility* APlayableGameMode::CreateAbilityFromTag(const FGameplayTag& abilityTag, UAbilityComponent* owner) const
+{
+	if (m_AbilityLoader == nullptr)
+	{
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid AbilityLoader");
+		return nullptr;
+	}
+
+	return m_AbilityLoader->CreateAbilityFromTag(abilityTag, owner);
+}
+
+IAbility* APlayableGameMode::CreateAbilityFromData(UAbilityData* abilityData, UAbilityComponent* owner) const
+{
+	if (m_AbilityLoader == nullptr)
+	{
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid AbilityLoader");
+		return nullptr;
+	}
+
+	return m_AbilityLoader->CreateAbilityFromData(abilityData, owner);
+}
+
+UAbilityData* APlayableGameMode::GetAbilityData(const FGameplayTag& abilityTag) const
+{
+	if (m_AbilityLoader == nullptr)
+	{
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid AbilityLoader");
+		return nullptr;
+	}
+
+	return m_AbilityLoader->GetAbilityData(abilityTag);
 }
 
 ABaseEnemy* APlayableGameMode::CreateEnemyFromID(int enemyID) const
@@ -140,13 +162,13 @@ void APlayableGameMode::InitGameState()
 		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create ItemLoader");
 	}
 
-	if (m_SpellLoader = NewObject<USpellLoader>())
+	if (m_AbilityLoader = NewObject<UAbilityLoader>())
 	{
-		m_SpellLoader->Init();
+		m_AbilityLoader->Init();
 	}
 	else
 	{
-		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create SpellLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Failed to create AbilityLoader");
 	}
 
 	if (m_EnemyLoader = NewObject<UEnemyLoader>())
@@ -176,13 +198,13 @@ void APlayableGameMode::StartPlay()
 
 const TArray<TSharedPtr<FSpellTableData>> APlayableGameMode::GetAllSpellTableDataEntries() const
 {
-	if (m_SpellLoader == nullptr)
+	if (m_AbilityLoader == nullptr)
 	{
-		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid SpellLoader");
+		LOG_ERROR("[PLAYABLE GAMEMODE] Invalid AbilityLoader");
 		return TArray<TSharedPtr<FSpellTableData>>();
 	}
 
-	return m_SpellLoader->GetAllSpellTableDataEntries();
+	return m_AbilityLoader->GetAllSpellTableDataEntries();
 }
 
 void APlayableGameMode::BeginPlay()

@@ -8,7 +8,7 @@
 #include "SpellInventoryGrid.h"
 #include "SpellLoadoutDisplay.h"
 #include "SpellInfoDisplay.h"
-#include "TheAscendance/Spells/Structs/SpellData.h"
+#include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
 #include "TheAscendance/Characters/Player/PlayerCharacter.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
@@ -71,18 +71,12 @@ void UGrimoire::NativeConstruct()
 		return;
 	}
 
-	m_PlayerLoadout->OnSpellsUpdated.AddUObject(this, &UGrimoire::UpdateGrimoire);
 
 	UpdateGrimoire(m_PlayerLoadout->GetSpellTags());
 }
 
 void UGrimoire::NativeDestruct()
 {
-	if (m_PlayerLoadout != nullptr)
-	{
-		m_PlayerLoadout->OnSpellsUpdated.RemoveAll(this);
-	}
-
 	Super::NativeDestruct();
 }
 

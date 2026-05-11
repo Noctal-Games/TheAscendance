@@ -2,8 +2,8 @@
 
 #include "BaseProjectile.h"
 #include "TheAscendance/Core/CoreMacros.h"
-#include "TheAscendance/Spells/Interfaces/Spell.h"
-#include "TheAscendance/Spells/Structs/SpellData.h"
+#include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
+#include "TheAscendance/Abilities/Interfaces/Ability.h"
 
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
@@ -49,15 +49,15 @@ ABaseProjectile::ABaseProjectile()
 	m_StaticMeshComponent->SetupAttachment(m_Collider);
 }
 
-void ABaseProjectile::Init(ISpell* spell, UProjectileSpellData* spellData)
+void ABaseProjectile::Init(IAbility* ability, UProjectileSpellData* spellData)
 {
-	if (spell == nullptr || spellData == nullptr)
+	if (ability == nullptr || spellData == nullptr)
 	{
-		LOG_ERROR("Tried to Init BaseProjectile with invalid Spell or SpellData");
+		LOG_ERROR("[BASE PROJECTILE] Tried to Init BaseProjectile with invalid Ability or SpellData");
 		return;
 	}
 
-	m_Spell = spell->_getUObject();
+	m_Ability = ability->_getUObject();
 	m_SpellData = spellData;
 
 	float baseRadius = m_Collider->GetUnscaledSphereRadius();
@@ -67,20 +67,20 @@ void ABaseProjectile::Init(ISpell* spell, UProjectileSpellData* spellData)
 	m_MaxTravelDistance = m_SpellData->Range;
 }
 
-void ABaseProjectile::AddIgnoreActor(AActor* toIgnore)
-{
-	m_IgnoredOwner = toIgnore;
-	m_Collider->IgnoreActorWhenMoving(toIgnore, true);
-}
-
 void ABaseProjectile::SetIsActive(bool isActive)
 {
 	m_IsActive = isActive;
 	m_IsActive ? m_Collider->SetCollisionProfileName("Projectile") : m_Collider->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void ABaseProjectile::ApplyForce(FVector unitDirection)
+void ABaseProjectile::ApplyForce(const FVector& unitDirection)
 {
+	if(m_SpellData == nullptr)
+	{
+		LOG_ERROR("[BASE PROJECTILE] Tried to ApplyForce with invalid SpellData");
+		return;
+	}
+
 	float speed = m_SpellData->ProjectileSpeed;
 
 	m_MovementComponent->ProjectileGravityScale = m_SpellData->IsAffectedByGravity ? m_SpellData->GravityScale : 0.0f;
@@ -94,7 +94,7 @@ void ABaseProjectile::SetNiagara(UNiagaraSystem* niagaraSystem)
 {
 	if(niagaraSystem == nullptr)
 	{
-		LOG_ERROR("Tried to set Projectile Niagara with invalid NiagaraComponent or NiagaraSystem");
+		LOG_ERROR("[BASE PROJECTILE] Tried to set Niagara with invalid NiagaraComponent or NiagaraSystem");
 		return;
 	}
 
@@ -105,7 +105,7 @@ void ABaseProjectile::SetDecoratedSelf(IProjectile* decoratedSelf)
 {
 	if (decoratedSelf == nullptr)
 	{
-		LOG_ERROR("Tried to set Projectile DecoratedSelf with invalid Projectile");
+		LOG_ERROR("[BASE PROJECTILE] Tried to set DecoratedSelf with invalid Projectile");
 		return;
 	}
 
@@ -114,8 +114,8 @@ void ABaseProjectile::SetDecoratedSelf(IProjectile* decoratedSelf)
 
 void ABaseProjectile::HandleOnHit(UPrimitiveComponent* hitComp, AActor* otherActor, UPrimitiveComponent* otherComp, FVector normalImpulse, const FHitResult& hit)
 {
-	m_Spell->OnHit(otherActor, GetActorLocation());
-	m_Spell->ProcessHit(GetActorLocation());
+	m_Ability->OnHit(otherActor, GetActorLocation());
+	m_Ability->ProcessHit(GetActorLocation());
 	
 	Destroy();
 }
@@ -131,23 +131,30 @@ void ABaseProjectile::HandleOnUpdate(float deltaTime)
 
 	if (distance.Length() >= m_MaxTravelDistance)
 	{
+		LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "RANGE")
 		Destroy();
 	}
 }
 
 void ABaseProjectile::ProcessOverlapDamage(int& damage)
 {
-	if (m_Spell == nullptr)
+	if (m_Ability == nullptr)
 	{
 		return;
 	}
 
-	m_Spell->ProcessOverlapDamage(damage);
+	m_Ability->ProcessOverlapDamage(damage);
 }
 
-ISpell* ABaseProjectile::GetSpell()
+void ABaseProjectile::AddIgnoreActor(AActor* toIgnore)
 {
-	return m_Spell.GetInterface();
+	m_IgnoredOwner = toIgnore;
+	m_Collider->IgnoreActorWhenMoving(toIgnore, true);
+}
+
+IAbility* ABaseProjectile::GetAbility()
+{
+	return m_Ability.GetInterface();
 }
 
 AActor* ABaseProjectile::GetProjectileActor()
@@ -167,15 +174,16 @@ void ABaseProjectile::OnHit(UPrimitiveComponent* hitComp, AActor* otherActor, UP
 		return;
 	}
 
-	if (m_Spell == nullptr)
+	if (m_Ability == nullptr)
 	{
+		LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "HIT")
 		Destroy();
 		return;
 	}
 
 	if (m_DecoratedSelf == nullptr)
 	{
-		LOG_ERROR("Projectile DecoratedSelf is invalid");
+		LOG_ERROR("[BASE PROJECTILE] DecoratedSelf is invalid");
 		HandleOnHit(hitComp, otherActor, otherComp, normalImpulse, hit);
 		return;
 	}
@@ -190,15 +198,16 @@ void ABaseProjectile::BeginOverlap(UPrimitiveComponent* overlappedComponent, AAc
 		return;
 	}
 
-	if (m_Spell == nullptr)
+	if (m_Ability == nullptr)
 	{
+		LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "OVERLAP")
 		Destroy();
 		return;
 	}
 
 	if (m_DecoratedSelf == nullptr)
 	{
-		LOG_ERROR("Projectile DecoratedSelf is invalid");
+		LOG_ERROR("[BASE PROJECTILE] DecoratedSelf is invalid");
 		HandleOnHit(overlappedComponent, otherActor, otherComp, FVector(), sweepResult);
 		return;
 	}
@@ -227,7 +236,7 @@ void ABaseProjectile::Tick(float deltaTime)
 
 	if (m_DecoratedSelf == nullptr)
 	{
-		LOG_ERROR("Projectile DecoratedSelf is invalid");
+		LOG_ERROR("[BASE PROJECTILE] DecoratedSelf is invalid");
 		HandleOnUpdate(deltaTime);
 		return;
 	}

@@ -11,7 +11,7 @@
 class UStaticMeshComponent;
 class UStaticMesh;
 class APlayerCharacter;
-struct FItemData;
+class UItemData;
 
 UCLASS()
 class THEASCENDANCE_API AItem : public ABaseInteractableActor
@@ -22,16 +22,17 @@ public:
 	// Sets default values for this actor's properties
 	AItem();
 
-	void Init(FItemData* itemData);
+	virtual void Init(UItemData* itemData);
 	void SetStaticMesh();
 
 	virtual void Interact(APlayerCharacter* player) override;
 	virtual EInteractType GetInteractType() override;
-private:
+protected:
 	UPROPERTY();
 	TSoftObjectPtr<UStaticMesh> m_Mesh = nullptr;
 	UPROPERTY(EditInstanceOnly, meta = (DisplayName = "Static Mesh Component"));
 	TObjectPtr<UStaticMeshComponent> m_MeshComponent = nullptr;
 
-	TSharedPtr<FItemData> m_ItemData = nullptr;
+	UPROPERTY();
+	TObjectPtr<UItemData> m_ItemData = nullptr;
 };

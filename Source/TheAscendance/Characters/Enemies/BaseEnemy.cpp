@@ -4,6 +4,7 @@
 #include "BaseEnemy.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "TheAscendance/Characters/Components/CharacterStatsComponent.h"
 #include "TheAscendance/Characters/CharacterGameplayTags.h"
 #include "TheAscendance/AI/TAAIController.h"
@@ -55,7 +56,7 @@ void ABaseEnemy::Init(FEnemyTableData* data)
 		LOG_ERROR("[BASE ENEMY]Tried to Init BaseEnemy with invalid EnemyAnimationBP");
 	}
 
-	UCoreFunctionLibrary::RequestAsyncLoad(assetPaths, [this]() { SetSkeletalMesh(); });
+	UStreamableFunctionLibrary::RequestAsyncLoad(assetPaths, [this]() { SetSkeletalMesh(); });
 
 	const FEnemyStats& stats = data->EnemyData.EnemyStats;
 	

@@ -14,6 +14,7 @@ class UDataHandlerSubsystem;
 class UQuestManagerSubsystem;
 class UUIManagerSubsystem;
 class UGameEventSubsystem;
+class UItemRegistrySubsystem;
 
 UCLASS()
 class THEASCENDANCE_API UCoreFunctionLibrary : public UObject
@@ -51,9 +52,7 @@ public:
 	static UQuestManagerSubsystem* GetQuestManagerSubsystem();
 	static UUIManagerSubsystem* GetUIManagerSubsystem();
 	static UGameEventSubsystem* GetGameEventSubsystem();
-
-	static void RequestAsyncLoad(const FSoftObjectPath& targetToStream, TFunction<void()> delegate = nullptr);
-	static void RequestAsyncLoad(const TArray<FSoftObjectPath>& targetsToStream, TFunction<void()> delegate = nullptr);
+	static UItemRegistrySubsystem* GetItemRegistrySubsystem();
 
 	template<class UserClass>
 	static void SetTimer(FTimerHandle& outHandle, UserClass* inObj, typename FTimerDelegate::TMethodPtr<UserClass> inTimerMethod, float inRate, bool inbLoop = false, float inFirstDelay = -1.0f)

@@ -4,6 +4,7 @@
 #include "EffectHandlerComponent.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
+#include "TheAscendance/Core/StreamableFunctionLibrary.h"
 #include "TheAscendance/Effects/Structs/EffectData.h"
 #include "TheAscendance/Effects/CoreEffect.h"
 #include "TheAscendance/Characters/Interfaces/Susceptible.h"
@@ -69,7 +70,7 @@ void UEffectHandlerComponent::AddEffect(UCoreEffect* effect)
 			m_NiagaraSystems.Add(effectData->EffectTag, effectData->EffectNiagara);
 			m_NiagaraComponents.Add(effectData->EffectTag, nullptr);
 
-			UCoreFunctionLibrary::RequestAsyncLoad(m_NiagaraSystems[effectData->EffectTag].ToSoftObjectPath(), [this, effectData]()
+			UStreamableFunctionLibrary::RequestAsyncLoad(m_NiagaraSystems[effectData->EffectTag].ToSoftObjectPath(), [this, effectData]()
 				{
 
 					if (m_NiagaraSystems[effectData->EffectTag].IsValid())
