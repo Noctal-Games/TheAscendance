@@ -15,6 +15,7 @@ class AWaypointRoute;
 class UEnemyData;
 class UCombatAIComponent;
 class UEnemyClassData;
+class UPerceptionComponent;
 struct FEnemyAbilityData;
 struct FLoadedAbilityData;
 
@@ -47,6 +48,7 @@ public:
 	void StartAbility(const FGameplayTag& abilityTag);
 	bool IsAbilityOnCooldown(const FGameplayTag& abilityTag);
 
+	void SetPauseAIMovement(bool val);
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -66,6 +68,8 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<UCombatAIComponent> m_CombatAgent = nullptr;
+	UPROPERTY()
+	TObjectPtr<UPerceptionComponent> m_PerceptionComponent = nullptr;
 
 	FGameplayTag m_EnemyTag;
 };

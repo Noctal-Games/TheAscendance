@@ -15,6 +15,7 @@
 #include "TheAscendance/Abilities/Components/AbilityComponent.h"
 #include "TheAscendance/AI/Combat/Components/CombatAIComponent.h"	
 #include "TheAscendance/AI/Actions/Attacks/Structs/AttackData.h"
+#include "TheAscendance/AI/Components/PerceptionComponent.h"
 
 #include "Components/CapsuleComponent.h"
 
@@ -25,6 +26,9 @@ ABaseEnemy::ABaseEnemy() : ABaseCharacter()
 
 	m_CombatAgent = CreateDefaultSubobject<UCombatAIComponent>(TEXT("Combat Agent Component"));
 	checkf(m_CombatAgent, TEXT("Combat Agent Component failed to initialise"));
+	m_PerceptionComponent = CreateDefaultSubobject<UPerceptionComponent>(TEXT("Perception Component"));
+	checkf(m_PerceptionComponent, TEXT("Perception failed to initialise"));
+	m_PerceptionComponent->SetIsActive(false);
 }
 
 void ABaseEnemy::Init(const UEnemyData* data)
@@ -105,6 +109,16 @@ void ABaseEnemy::Init(const UEnemyData* data)
 			}
 
 			weakThis->SetSkeletalMesh();
+
+			if (weakThis->m_PerceptionComponent != nullptr)
+			{
+				weakThis->m_PerceptionComponent->Init(data->PerceptionSettings);
+			}
+			else
+			{
+				LOG_ERROR("[BASE ENEMY] BaseEnemy has invalid PerceptionComponent");
+			}
+
 			weakThis->InitCombatAIComponent(abilities, data->ClassData, data->CombatSettings.GoalWeights);
 		});
 }
@@ -255,6 +269,17 @@ bool ABaseEnemy::IsAbilityOnCooldown(const FGameplayTag& abilityTag)
 	return m_AbilityComponent->IsAbilityOnCooldown(abilityTag);
 }
 
+void ABaseEnemy::SetPauseAIMovement(bool val)
+{
+	if (m_Controller.IsValid() == false)
+	{
+		LOG_ERROR("[BASE ENEMY] Tried to SetPauseAIMovement with invalid controller");
+		return;
+	}
+
+	m_Controller->SetPauseMovement(val);
+}
+
 void ABaseEnemy::BeginPlay()
 {
 	ABaseCharacter::BeginPlay();
@@ -297,7 +322,7 @@ void ABaseEnemy::InitCombatAIComponent(const TArray<FEnemyAbilityData>& abilitie
 	combatSettings.PreferredEngagementRange = classData->PreferredEngagementRange;
 	combatSettings.EngagementRangeTolerance = classData->EngagementRangeTolerance;
 
-	m_CombatAgent->Init(combatSettings, m_AbilityComponent);
+	m_CombatAgent->Init(m_PerceptionComponent, combatSettings, m_AbilityComponent);
 }
 
 FLoadedAbilityData ABaseEnemy::ProcessLoadedAbilityData(const FEnemyAbilityData& abilityData)

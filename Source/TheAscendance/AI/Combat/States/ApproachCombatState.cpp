@@ -16,6 +16,12 @@ void UApproachCombatState::EndState()
 
 void UApproachCombatState::Update(float deltaTime)
 {
+	if (m_OwnerComponent == nullptr)
+	{
+		LOG_ERROR("[APPROACH COMBAT STATE] OwnerComponent is invalid");
+		return;
+	}
+
 	if(m_OwnerComponent->CombatContext.Target == nullptr)
 	{
 		m_OwnerComponent->SetState(ECombatState::IDLE);
@@ -28,12 +34,6 @@ void UApproachCombatState::Update(float deltaTime)
 	if (target == nullptr)
 	{
 		m_OwnerComponent->SetState(ECombatState::IDLE);
-		return;
-	}
-
-	if(ownerCharacter == nullptr)
-	{
-		LOG_ERROR("[APPROACH COMBAT STATE] Owner is not of type ABaseEnemy");
 		return;
 	}
 

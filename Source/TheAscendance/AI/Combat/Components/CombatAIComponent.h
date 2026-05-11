@@ -8,11 +8,14 @@
 #include "TheAscendance/Characters/Enemies/Structs/EnemyData.h"
 #include "TheAscendance/AI/Combat/Structs/CombatContext.h"
 #include "TheAscendance/AI/Actions/Attacks/Structs/AttackData.h"
+#include "TheAscendance/AI/Perception/Structs/PerceptionContext.h"
 #include "CombatAIComponent.generated.h"
 
 class UAbstractCombatState;
 class UAbilityComponent;
 class ABaseEnemy;
+class ATAAIController;
+class UPerceptionComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API UCombatAIComponent : public UActorComponent
@@ -23,11 +26,18 @@ public:
 	// Sets default values for this component's properties
 	UCombatAIComponent();
 
-	void Init(const FLoadedCombatSettings& combatSettings, UAbilityComponent* abilityComponent);
+	void Init(UPerceptionComponent* perceptionComponent, const FLoadedCombatSettings& combatSettings, UAbilityComponent* abilityComponent);
 	void SetState(ECombatState newState);
 
 	void UseAbility();
 	void SetIsCombatLocked(bool val);
+
+	void SetIsAIMovementPaused(bool val);
+	void SetFocus(AActor* target);
+
+	void LookAtTarget();
+
+	ABaseEnemy* GetEnemyOwner();
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -44,25 +54,34 @@ protected:
 private:
 	void EvaluateCombat();
 	void HandleAbilityFinished();
+	bool TryConsumeReaction();
 
 public:
 	UPROPERTY()
 	FCombatContext CombatContext;
 	UPROPERTY()
 	FLoadedCombatSettings CombatSettings;
+	UPROPERTY()
+	FPerceptionContext PerceptionContext;
 
 private:
 	UPROPERTY()
 	TWeakObjectPtr<ABaseEnemy> m_Owner = nullptr;
+	UPROPERTY()
+	TWeakObjectPtr<ATAAIController> m_Controller = nullptr;
+	UPROPERTY()
+	TWeakObjectPtr<UPerceptionComponent> m_PerceptionComponent = nullptr;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY()
 	FBehaviourSettings m_BehaviourSettings;
+
 
 	UPROPERTY()
 	TMap<ECombatState, TObjectPtr<UAbstractCombatState>> m_CombatStates;
 	ECombatState m_CurrentCombatState = ECombatState::MAX;
 
-	float m_DecisionTimer = 0.0f;
+	float m_LastReactionTime = 0.0f;
+	float m_CurrentReactionTime = 0.0f;
 
 	bool m_IsCombatLocked = false;
 };

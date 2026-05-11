@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "TheAscendance/Characters/Enemies/Structs/EnemyData.h"
 #include "TheAscendance/AI/Perception/Enums/SightBodyParts.h"
+#include "TheAscendance/AI/Perception/Structs/PerceptionContext.h"
 #include "PerceptionComponent.generated.h"
 
 class ABaseCharacter;
@@ -38,7 +39,10 @@ private:
 	void UpdatePerception();
 	bool CheckForLineOfSight();
 
-private:	
+private:
+	UPROPERTY()
+	TMap<TWeakObjectPtr<ABaseCharacter>, FTargetPerceptionState> m_Targets;
+
 	UPROPERTY()
 	TWeakObjectPtr<ABaseCharacter> m_Target = nullptr;
 

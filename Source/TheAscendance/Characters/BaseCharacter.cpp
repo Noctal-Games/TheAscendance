@@ -394,3 +394,25 @@ void ABaseCharacter::BeginPlay()
 	//Test
 	m_TestEquipToggle = false;
 }
+
+bool ABaseCharacter::IsMainHandPrimaryAttacking()
+{
+	return false;
+}
+
+bool ABaseCharacter::IsOffHandPrimaryAttacking()
+{
+	return false;
+}
+
+void ABaseCharacter::EndMainHandAttack()
+{
+	m_IsMainHandAttacking = false;
+	return;
+}
+
+void ABaseCharacter::EndOffHandAttack()
+{
+	m_IsOffHandAttacking = false;
+	return;
+}

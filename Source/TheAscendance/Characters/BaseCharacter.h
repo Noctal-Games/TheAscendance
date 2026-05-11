@@ -90,6 +90,23 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	//Deprecated, remove when blueprints no longer use:
+	UFUNCTION(BlueprintCallable)
+	bool IsMainHandAttacking() { return m_IsMainHandAttacking; };
+	UFUNCTION(BlueprintCallable)
+	bool IsOffHandAttacking() { return m_IsOffHandAttacking; };
+
+	UFUNCTION(BlueprintCallable)
+	bool IsMainHandPrimaryAttacking();
+	UFUNCTION(BlueprintCallable)
+	bool IsOffHandPrimaryAttacking();
+
+	UFUNCTION(BlueprintCallable)
+	void EndMainHandAttack();
+	UFUNCTION(BlueprintCallable)
+	void EndOffHandAttack();
+
 protected:
 	friend class ULoadoutComponent;
 	friend class UPlayerHUD;

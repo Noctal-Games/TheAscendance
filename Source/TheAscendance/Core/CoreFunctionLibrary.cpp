@@ -9,12 +9,19 @@
 #include "TheAscendance/Game/Subsystems/QuestManagerSubsystem.h"
 #include "TheAscendance/Game/Subsystems/UIManagerSubsystem.h"
 #include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
+#include "TheAscendance/AI/Combat/CombatManagerSubsystem.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 
 UWorld* UCoreFunctionLibrary::GetGameWorld()
 {
+	if (GEngine == nullptr)
+	{
+		//Engine not loaded
+		return nullptr;
+	}
+
 	for (const FWorldContext& context : GEngine->GetWorldContexts())
 	{
 		if (context.WorldType == EWorldType::Game || context.WorldType == EWorldType::PIE)
@@ -145,6 +152,17 @@ UItemRegistrySubsystem* UCoreFunctionLibrary::GetItemRegistrySubsystem()
 	if (UWorld* world = GetGameWorld())
 	{
 		return world->GetGameInstance()->GetSubsystem<UItemRegistrySubsystem>();
+	}
+
+	LOG_ERROR("[CORE FUNCTION LIBRARY] GameWorld was invalid");
+	return nullptr;
+}
+
+UCombatManagerSubsystem* UCoreFunctionLibrary::GetCombatManagerSubsystem()
+{
+	if (UWorld* world = GetGameWorld())
+	{
+		return world->GetGameInstance()->GetSubsystem<UCombatManagerSubsystem>();
 	}
 
 	LOG_ERROR("[CORE FUNCTION LIBRARY] GameWorld was invalid");

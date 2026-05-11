@@ -10,6 +10,8 @@
 #include "TheAscendance/AI/States/AttackCombatState.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
 #include "TheAscendance/Abilities/Components/AbilityComponent.h"
+#include "TheAscendance/AI/TAAIController.h"
+#include "TheAscendance/AI/Components/PerceptionComponent.h"
 
 // Sets default values for this component's properties
 UCombatAIComponent::UCombatAIComponent()
@@ -21,11 +23,18 @@ UCombatAIComponent::UCombatAIComponent()
 	// ...
 }
 
-void UCombatAIComponent::Init(const FLoadedCombatSettings& combatSettings, UAbilityComponent* abilityComponent)
+void UCombatAIComponent::Init(UPerceptionComponent* perceptionComponent, const FLoadedCombatSettings& combatSettings, UAbilityComponent* abilityComponent)
 {
 	if (abilityComponent != nullptr)
 	{
 		abilityComponent->OnAbilityFinished.AddUObject(this, &UCombatAIComponent::HandleAbilityFinished);
+	}
+
+	m_PerceptionComponent = perceptionComponent;
+
+	if (m_PerceptionComponent != nullptr)
+	{
+		m_PerceptionComponent->SetIsActive(true);
 	}
 
 	CombatSettings = combatSettings;
@@ -96,7 +105,78 @@ void UCombatAIComponent::UseAbility()
 
 void UCombatAIComponent::SetIsCombatLocked(bool val)
 {
+	//Can assume that locking combat pauses AI movement and focus for now, as currently only used by abilities and ability movement will be montage/root motion driven
+
+	if (val == true)
+	{
+		SetIsAIMovementPaused(false);
+		SetFocus(nullptr);
+	}
+	else
+	{
+		SetIsAIMovementPaused(true);
+
+		if (CombatContext.Target.IsValid())
+		{
+			SetFocus(CombatContext.Target.Get());
+		}
+	}
+
 	m_IsCombatLocked = val;
+}
+
+void UCombatAIComponent::SetIsAIMovementPaused(bool val)
+{
+	if (m_Controller == nullptr)
+	{
+		LOG_ERROR("[COMBAT AI COMPONENT] Controller is invalid");
+		return;
+	}
+
+	m_Controller->SetPauseMovement(val);
+}
+
+void UCombatAIComponent::SetFocus(AActor* target)
+{
+	if (m_Controller.IsValid() == false)
+	{
+		LOG_ERROR("[BASE ENEMY] Tried to set focus with invalid controller");
+		return;
+	}
+
+	if (target == nullptr)
+	{
+		m_Controller->ClearFocus(EAIFocusPriority::Gameplay);
+		return;
+	}
+
+	m_Controller->SetFocus(target);
+}
+
+void UCombatAIComponent::LookAtTarget()
+{
+	if (m_Controller.IsValid() == false)
+	{
+		LOG_ERROR("[BASE ENEMY] Tried to set focus with invalid controller");
+		return;
+	}
+
+	if (CombatContext.Target == nullptr)
+	{
+		return;
+	}
+
+	m_Controller->SetFocus(CombatContext.Target.Get());
+}
+
+ABaseEnemy* UCombatAIComponent::GetEnemyOwner()
+{
+	if (m_Owner.IsValid() == false)
+	{
+		return nullptr;
+	}
+
+	return m_Owner.Get();
 }
 
 // Called when the game starts
@@ -105,6 +185,11 @@ void UCombatAIComponent::BeginPlay()
 	Super::BeginPlay();
 
 	m_Owner = Cast<ABaseEnemy>(GetOwner());
+
+	if (m_Owner != nullptr)
+	{
+		m_Controller = Cast<ATAAIController>(m_Owner->GetController());
+	}
 }
 
 // Called every frame
@@ -123,12 +208,15 @@ void UCombatAIComponent::TickComponent(float deltaTime, ELevelTick TickType, FAc
 		return;
 	}
 
-	m_DecisionTimer -= deltaTime;
-
-	if (m_DecisionTimer <= 0.0f)
+	if (TryConsumeReaction() == true)
 	{
+		if (m_PerceptionComponent == nullptr)
+		{
+			LOG_ERROR("[COMBAT AI COMPONENT] PerceptionComponent is invalid");
+			return;
+		}
+
 		EvaluateCombat();
-		//ResetDecisionTimer();
 	}
 }
 
@@ -221,7 +309,7 @@ void UCombatAIComponent::EvaluateCombat()
 
 void UCombatAIComponent::HandleAbilityFinished()
 {
-	m_IsCombatLocked = false;
+	SetIsCombatLocked(false);
 	SetState(ECombatState::IDLE);
 	//SetState(ECombatState::Retreat);
 }
@@ -308,6 +396,27 @@ float UCombatAIComponent::ScoreStrafe() const
 	return 0.0f;
 }
 
+bool UCombatAIComponent::TryConsumeReaction()
+{
+	UWorld* world = UCoreFunctionLibrary::GetGameWorld();
+
+	if (world == nullptr)
+	{
+		return false;
+	}
+
+	const float currentTime = world->GetTimeSeconds();
+	bool canReact = (currentTime - m_LastReactionTime) >= m_CurrentReactionTime;
+
+	if (canReact == false)
+	{
+		return false;
+	}
+
+	m_LastReactionTime = currentTime;
+	m_CurrentReactionTime = m_BehaviourSettings.ReactionTime.GetRandomValue();
+	return true;
+}
 
 
 

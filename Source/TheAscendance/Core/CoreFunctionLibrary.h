@@ -15,6 +15,7 @@ class UQuestManagerSubsystem;
 class UUIManagerSubsystem;
 class UGameEventSubsystem;
 class UItemRegistrySubsystem;
+class UCombatManagerSubsystem;
 
 UCLASS()
 class THEASCENDANCE_API UCoreFunctionLibrary : public UObject
@@ -53,6 +54,7 @@ public:
 	static UUIManagerSubsystem* GetUIManagerSubsystem();
 	static UGameEventSubsystem* GetGameEventSubsystem();
 	static UItemRegistrySubsystem* GetItemRegistrySubsystem();
+	static UCombatManagerSubsystem* GetCombatManagerSubsystem();
 
 	template<class UserClass>
 	static void SetTimer(FTimerHandle& outHandle, UserClass* inObj, typename FTimerDelegate::TMethodPtr<UserClass> inTimerMethod, float inRate, bool inbLoop = false, float inFirstDelay = -1.0f)

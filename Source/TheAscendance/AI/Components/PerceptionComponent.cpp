@@ -55,7 +55,6 @@ void UPerceptionComponent::SetIsActive(bool isActive)
 
 bool UPerceptionComponent::IsTargetDetected() const
 {
-	LOG_ONSCREEN(3, 1.0f, FColor::Yellow, "%f", m_CurrentDetection)
 	return m_IsTargetDetected;
 }
 
