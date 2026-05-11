@@ -4,7 +4,7 @@
 #include "SpellInventoryEntry.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "TheAscendance/Core/CoreFunctionLibrary.h"
-#include "TheAscendance/Spells/Structs/SpellData.h"
+#include "TheAscendance/Abilities/Spells/Structs/SpellData.h"
 #include "TheAscendance/UI/Data/SpellDataEntryObject.h"
 #include "TheAscendance/Game/Subsystems/UIManagerSubsystem.h"
 #include "Grimoire.h"

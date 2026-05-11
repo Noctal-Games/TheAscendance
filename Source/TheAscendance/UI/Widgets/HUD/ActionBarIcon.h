@@ -9,25 +9,26 @@
 
 class UImage;
 class UBorder;
+class UActionCooldownWidget;
 
 UCLASS()
 class THEASCENDANCE_API UActionBarIcon : public UCommonUserWidget
 {
 	GENERATED_BODY()
 	
-public:
 
 protected:
 	friend class UActionBar;
+	void LoadAbility(const FGameplayTag& abilityTag, const TSoftObjectPtr<UTexture2D>& icon);
+	void ClearAbility();
 
-	void SetSpellTag(const FGameplayTag& spellTag);
-	void SetEquipmentTag(const FGameplayTag& equipmentTag);
+	void OnCooldownTriggered(const FGameplayTag& abilityTag, float remaining, float max);
 
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
 private:
 	void SetIcon();
-	void UpdateIcon();
+	void ClearAbilityIcon();
 
 public:
 	UPROPERTY(EditDefaultsOnly)
@@ -38,10 +39,11 @@ private:
 	TObjectPtr<UImage> m_ActionIconImage = nullptr;
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget, DisplayName = "Action Icon Border"))
 	TObjectPtr<UBorder> m_ActionIconBorder = nullptr;
+	UPROPERTY(EditAnywhere, meta = (BindWidget, DisplayName = "Action Cooldown Widget"))
+	TObjectPtr<UActionCooldownWidget> m_CooldownWidget;
 
 	UPROPERTY()
 	TSoftObjectPtr<UTexture2D> m_Texture = nullptr;
 
-	FGameplayTag m_SpellTag;
-	FGameplayTag m_EquipmentTag;
+	FGameplayTag m_AbilityTag;
 };

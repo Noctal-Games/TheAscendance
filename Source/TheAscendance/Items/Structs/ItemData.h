@@ -3,18 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TheAscendance/Items/Enums/ItemType.h"
-#include "TheAscendance/Core/CoreMacros.h"
-#include "TheAscendance/Items/Structs/WeaponData.h"
+#include "Engine/DataAsset.h"
+#include "UObject/AssetRegistryTagsContext.h"
+#include "TheAscendance/Items/Enums/EquipmentSlot.h"
+#include "TheAscendance/Abilities/Melee/Structs/MeleeData.h"
 #include "GameplayTagContainer.h"
 #include "ItemData.generated.h"
 
-USTRUCT(BlueprintType)
-struct FItemData : public FTableRowBase
+class UMeleeData;
+
+UCLASS(BlueprintType)
+class THEASCENDANCE_API UItemData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly, meta = (Categories = "Item"))
+public:
+	virtual void GetAssetRegistryTags(FAssetRegistryTagsContext context) const override;
+
+public:
+	UPROPERTY(EditDefaultsOnly, meta = (Categories = "Item", AssetRegistrySearchable))
 	FGameplayTag ItemTag;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -31,9 +38,27 @@ struct FItemData : public FTableRowBase
 
 	UPROPERTY(EditDefaultsOnly)
 	TSoftObjectPtr<UStaticMesh> ItemMesh = nullptr;
-
-	FItemData() {}
-
-	FItemData(FItemData& itemData) = default;
 };
 
+UCLASS(BlueprintType)
+class THEASCENDANCE_API UEquippableItemData : public UItemData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	EEquipmentSlot EquipmentSlotUsed;
+};
+
+UCLASS(BlueprintType)
+class THEASCENDANCE_API UWeaponItemData : public UEquippableItemData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	FMeleeAbilityData PrimaryAbility;
+
+	UPROPERTY(EditDefaultsOnly)
+	FMeleeAbilityData AltAbility;
+};

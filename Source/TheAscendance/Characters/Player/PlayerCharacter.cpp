@@ -7,17 +7,15 @@
 #include "PlayerMovementComponent.h"
 #include "TheAscendance/Characters/Components/CharacterStatsComponent.h"
 #include "TheAscendance/Game/GameModes/PlayableGameMode.h"
-#include "TheAscendance/Items/HeldItem.h"
-#include "TheAscendance/Spells/Interfaces/Spell.h"
 #include "TheAscendance/Characters/CharacterGameplayTags.h"
 #include "TheAscendance/Game/Subsystems/AudioManagerSubsystem.h"
 #include "TheAscendance/Characters/Components/LoadoutComponent.h"
 #include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
-#include "TheAscendance/Spells/SpellGameplayTags.h"
-#include "TheAscendance/Spells/Components/SpellCasterComponent.h"
+#include "TheAscendance/Abilities/Spells/SpellGameplayTags.h"
 #include "TheAscendance/Items/ItemGameplayTags.h"
 #include "TheAscendance/Actors/Interaction/Interfaces/Interactable.h"
-#include "TheAscendance/Abilities/Components/AbilityComponent.h"
+#include "TheAscendance/Characters/Components/EquipmentManagerComponent.h"
+
 
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -25,8 +23,8 @@
 // Sets default values
 APlayerCharacter::APlayerCharacter() : ABaseCharacter()
 {
-	m_AbilityComponent = CreateDefaultSubobject<UAbilityComponent>(TEXT("Ability Component"));
-	checkf(m_AbilityComponent, TEXT("Ability Component failed to initialise"));
+	m_EquipmentManagerComponent = CreateDefaultSubobject<UEquipmentManagerComponent>(TEXT("Equipment Manager Component"));
+	checkf(m_EquipmentManagerComponent, TEXT("Equipment Manager Component failed to initialise"));
 
 	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
@@ -48,6 +46,17 @@ ACustomPlayerController* APlayerCharacter::GetPlayerController()
 	return m_PlayerController;
 }
 
+EIdleType APlayerCharacter::GetIdleType()
+{
+	if (m_EquipmentManagerComponent == nullptr)
+	{
+		LOG_ERROR("[PLAYER CHARACTER] Tried to GetIdleType but EquipmentManagerComponent was null");
+		return EIdleType::NO_ITEMS;
+	}
+
+	return m_EquipmentManagerComponent->GetIdleType();
+}
+
 void APlayerCharacter::Interact()
 {
 	if (m_InteractTarget == nullptr)
@@ -57,6 +66,17 @@ void APlayerCharacter::Interact()
 	}
 
 	m_InteractTarget->Interact(this);
+}
+
+bool APlayerCharacter::IsHoldingTwoHandedItem()
+{
+	if(m_EquipmentManagerComponent == nullptr)
+	{
+		LOG_ERROR("[PLAYER CHARACTER] Tried to check if holding two handed item but EquipmentManagerComponent was null");
+		return false;
+	}
+
+	return m_EquipmentManagerComponent->IsHoldingTwoHandedItem();
 }
 
 bool APlayerCharacter::PickupItem(const FGameplayTag& itemTag, int amount)
@@ -165,9 +185,9 @@ UCameraComponent* APlayerCharacter::GetCamera()
 	return m_Camera;
 }
 
-const FVector APlayerCharacter::GetCastStartForward()
+UAbilityComponent* APlayerCharacter::GetAbilityComponent()
 {
-	return m_Camera->GetForwardVector();
+	return m_AbilityComponent;
 }
 
 float APlayerCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float playRate, FName startSection)
@@ -202,14 +222,26 @@ float APlayerCharacter::PlayAnimationMontage(UAnimMontage* montageToPlay, float 
 	return duration;
 }
 
-void APlayerCharacter::StopAbility()
+bool APlayerCharacter::EquipItem(EEquippablePart part, const FGameplayTag& itemTag)
 {
-	if (m_AbilityComponent == nullptr)
+	if (m_EquipmentManagerComponent == nullptr)
 	{
+		LOG_ERROR("[PLAYER CHARACTER] Tried to Equip item but EquipmentManagerComponent was null");
+		return false;
+	}
+
+	return m_EquipmentManagerComponent->EquipItem(itemTag, part);
+}
+
+void APlayerCharacter::UnEquipItem(EEquippablePart part)
+{
+	if (m_EquipmentManagerComponent == nullptr)
+	{
+		LOG_ERROR("[PLAYER CHARACTER] Tried to Equip item but EquipmentManagerComponent was null");
 		return;
 	}
 
-	m_AbilityComponent->StopAbility();
+	m_EquipmentManagerComponent->UnEquipItem(part);
 }
 
 // Called when the game starts or when spawned
@@ -238,30 +270,16 @@ void APlayerCharacter::BeginPlay()
 		}
 
 		m_HandsMesh = mesh;
-
-		if (m_HandsMesh == nullptr)
-		{
-			continue;
-		}
-
-		if (m_MainHandItem != nullptr)
-		{
-			m_MainHandItem->SetActorLocation(m_HandsMesh->GetSocketLocation("WeaponSocket_r"));
-			m_MainHandItem->K2_AttachToComponent(m_HandsMesh, "WeaponSocket_r", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
-		}
-
-		if (m_OffHandItem != nullptr)
-		{
-			m_OffHandItem->SetActorLocation(m_HandsMesh->GetSocketLocation("WeaponSocket_l"));
-			m_OffHandItem->K2_AttachToComponent(m_HandsMesh, "WeaponSocket_l", EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true);
-		}
-
-		break;
 	}
 
-	if (m_AbilityComponent != nullptr)
+	if (m_EquipmentManagerComponent != nullptr)
 	{
-		m_AbilityComponent->TestSetAbilities(TestAbilities);
+		m_EquipmentManagerComponent->Init(this, m_AbilityComponent, m_LoadoutComponent);
+	}
+
+	if(m_LoadoutComponent != nullptr)
+	{
+		m_LoadoutComponent->SetSpells(TestSpellTags);
 	}
 }
 
@@ -335,6 +353,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	ABaseCharacter::Tick(DeltaTime);
 
+	EIdleType idleType = GetIdleType();
+	LOG_ONSCREEN(6, 1, FColor::Green, "[PLAYER CHARACTER] IDLE TYPE: %s", *UEnum::GetValueAsString(idleType));
 	LOG_ONSCREEN(0, 1, FColor::Yellow, "[PLAYER CHARACTER] USING ANIMATIONS: %s", m_AnimTest ? TEXT("TRUE") : TEXT("FALSE"));
 
 	HandleLookAtInteractions();
@@ -359,91 +379,69 @@ void APlayerCharacter::TestFunction1()
 
 void APlayerCharacter::TestFunction2()
 {
-	//LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "TEST 2");
-	//EndMainHandAttack();
-	//EndOffHandAttack();
+	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "[PLAYER CHARACTER] TEST 3");
 
+	if (m_TestEquipToggle == false)
+	{
+		if (EquipItem(EEquippablePart::LEFT_HAND, ITEM_EQUIPMENT_GREATSWORD) == false)
+		{
+			return;
+		}
+	}
+	else
+	{
+		UnEquipItem(EEquippablePart::LEFT_HAND);
+	}
+
+	m_TestEquipToggle = !m_TestEquipToggle;
 }
 
 void APlayerCharacter::TestFunction3()
 {
 	LOG_ONSCREEN(-1, 1.0f, FColor::Yellow, "[PLAYER CHARACTER] TEST 3");
 
-	if (m_TestEquipToggle == false)
+	if (m_TestEquipToggle2 == false)
 	{
-		m_LoadoutComponent->EquipItem(EEquippablePart::LEFT_HAND, ITEM_EQUIPMENT_SWORD);
+		if (EquipItem(EEquippablePart::RIGHT_HAND, ITEM_EQUIPMENT_SWORD) == false)
+		{
+			return;
+		}
 	}
 	else
 	{
-		m_LoadoutComponent->UnEquipItem(EEquippablePart::LEFT_HAND);
+		UnEquipItem(EEquippablePart::RIGHT_HAND);
 	}
 
-	m_TestEquipToggle = !m_TestEquipToggle;
-
-	float rand = FMath::RandRange(0, 100);
-
-	if (rand < 50)
-	{
-		m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::SHIELD, 20);
-	}
-	else
-	{
-		m_CharacterStatsComponent->AdjustStatByValue(ECharacterStat::SHIELD, -10);
-	}
+	m_TestEquipToggle2 = !m_TestEquipToggle2;
 }
 
-bool APlayerCharacter::TestMainHandPrimaryAttack()
+FVector APlayerCharacter::GetSocketLocationFromPart(EEquippablePart part)
 {
-	if (m_AbilityComponent == nullptr)
+	if(part != EEquippablePart::RIGHT_HAND && part != EEquippablePart::LEFT_HAND)
 	{
-		return false;
+		return Super::GetSocketLocationFromPart(part);
 	}
 
-	m_AbilityComponent->StartAbility(1);
-	return true;
+	if(m_HandsMesh == nullptr)
+	{
+		LOG_ERROR("[PLAYER CHARACTER] Tried to get socket location from hand part but HandsMesh was invalid");
+		return FVector::Zero();
+	}
+
+	FName socketName = GetSocketNameFromPart(part);
+
+	if (m_HandsMesh->DoesSocketExist(socketName) == false)
+	{
+		LOG_ERROR("[PLAYER CHARACTER] Tried to get socket location for socket that doesn't exist: %s", *socketName.ToString());
+		return FVector::Zero();
+	}
+
+	return m_HandsMesh->GetSocketLocation(socketName);
 }
 
-bool APlayerCharacter::TestMainHandSecondaryAttack()
+USkeletalMeshComponent* APlayerCharacter::GetEquipmentMesh()
 {
-	if (m_AbilityComponent == nullptr)
-	{
-		return false;
-	}
-
-	m_AbilityComponent->StartAbility(3);
-	return true;
-}
-
-bool APlayerCharacter::TestOffHandPrimaryAttack()
-{
-	if (m_AbilityComponent == nullptr)
-	{
-		return false;
-	}
-
-	m_AbilityComponent->StartAbility(2);
-	return true;
-}
-
-bool APlayerCharacter::TestOffHandSecondaryAttack()
-{
-	if (m_AbilityComponent == nullptr)
-	{
-		return false;
-	}
-
-	m_AbilityComponent->StartAbility(4);
-	return true;
-}
-
-void APlayerCharacter::TestEndAttack()
-{
-	if (m_AbilityComponent == nullptr)
-	{
-		return;
-	}
-
-	m_AbilityComponent->StopAbility();
+	return m_HandsMesh;
 }
 
 void APlayerCharacter::AttackInputRelease()

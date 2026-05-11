@@ -2,7 +2,7 @@
 
 
 #include "PenetrationProjectileDecorator.h"
-#include "TheAscendance/Spells/Interfaces/Spell.h"
+#include "TheAscendance/Abilities/Interfaces/Ability.h"
 
 void UPenetrationProjectileDecorator::HandleOnOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult)
 {
@@ -15,10 +15,9 @@ void UPenetrationProjectileDecorator::HandleOnOverlap(UPrimitiveComponent* overl
 	int damage = 0;
 	ProcessOverlapDamage(damage);
 
-	if (ISpell* spell = GetSpell())
+	if (IAbility* ability = GetAbility())
 	{
-		spell->OnOverlap(otherActor, otherActor->GetActorLocation(), damage);
-
+		ability->OnOverlap(otherActor, otherActor->GetActorLocation(), damage);
 	}
 
 	m_PenetrateCount += 1;

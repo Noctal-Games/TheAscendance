@@ -11,8 +11,6 @@
 #include "TheAscendance/Game/Subsystems/GameEventSubsystem.h"
 
 #include "Kismet/GameplayStatics.h"
-#include "Engine/StreamableManager.h"
-#include "Engine/AssetManager.h"
 #include "TimerManager.h"
 
 UWorld* UCoreFunctionLibrary::GetGameWorld()
@@ -25,7 +23,7 @@ UWorld* UCoreFunctionLibrary::GetGameWorld()
 		}
 	}
 
-	LOG_ERROR("[CORE] Unable to find a valid Game World Context");
+	LOG_ERROR("[CORE FUNCTION LIBRARY] Unable to find a valid Game World Context");
 	return nullptr;
 }
 
@@ -36,7 +34,7 @@ APlayableGameMode* UCoreFunctionLibrary::GetPlayableGameMode()
 		return world->GetAuthGameMode<APlayableGameMode>();
 	}
 
-	LOG_ERROR("[CORE] GameWorld was invalid");
+	LOG_ERROR("[CORE FUNCTION LIBRARY] GameWorld was invalid");
 	return nullptr;
 }
 
@@ -47,7 +45,7 @@ APlayerCharacter* UCoreFunctionLibrary::GetPlayerCharacter()
 		return player;
 	}
 
-	LOG_ERROR("[CORE] PlayerCharacter was invalid");
+	LOG_ERROR("[CORE FUNCTION LIBRARY] PlayerCharacter was invalid");
 	return nullptr;
 }
 
@@ -58,23 +56,23 @@ ACustomPlayerController* UCoreFunctionLibrary::GetPlayerController()
 		return controller;
 	}
 
-	LOG_ERROR("[CORE] PlayerController was invalid");
+	LOG_ERROR("[CORE FUNCTION LIBRARY] PlayerController was invalid");
 	return nullptr;
 }
 
 void UCoreFunctionLibrary::LogInfo(FString string)
 {
-	LOG_INFO("[CORE - BLUEPRINT] %s", *string);
+	LOG_INFO("[CORE FUNCTION LIBRARY - BLUEPRINT] %s", *string);
 }
 
 void UCoreFunctionLibrary::LogWarning(FString string)
 {
-	LOG_WARNING("[CORE - BLUEPRINT] %s", *string);
+	LOG_WARNING("[CORE FUNCTION LIBRARY - BLUEPRINT] %s", *string);
 }
 
 void UCoreFunctionLibrary::LogError(FString string)
 {
-	LOG_ERROR("[CORE - BLUEPRINT] %s", *string);
+	LOG_ERROR("[CORE FUNCTION LIBRARY - BLUEPRINT] %s", *string);
 }
 
 void UCoreFunctionLibrary::DrawDebugLine(const FVector& start, const FVector& end, const FColor colour, const float duration)
@@ -105,7 +103,7 @@ UDataHandlerSubsystem* UCoreFunctionLibrary::GetDataHandlerSubsystem()
 		return world->GetGameInstance()->GetSubsystem<UDataHandlerSubsystem>();
 	}
 
-	LOG_ERROR("[CORE] GameWorld was invalid");
+	LOG_ERROR("[CORE FUNCTION LIBRARY] GameWorld was invalid");
 	return nullptr;
 }
 
@@ -116,7 +114,7 @@ UQuestManagerSubsystem* UCoreFunctionLibrary::GetQuestManagerSubsystem()
 		return world->GetGameInstance()->GetSubsystem<UQuestManagerSubsystem>();
 	}
 
-	LOG_ERROR("[CORE] GameWorld was invalid");
+	LOG_ERROR("[CORE FUNCTION LIBRARY] GameWorld was invalid");
 	return nullptr;
 }
 
@@ -127,7 +125,7 @@ UUIManagerSubsystem* UCoreFunctionLibrary::GetUIManagerSubsystem()
 		return world->GetGameInstance()->GetSubsystem<UUIManagerSubsystem>();
 	}
 
-	LOG_ERROR("[CORE] GameWorld was invalid");
+	LOG_ERROR("[CORE FUNCTION LIBRARY] GameWorld was invalid");
 	return nullptr;
 }
 
@@ -138,86 +136,26 @@ UGameEventSubsystem* UCoreFunctionLibrary::GetGameEventSubsystem()
 		return world->GetGameInstance()->GetSubsystem<UGameEventSubsystem>();
 	}
 
-	LOG_ERROR("[CORE] GameWorld was invalid");
+	LOG_ERROR("[CORE FUNCTION LIBRARY] GameWorld was invalid");
 	return nullptr;
 }
 
-void UCoreFunctionLibrary::RequestAsyncLoad(const FSoftObjectPath& targetToStream, TFunction<void()> delegate)
+UItemRegistrySubsystem* UCoreFunctionLibrary::GetItemRegistrySubsystem()
 {
-	LOG_INFO("[CORE] Requesting ASync Load for: %s", *targetToStream.ToString());
-
-	UAssetManager::GetStreamableManager().RequestAsyncLoad(targetToStream, FStreamableDelegate::CreateLambda([delegate = MoveTemp(delegate), targetToStream]()
-		{
-			UObject* loadedObject = targetToStream.ResolveObject();
-
-			if (loadedObject != nullptr)
-			{
-				LOG_INFO("[CORE] Successful ASync Load for: %s", *targetToStream.ToString());
-			}
-			else
-			{
-				LOG_ERROR("[CORE] Failed ASync Load for: %s", *targetToStream.ToString());
-			}
-
-			if (delegate.IsSet())
-			{
-				delegate();
-			}
-		}
-	));
-}
-
-void UCoreFunctionLibrary::RequestAsyncLoad(const TArray<FSoftObjectPath>& targetsToStream, TFunction<void()> delegate)
-{
-	if (targetsToStream.Num() == 0)
+	if (UWorld* world = GetGameWorld())
 	{
-		LOG_WARNING("[CORE] Tried to RequestASyncLoad for multiple items, but the array was empty");
-
-		if (delegate.IsSet())
-		{
-			delegate();
-		}
-
-		return;
-	}
-	else if (targetsToStream.Num() == 1)
-	{
-		LOG_WARNING("[CORE] Requesting ASync Load for multiple items, but the array only contains one item. Consider using the single load alternative.");
+		return world->GetGameInstance()->GetSubsystem<UItemRegistrySubsystem>();
 	}
 
-	for (const FSoftObjectPath& path : targetsToStream)
-	{
-		LOG_INFO("[CORE] Requesting ASync Load for: %s", *path.ToString());
-	}
-
-	UAssetManager::GetStreamableManager().RequestAsyncLoad(targetsToStream, FStreamableDelegate::CreateLambda([delegate = MoveTemp(delegate), targetsToStream]()
-		{
-			for (const FSoftObjectPath& path : targetsToStream)
-			{
-				UObject* loadedObject = path.ResolveObject();
-
-				if (loadedObject != nullptr)
-				{
-					LOG_INFO("[CORE] Successful ASync Load for: %s", *path.ToString());
-					continue;
-				}
-				
-				LOG_ERROR("[CORE] Failed ASync Load for: %s", *path.ToString());
-			}
-
-			if (delegate.IsSet())
-			{
-				delegate();
-			}
-		}
-	));
+	LOG_ERROR("[CORE FUNCTION LIBRARY] GameWorld was invalid");
+	return nullptr;
 }
 
 void UCoreFunctionLibrary::ClearTimerHandle(FTimerHandle& inHandle, const FString handleName)
 {
 	if (UWorld* world = UCoreFunctionLibrary::GetGameWorld())
 	{
-		LOG_INFO("[CORE] Clearing TimerHandle: %s(%s)", *handleName, *inHandle.ToString());
+		LOG_INFO("[CORE FUNCTION LIBRARY] Clearing TimerHandle: %s(%s)", *handleName, *inHandle.ToString());
 		world->GetTimerManager().ClearTimer(inHandle);
 	}
 }

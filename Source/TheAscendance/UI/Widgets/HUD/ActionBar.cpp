@@ -3,21 +3,30 @@
 
 #include "ActionBar.h"
 #include "TheAscendance/Core/CoreMacros.h"
-#include "TheAscendance/Characters/Components/LoadoutComponent.h"
+#include "TheAscendance/Abilities/Components/AbilityComponent.h"
+#include "TheAscendance/Abilities/Structs/AbilityInfo.h"
 #include "ActionBarIcon.h"
+#include "TheAscendance/Abilities/Components/AbilityComponent.h"
+#include "TheAscendance/Abilities/Enums/AbilitySlot.h"
 
-void UActionBar::Init(ULoadoutComponent* ownerLoadoutComponent)
+void UActionBar::Init(UAbilityComponent* abilityComponent)
 {
-	m_OwnerLoadoutComponent = ownerLoadoutComponent;
-
-	if (m_OwnerLoadoutComponent.IsValid() == false)
+	if (abilityComponent == nullptr)
 	{
-		LOG_ERROR("[ACTION BAR] Tried to Init but OwnerLoadoutComponent was invalid");
+		LOG_ERROR("[ACTION BAR ICON] Ability Component is invalid.");
 		return;
 	}
 
-	m_OnSpellsUpdatedHandled = m_OwnerLoadoutComponent->OnSpellsUpdated.AddUObject(this, &UActionBar::OnSpellsUpdated);
-	m_OnEquipmentUpdatedHandled = m_OwnerLoadoutComponent->OnEquipmentUpdated.AddUObject(this, &UActionBar::OnEquipmentUpdated);
+	abilityComponent->OnAbilitiesUpdate.AddUObject(this, &UActionBar::OnAbilitiesUpdated);
+	abilityComponent->OnAbilityCooldown.AddUObject(this, &UActionBar::OnCooldownTriggered);
+}
+
+void UActionBar::OnCooldownTriggered(const FGameplayTag& abilityTag, float remaining, float max)
+{
+	m_MainHandActionSlot1->OnCooldownTriggered(abilityTag, remaining, max);
+	m_MainHandActionSlot2->OnCooldownTriggered(abilityTag, remaining, max);
+	m_OffHandActionSlot1->OnCooldownTriggered(abilityTag, remaining, max);
+	m_OffHandActionSlot2->OnCooldownTriggered(abilityTag, remaining, max);
 }
 
 void UActionBar::NativeConstruct()
@@ -27,68 +36,67 @@ void UActionBar::NativeConstruct()
 
 void UActionBar::NativeDestruct()
 {
-	if (m_OwnerLoadoutComponent.IsValid())
-	{
-		m_OwnerLoadoutComponent->OnSpellsUpdated.Remove(m_OnSpellsUpdatedHandled);
-		m_OwnerLoadoutComponent->OnEquipmentUpdated.Remove(m_OnEquipmentUpdatedHandled);
-	}
-
 	Super::NativeDestruct();
 }
 
-void UActionBar::OnSpellsUpdated(const TArray<FGameplayTag>& spellTags)
+void UActionBar::OnAbilitiesUpdated(const TArray<FAbilityInfo>& abilityInfo)
 {
-	for(int i = 0; i < spellTags.Num(); ++i)
+	TMap<EAbilitySlot, FAbilityInfo> slotToAbility;
+
+	for (const auto& info : abilityInfo)
 	{
-		if (i == 0)
+		for (EAbilitySlot slot : info.SlotsUsed)
 		{
-			m_MainHandActionSlot1->SetSpellTag(spellTags[i]);
-		}
-		else if (i == 1)
-		{
-			m_MainHandActionSlot2->SetSpellTag(spellTags[i]);
-		}
-		else if (i == 2)
-		{
-			m_OffHandActionSlot1->SetSpellTag(spellTags[i]);
-		}
-		else if (i == 3)
-		{
-			m_OffHandActionSlot2->SetSpellTag(spellTags[i]);
-		}
-		else
-		{
-			LOG_ERROR("[ACTION BAR] Received more spell tags than action slots");
-			return;
+			slotToAbility.FindOrAdd(slot) = info;
 		}
 	}
+
+	auto applySlot = [&](EAbilitySlot slot, UActionBarIcon* widget)
+		{
+			const FAbilityInfo* info = slotToAbility.Find(slot);
+
+			if (!info || info->Icon.IsNull())
+			{
+				widget->ClearAbilityIcon();
+				return;
+			}
+
+			widget->LoadAbility(info->Tag, info->Icon);
+		};
+
+	applySlot(EAbilitySlot::MAINHAND_PRIMARY, m_MainHandActionSlot1);
+	applySlot(EAbilitySlot::MAINHAND_ALT, m_MainHandActionSlot2);
+	applySlot(EAbilitySlot::OFFHAND_PRIMARY, m_OffHandActionSlot1);
+	applySlot(EAbilitySlot::OFFHAND_ALT, m_OffHandActionSlot2);
 }
 
-void UActionBar::OnEquipmentUpdated(const FEquipmentMap& equipmentMap)
-{
-	if(equipmentMap.Map.Contains(EEquippablePart::RIGHT_HAND))
-	{
-		FGameplayTag rightHandTag = equipmentMap.Map[EEquippablePart::RIGHT_HAND];
 
-		m_MainHandActionSlot1->SetEquipmentTag(rightHandTag);
-		m_MainHandActionSlot2->SetEquipmentTag(rightHandTag);
-	}
-	else
-	{
-		m_MainHandActionSlot1->SetEquipmentTag(FGameplayTag::EmptyTag);
-		m_MainHandActionSlot2->SetEquipmentTag(FGameplayTag::EmptyTag);
-	}
+//for(const auto& info : abilityInfo)
+//{
+//	for (const auto& slot : info.SlotsUsed)
+//	{
+//		switch (slot)
+//		{
+//			case EAbilitySlot::MAINHAND_PRIMARY:
+//				info.Icon.IsNull() ? m_MainHandActionSlot1->ClearAbilityIcon() : m_MainHandActionSlot1->LoadAbilityIcon(info.Icon);
+//				break;
+//			case EAbilitySlot::MAINHAND_ALT:
+//				info.Icon.IsNull() ? m_MainHandActionSlot1->ClearAbilityIcon() : m_MainHandActionSlot2->LoadAbilityIcon(info.Icon);
+//				break;
+//			case EAbilitySlot::OFFHAND_PRIMARY:
+//				info.Icon.IsNull() ? m_OffHandActionSlot1->ClearAbilityIcon() : m_OffHandActionSlot1->LoadAbilityIcon(info.Icon);
+//				break;
+//			case EAbilitySlot::OFFHAND_ALT:
+//				info.Icon.IsNull() ? m_OffHandActionSlot2->ClearAbilityIcon() : m_OffHandActionSlot2->LoadAbilityIcon(info.Icon);
+//				break;
+//			default:
+//				LOG_ERROR("[ACTION BAR] Invalid ability slot used in ability info.");
+//				break;
+//		}
+//	}
+//}
 
-	if(equipmentMap.Map.Contains(EEquippablePart::LEFT_HAND))
-	{
-		FGameplayTag leftHandTag = equipmentMap.Map[EEquippablePart::LEFT_HAND];
-
-		m_OffHandActionSlot1->SetEquipmentTag(leftHandTag);
-		m_OffHandActionSlot2->SetEquipmentTag(leftHandTag);
-	}
-	else
-	{
-		m_OffHandActionSlot1->SetEquipmentTag(FGameplayTag::EmptyTag);
-		m_OffHandActionSlot2->SetEquipmentTag(FGameplayTag::EmptyTag);
-	}
-}
+//abilityInfo.IsValidIndex(0) ? m_MainHandActionSlot1->LoadAbilityIcon(abilityInfo[0].Icon) : m_MainHandActionSlot1->ClearAbilityIcon();
+//abilityInfo.IsValidIndex(1) ? m_MainHandActionSlot2->LoadAbilityIcon(abilityInfo[1].Icon) : m_MainHandActionSlot2->ClearAbilityIcon();
+//abilityInfo.IsValidIndex(2) ? m_OffHandActionSlot1->LoadAbilityIcon(abilityInfo[2].Icon) : m_OffHandActionSlot1->ClearAbilityIcon();
+//abilityInfo.IsValidIndex(3) ? m_OffHandActionSlot2->LoadAbilityIcon(abilityInfo[3].Icon) : m_OffHandActionSlot2->ClearAbilityIcon();

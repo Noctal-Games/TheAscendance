@@ -23,7 +23,7 @@ void UPlayerHUD::Init(APlayerCharacter* ownerCharacter)
 
 	m_OwnerCharacter->m_OnInteractTargetChanged.BindUObject(this, &UPlayerHUD::UpdateCrosshair);
 
-	m_ActionBar->Init(m_OwnerCharacter->GetLoadoutComponent());
+	m_ActionBar->Init(m_OwnerCharacter->GetAbilityComponent());
 
 	m_HealthBar->BoundHUDStat = EHUDBarStat::HEALTH;
 	m_ManaBar->BoundHUDStat = EHUDBarStat::MANA;

@@ -7,6 +7,7 @@
 #include "TheAscendance/Characters/Enums/EquippablePart.h"
 #include "TheAscendance/Characters/Structs/LoadoutSlotData.h"
 #include "GameplayTagContainer.h"
+#include "TheAscendance/Abilities/Enums/AbilitySlot.h"
 #include "LoadoutComponent.generated.h"
 
 USTRUCT()
@@ -20,8 +21,7 @@ struct FEquipmentMap
 
 class ABaseCharacter;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnSpellsUpdated, const TArray<FGameplayTag>& /*SpellTags*/);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnEquipmentUpdated, const FEquipmentMap& /*Equipment*/);
+DECLARE_MULTICAST_DELEGATE(FOnSpellsUpdate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class THEASCENDANCE_API ULoadoutComponent : public UActorComponent
@@ -33,26 +33,27 @@ public:
 	ULoadoutComponent();
 
 	void EquipItem(EEquippablePart part, const FGameplayTag& itemTag);
+	void BlockEquipItem(EEquippablePart part);
 	void UnEquipItem(EEquippablePart part);
 
 	void SetSpells(const TArray<FGameplayTag>& spellTags);
+
+	bool IsPartEquipped(const EEquippablePart& part);
 protected:
 	friend class UGrimoire;
+	friend class UEquipmentManagerComponent;
 	const TArray<FGameplayTag>& GetSpellTags() const;
-
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	TMap<EAbilitySlot, FGameplayTag> GetSpellsCopy() const;
 
 private:
 	bool Contains(EEquippablePart part);
 
-public:
-	FOnSpellsUpdated OnSpellsUpdated;
-	FOnEquipmentUpdated OnEquipmentUpdated;
+protected:
+	FOnSpellsUpdate OnSpellsUpdate;
 
 private:
-	TWeakObjectPtr<ABaseCharacter> m_Owner = nullptr;
-
-	TArray<TSharedPtr<FLoadoutSlotData>> m_Loadout;
+	TArray<FLoadoutSlotData> m_Loadout;
 	TArray<FGameplayTag> m_SpellTags;
+
+	TMap<EAbilitySlot, FGameplayTag> m_TestSpellTags;
 };
