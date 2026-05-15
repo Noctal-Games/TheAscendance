@@ -16,3 +16,14 @@ enum class EEquippablePart : uint8
 };
 
 ENUM_RANGE_BY_COUNT(EEquippablePart, EEquippablePart::MAX)
+
+UENUM(BlueprintType)
+enum class EIdleType : uint8
+{
+	NO_ITEMS UMETA(DisplayName = "No Items"),
+	EQUIPPED_MAINHAND UMETA(DisplayName = "Equipped Main Hand"),
+	EQUIPPED_OFFHAND UMETA(DisplayName = "Equipped Off Hand"),
+	EQUIPPED_BOTHHANDS UMETA(DisplayName = "Equipped Both Hands"),
+
+	EQUIPPED_TWOHANDED UMETA(DisplayName = "Equipped Two Handed"),
+};
