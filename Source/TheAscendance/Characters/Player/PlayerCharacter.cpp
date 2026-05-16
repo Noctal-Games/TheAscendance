@@ -46,6 +46,17 @@ ACustomPlayerController* APlayerCharacter::GetPlayerController()
 	return m_PlayerController;
 }
 
+EIdleType APlayerCharacter::GetIdleType()
+{
+	if (m_EquipmentManagerComponent == nullptr)
+	{
+		LOG_INFO("[PLAYER CHARACTER] EquipmentManager is invalid");
+		return EIdleType::NO_ITEMS;
+	}
+
+	return m_EquipmentManagerComponent->GetIdleType();
+}
+
 void APlayerCharacter::Interact()
 {
 	if (m_InteractTarget == nullptr)
@@ -55,6 +66,17 @@ void APlayerCharacter::Interact()
 	}
 
 	m_InteractTarget->Interact(this);
+}
+
+bool APlayerCharacter::IsHoldingTwoHandedItem()
+{
+	if (m_EquipmentManagerComponent == nullptr)
+	{
+		LOG_INFO("[PLAYER CHARACTER] EquipmentManager is invalid");
+		return false;
+	}
+
+	return m_EquipmentManagerComponent->IsHoldingTwoHandedItem();
 }
 
 bool APlayerCharacter::PickupItem(const FGameplayTag& itemTag, int amount)

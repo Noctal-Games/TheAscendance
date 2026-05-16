@@ -51,6 +51,6 @@ void UCombatManagerSubsystem::CleanRegistry()
 {
 	m_RegisteredComponents.RemoveAll([](const TWeakObjectPtr<UCombatAIComponent>& ptr)
 		{
-			return !ptr.IsValid();
+			return ptr.IsValid() == false;
 		});
 }

@@ -3,3 +3,12 @@
 
 #include "AbilityData.h"
 
+FAbilityInfo UAbilityData::GetAbilityInfo()
+{
+	FAbilityInfo info;
+	info.Tag = AbilityTag;
+	info.Cooldown = Cooldown;
+	info.Icon = AbilityIcon;
+
+	return info;
+}

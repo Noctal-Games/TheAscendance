@@ -37,9 +37,7 @@ void UBaseAbility::Init(UAbilityComponent* ownerComponent, UAbilityData* ability
 		return;
 	}
 
-	m_AbilityInfo.Tag = m_AbilityData->AbilityTag;
-	m_AbilityInfo.Icon = m_AbilityData->AbilityIcon;
-	m_Cooldown = m_AbilityData->Cooldown;
+	m_AbilityInfo = m_AbilityData->GetAbilityInfo();
 
 	UStreamableFunctionLibrary::RequestAsyncLoad(m_AbilityAnimation.ToSoftObjectPath());
 
@@ -101,6 +99,9 @@ void UBaseAbility::Execute()
 		return;
 	}
 
+	//Temp until notifies are fixed
+	UCoreFunctionLibrary::SetTimer(m_AbilityTriggerHandle, this, &UBaseAbility::TriggerAbility, 0.5f);
+
 	//Timer to prevent animation locking up attacks. If an animation fails to notify, the ability and character attack state will be reset by default. 
 	float duration = PlayAnimMontageOnOwner(m_AbilityAnimation.Get());
 	UCoreFunctionLibrary::SetTimer(m_AbilityDurationHandle, this, &UBaseAbility::Stop, duration);
@@ -110,10 +111,9 @@ void UBaseAbility::TriggerAbility()
 {
 	LOG_ONSCREEN(-1, 5.0f, FColor::Yellow, "Ability - %s: TRIGGER", *GetAbilityTag().ToString());
 
-	if (m_CooldownTimer > 0.0f)
+	if (m_AbilityTriggerHandle.IsValid())
 	{
-		LOG_WARNING("[BASE ABILITY] Check CanStart before activating ability");
-		return;
+		UCoreFunctionLibrary::ClearTimerHandle(m_AbilityTriggerHandle, FString("Trigger Ability"));
 	}
 	
 	TriggerCooldown();
@@ -286,7 +286,7 @@ bool UBaseAbility::CanStart() const
 
 void UBaseAbility::Update(float deltaTime)
 {   
-	if (m_Cooldown < 0)
+	if (m_CooldownTimer < 0)
 	{
 		return;
 	}
@@ -323,10 +323,10 @@ void UBaseAbility::AffectOwnerStat()
 
 void UBaseAbility::TriggerCooldown()
 {
-	m_CooldownTimer = m_Cooldown;
+	m_CooldownTimer = m_AbilityInfo.Cooldown;
 
 	if (m_OwnerComponent != nullptr && m_AbilityData != nullptr)
 	{
-		m_OwnerComponent->OnAbilityCooldown.Broadcast(m_AbilityData->AbilityTag, m_CooldownTimer, m_Cooldown);
+		m_OwnerComponent->OnAbilityCooldown.Broadcast(m_AbilityData->AbilityTag, m_CooldownTimer, m_AbilityInfo.Cooldown);
 	}
 }

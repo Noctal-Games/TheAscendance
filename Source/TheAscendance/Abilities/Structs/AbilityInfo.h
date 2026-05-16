@@ -13,9 +13,10 @@ struct FAbilityInfo
 	GENERATED_BODY()
 
 	FGameplayTag Tag;
+	float Cooldown = 0.0f;
 
 	UPROPERTY()
-	TSoftObjectPtr<UTexture2D> Icon;
+	TSoftObjectPtr<UTexture2D> Icon = nullptr;
 
 	TArray<EAbilitySlot> SlotsUsed;
 };

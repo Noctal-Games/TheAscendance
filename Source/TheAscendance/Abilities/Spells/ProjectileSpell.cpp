@@ -41,11 +41,6 @@ void UProjectileSpell::Init(UAbilityComponent* ownerComponent, UAbilityData* abi
 
 void UProjectileSpell::TriggerAbility()
 {
-	if (UBaseSpell::CanStart() == false)
-	{
-		return;
-	}
-
 	if(m_SpellData == nullptr)
 	{
 		LOG_ERROR("[PROJECTILE SPELL] Tried to Execute ProjectileSpell with invalid SpellData");

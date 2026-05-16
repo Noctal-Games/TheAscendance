@@ -10,6 +10,7 @@
 #include "TheAscendance/Abilities/Enums/AbilityType.h"
 #include "TheAscendance/Characters/Enums/CharacterStat.h"
 #include "TheAscendance/Abilities/Enums/AbilitySlot.h"	
+#include "TheAscendance/Abilities/Structs/AbilityInfo.h"
 #include "AbilityData.generated.h"
 
 class UAnimMontage;
@@ -21,6 +22,9 @@ UCLASS(Abstract)
 class THEASCENDANCE_API UAbilityData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
+
+public:
+	FAbilityInfo GetAbilityInfo();
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (Categories = "Ability"))

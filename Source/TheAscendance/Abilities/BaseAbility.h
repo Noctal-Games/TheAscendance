@@ -86,10 +86,10 @@ private:
 	TSoftObjectPtr<UAnimMontage> m_AbilityAnimation = nullptr;
 
 	FTimerHandle m_AbilityDurationHandle;
+	FTimerHandle m_AbilityTriggerHandle;
 
 	UPROPERTY()
 	TSoftObjectPtr<UNiagaraSystem> m_HitNiagara = nullptr;
 
-	float m_Cooldown = 0.0f;
 	float m_CooldownTimer = 0.0f;
 };

@@ -162,7 +162,7 @@ UCombatManagerSubsystem* UCoreFunctionLibrary::GetCombatManagerSubsystem()
 {
 	if (UWorld* world = GetGameWorld())
 	{
-		return world->GetGameInstance()->GetSubsystem<UCombatManagerSubsystem>();
+		return world->GetSubsystem<UCombatManagerSubsystem>();
 	}
 
 	LOG_ERROR("[CORE FUNCTION LIBRARY] GameWorld was invalid");

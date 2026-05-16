@@ -109,12 +109,12 @@ void UCombatAIComponent::SetIsCombatLocked(bool val)
 
 	if (val == true)
 	{
-		SetIsAIMovementPaused(false);
+		SetIsAIMovementPaused(true);
 		SetFocus(nullptr);
 	}
 	else
 	{
-		SetIsAIMovementPaused(true);
+		SetIsAIMovementPaused(false);
 
 		if (CombatContext.Target.IsValid())
 		{
@@ -127,7 +127,7 @@ void UCombatAIComponent::SetIsCombatLocked(bool val)
 
 void UCombatAIComponent::SetIsAIMovementPaused(bool val)
 {
-	if (m_Controller == nullptr)
+	if (m_Controller.IsValid() == false)
 	{
 		LOG_ERROR("[COMBAT AI COMPONENT] Controller is invalid");
 		return;
@@ -186,7 +186,7 @@ void UCombatAIComponent::BeginPlay()
 
 	m_Owner = Cast<ABaseEnemy>(GetOwner());
 
-	if (m_Owner != nullptr)
+	if (m_Owner.IsValid() == true)
 	{
 		m_Controller = Cast<ATAAIController>(m_Owner->GetController());
 	}
