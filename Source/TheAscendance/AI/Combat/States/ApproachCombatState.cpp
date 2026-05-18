@@ -8,6 +8,8 @@
 
 void UApproachCombatState::StartState()
 {
+	UAbstractCombatState::StartState();
+
 	if (m_OwnerComponent != nullptr)
 	{
 		m_OwnerComponent->RequestWaitForState();
@@ -58,7 +60,9 @@ void UApproachCombatState::Update(float deltaTime)
 		return;
 	}
 
-	ownerCharacter->SetDestination(target->GetActorLocation());
+	m_OwnerComponent->m_MovementIntent = target->GetActorLocation() - ownerCharacter->GetActorLocation();
+
+	//ownerCharacter->SetDestination(target->GetActorLocation());
 }
 
 const FString UApproachCombatState::GetStateToString() const

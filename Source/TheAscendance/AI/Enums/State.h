@@ -22,6 +22,7 @@ enum class ECombatState : uint8
 	IDLE,
 	APPROACH, 
 	STRAFE, 
+	RETREAT, 
 
 	SUPPORT, 
 	PRESERVE_SELF,

@@ -8,6 +8,7 @@
 #include "TheAscendance/AI/Combat/States/IdleCombatState.h"
 #include "TheAscendance/AI/Combat/States/ApproachCombatState.h"
 #include "TheAscendance/AI/Combat/States/StrafeCombatState.h"
+#include "TheAscendance/AI/Combat/States/RetreatCombatState.h"
 #include "TheAscendance/AI/States/AttackCombatState.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
 #include "TheAscendance/Abilities/Components/AbilityComponent.h"
@@ -64,6 +65,12 @@ void UCombatAIComponent::Init(UPerceptionComponent* perceptionComponent, const F
 	{
 		state->Init(this);
 		m_CombatStates.Add(ECombatState::STRAFE, state);
+	}
+
+	if (URetreatCombatState* state = NewObject<URetreatCombatState>())
+	{
+		state->Init(this);
+		m_CombatStates.Add(ECombatState::RETREAT, state);
 	}
 
 	if (m_CombatStates.Num() != (int32)EState::MAX)
@@ -207,7 +214,7 @@ void UCombatAIComponent::GetCombatRangeValues(float& PreferredEngagementRange, f
 
 float UCombatAIComponent::GetAggression()
 {
-	return m_BehaviourSettings.Aggression;
+	return BehaviourSettings.Aggression;
 }
 
 ABaseEnemy* UCombatAIComponent::GetEnemyOwner()
@@ -265,6 +272,7 @@ void UCombatAIComponent::TickComponent(float deltaTime, ELevelTick TickType, FAc
 
 		if (m_StateFinished == false)
 		{
+			ApplyMovement(deltaTime);
 			return;
 		}
 
@@ -282,6 +290,8 @@ void UCombatAIComponent::TickComponent(float deltaTime, ELevelTick TickType, FAc
 
 		EvaluateCombat();
 	}
+
+	ApplyMovement(deltaTime);
 }
 
 void UCombatAIComponent::EvaluateCombat()
@@ -322,7 +332,7 @@ void UCombatAIComponent::EvaluateCombat()
 		highestScore = selfScore;
 		//desiredState = ECombatState::PRESERVE_SELF;
 	}
-
+	
 	const float strafeScore = ScoreStrafe();
 
 	if (strafeScore > highestScore)
@@ -349,23 +359,20 @@ void UCombatAIComponent::EvaluateCombat()
 
 	const bool tooFar = rangeDelta > (preferredRange * tolerance);
 
+	//Change to ScoreTooFar, which would encompass Approaching.... Etc
 	if (tooFar == true)
 	{
 		SetState(ECombatState::APPROACH);
 		return;
 	}
 
-	const bool tooClose = rangeDelta < -(preferredRange * tolerance);
+	//Change to ScoreTooClose, which would encompass Retreating, Holding Ground.... Etc
+	const float retreatScore = ScoreRetreat();
 
-	if (tooClose == true)
+	if (retreatScore > highestScore)
 	{
-		const float retreatScore = ScoreRetreat();
-
-		if (retreatScore > highestScore)
-		{
-			//SetState(ECombatState::Retreat);
-			return;
-		}
+		highestScore = retreatScore;
+		desiredState = ECombatState::RETREAT;
 	}
 
 	SetState(desiredState);
@@ -462,7 +469,33 @@ float UCombatAIComponent::ScoreSelf() const
 
 float UCombatAIComponent::ScoreRetreat() const
 {
-	return 0.0f;
+	float score = 0.0f;
+
+	if (CombatContext.Target.IsValid() == false)
+	{
+		return -1.0f;
+	}
+
+	AActor* target = CombatContext.Target.Get();
+
+	const float distance = (target->GetActorLocation() - GetOwner()->GetActorLocation()).Length();
+	const float preferredRange = CombatSettings.PreferredEngagementRange;
+
+	const float rangeDelta = distance - preferredRange; 
+	const float tooClose = FMath::Clamp(-rangeDelta / preferredRange, 0.0f, 1.0f);
+
+	const float aggression = BehaviourSettings.Aggression;
+
+	const float defensiveWeight = 1.0f - aggression;
+
+	score = tooClose * defensiveWeight;
+
+	if (score == 0.0f)
+	{
+		return -1.0f;
+	}
+
+	return score;
 }
 
 float UCombatAIComponent::ScoreStrafe() const
@@ -486,14 +519,15 @@ float UCombatAIComponent::ScoreStrafe() const
 	const float distanceRatio = FMath::Abs(rangeDelta) / FMath::Max(preferredRange, 1.0f);
 	const float rangeUrgency = FMath::Clamp(distanceRatio, 0.0f, 1.0f);
 
-	const float aggression = m_BehaviourSettings.Aggression;
+	const float aggression = BehaviourSettings.Aggression;
 
-	const float defensiveWeight = 1.0f - m_BehaviourSettings.Aggression;
+	const float defensiveWeight = 1.0f - BehaviourSettings.Aggression;
 
 	const float rangeTolerance = CombatSettings.EngagementRangeTolerance;
 	const float discipline = 1.0f - rangeTolerance;
+	//const float randomFactor = m_BehaviourSettings.DecisionRandomness.GetRandomValue();
 
-	score = rangeUrgency * defensiveWeight * discipline * 2.5f;
+	score = rangeUrgency * defensiveWeight * discipline;
 
 	if (rangeUrgency < 0.1f)
 	{
@@ -504,7 +538,6 @@ float UCombatAIComponent::ScoreStrafe() const
 	{
 		return -1.0f;
 	}
-	//const float randomFactor = m_BehaviourSettings.DecisionRandomness.GetRandomValue();
 
 	return score;
 }
@@ -527,9 +560,35 @@ bool UCombatAIComponent::TryConsumeReaction()
 	}
 
 	m_LastReactionTime = currentTime;
-	m_CurrentReactionTime = m_BehaviourSettings.ReactionTime.GetRandomValue();
+	m_CurrentReactionTime = BehaviourSettings.ReactionTime.GetRandomValue();
 	return true;
 }
 
+void UCombatAIComponent::SmoothMovementIntent(float deltaTime)
+{
+	const float smoothingSpeed = 7.0f;
 
+	const float alpha = 1.0f - FMath::Exp(-smoothingSpeed * deltaTime);
 
+	m_SmoothedMovement = FMath::Lerp(m_SmoothedMovement, m_MovementIntent, alpha);
+
+	m_SmoothedMovement.Z = 0.0f;
+	m_SmoothedMovement.Normalize();
+}
+
+void UCombatAIComponent::ApplyMovement(float deltaTime)
+{
+	AActor* owner = GetOwner();
+
+	if (owner == nullptr)
+	{
+		return;
+	}
+
+	SmoothMovementIntent(deltaTime);
+
+	const FVector ownerLocation = owner->GetActorLocation();
+	const FVector destination = ownerLocation + (m_SmoothedMovement * 300.0f);
+
+	SetDestination(destination);
+}

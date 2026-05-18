@@ -63,6 +63,8 @@ private:
 	void EvaluateCombat();
 	void HandleAbilityFinished();
 	bool TryConsumeReaction();
+	void SmoothMovementIntent(float deltaTime);
+	void ApplyMovement(float deltaTime);
 
 public:
 	UPROPERTY()
@@ -71,6 +73,15 @@ public:
 	FLoadedCombatSettings CombatSettings;
 	UPROPERTY()
 	FPerceptionContext PerceptionContext;
+	UPROPERTY()
+	FBehaviourSettings BehaviourSettings;
+
+protected:
+	friend class URetreatCombatState;
+	friend class UStrafeCombatState;
+	friend class UApproachCombatState;
+
+	FVector m_MovementIntent = FVector::ZeroVector;
 
 private:
 	UPROPERTY()
@@ -81,12 +92,10 @@ private:
 	TWeakObjectPtr<UPerceptionComponent> m_PerceptionComponent = nullptr;
 
 	UPROPERTY()
-	FBehaviourSettings m_BehaviourSettings;
-
-
-	UPROPERTY()
 	TMap<ECombatState, TObjectPtr<UAbstractCombatState>> m_CombatStates;
 	ECombatState m_CurrentCombatState = ECombatState::MAX;
+
+	FVector m_SmoothedMovement = FVector::ZeroVector;
 
 	float m_LastReactionTime = 0.0f;
 	float m_CurrentReactionTime = 0.0f;

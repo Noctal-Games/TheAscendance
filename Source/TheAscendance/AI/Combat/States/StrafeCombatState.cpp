@@ -137,9 +137,10 @@ void UStrafeCombatState::UpdateMovement()
 	}
 
 	desiredDirection.Normalize();
+	m_OwnerComponent->m_MovementIntent = desiredDirection;
 
-	const FVector destination = ownerLocation + (desiredDirection * 250.0f);
-	m_OwnerComponent->SetDestination(destination);
+	//const FVector destination = ownerLocation + (desiredDirection * 250.0f);
+	//m_OwnerComponent->SetDestination(destination);
 }
 
 void UStrafeCombatState::ChooseDirection()
