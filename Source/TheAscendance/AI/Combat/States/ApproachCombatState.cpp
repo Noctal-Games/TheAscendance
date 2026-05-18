@@ -8,10 +8,28 @@
 
 void UApproachCombatState::StartState()
 {
+	if (m_OwnerComponent != nullptr)
+	{
+		m_OwnerComponent->RequestWaitForState();
+		m_OwnerComponent->SetIsAIMovementPaused(false);
+		//Strafe speed
+	}
+	else
+	{
+		LOG_ERROR("[APPROACH COMBAT STATE] OwnerComponent is invalid");
+	}
 }
 
 void UApproachCombatState::EndState()
 {
+	if (m_OwnerComponent != nullptr)
+	{
+		m_OwnerComponent->NotifyStateFinished();
+		//Strafe speed
+	}
+
+	//Normal speed
+	UAbstractCombatState::EndState();
 }
 
 void UApproachCombatState::Update(float deltaTime)
@@ -22,7 +40,7 @@ void UApproachCombatState::Update(float deltaTime)
 		return;
 	}
 
-	if(m_OwnerComponent->CombatContext.Target == nullptr)
+	if(m_OwnerComponent->CombatContext.Target.IsValid() == false)
 	{
 		m_OwnerComponent->SetState(ECombatState::IDLE);
 		return;
@@ -31,18 +49,12 @@ void UApproachCombatState::Update(float deltaTime)
 	AActor* target = m_OwnerComponent->CombatContext.Target.Get();
 	ABaseEnemy* ownerCharacter = Cast<ABaseEnemy>(m_OwnerComponent->GetOwner());
 
-	if (target == nullptr)
-	{
-		m_OwnerComponent->SetState(ECombatState::IDLE);
-		return;
-	}
-
 	const float distance = FVector::Distance(ownerCharacter->GetActorLocation(), target->GetActorLocation());
-	const float preferredRange = 0.0f;// m_ClassData->PreferredEngagementRange;
+	const float maxRange = m_OwnerComponent->CombatSettings.MaxEngagementRange;
 
-	if (distance <= preferredRange)
+	if (distance <= maxRange)
 	{
-		m_OwnerComponent->SetState(ECombatState::ATTACK);
+		m_OwnerComponent->NotifyStateFinished();
 		return;
 	}
 

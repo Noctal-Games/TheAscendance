@@ -100,7 +100,7 @@ void UBaseAbility::Execute()
 	}
 
 	//Temp until notifies are fixed
-	UCoreFunctionLibrary::SetTimer(m_AbilityTriggerHandle, this, &UBaseAbility::TriggerAbility, 0.5f);
+	//UCoreFunctionLibrary::SetTimer(m_AbilityTriggerHandle, this, &UBaseAbility::TriggerAbility, 0.5f);
 
 	//Timer to prevent animation locking up attacks. If an animation fails to notify, the ability and character attack state will be reset by default. 
 	float duration = PlayAnimMontageOnOwner(m_AbilityAnimation.Get());
@@ -113,7 +113,7 @@ void UBaseAbility::TriggerAbility()
 
 	if (m_AbilityTriggerHandle.IsValid())
 	{
-		UCoreFunctionLibrary::ClearTimerHandle(m_AbilityTriggerHandle, FString("Trigger Ability"));
+		//UCoreFunctionLibrary::ClearTimerHandle(m_AbilityTriggerHandle, FString("Trigger Ability"));
 	}
 	
 	TriggerCooldown();

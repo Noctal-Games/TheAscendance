@@ -20,6 +20,14 @@ void UIdleCombatState::StartState()
 	{
 		LOG_ERROR("[IDLE COMBAT STATE] Failed to get CombatManagerSubsystem");
 	}
+
+	if (m_OwnerComponent != nullptr)
+	{
+		m_OwnerComponent->LookAtTarget();
+		m_OwnerComponent->SetIsAIMovementPaused(true);
+
+		//Strafe speed
+	}
 }
 
 void UIdleCombatState::EndState()
@@ -33,6 +41,12 @@ void UIdleCombatState::EndState()
 	{
 		LOG_ERROR("[IDLE COMBAT STATE] Failed to get CombatManagerSubsystem");
 	}
+
+	if (m_OwnerComponent != nullptr)
+	{
+		m_OwnerComponent->SetIsAIMovementPaused(false);
+		//Strafe speed
+	}
 }
 
 void UIdleCombatState::Update(float deltaTime)
@@ -40,12 +54,6 @@ void UIdleCombatState::Update(float deltaTime)
 	if(m_OwnerComponent.IsValid() == false)
 	{
 		LOG_ERROR("[IDLE COMBAT STATE] OwnerComponent is invalid");
-		return;
-	}
-
-	if(m_OwnerComponent->CombatContext.Target != nullptr)
-	{
-		m_OwnerComponent->SetState(ECombatState::APPROACH);
 		return;
 	}
 

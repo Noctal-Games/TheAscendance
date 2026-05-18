@@ -30,5 +30,10 @@ struct FPerceptionContext
 	GENERATED_BODY()
 
 	UPROPERTY()
-	TMap<TWeakObjectPtr<ABaseCharacter>, FTargetPerceptionState> KnownTargets;
+	TWeakObjectPtr<ABaseCharacter> Target;
+	//Use if ever multiplayer or player has ally NPCs
+	//UPROPERTY()
+	//TMap<TWeakObjectPtr<ABaseCharacter>, FTargetPerceptionState> KnownTargets;
+	UPROPERTY()
+	TMap<TWeakObjectPtr<ABaseCharacter>, FTargetPerceptionState> KnownEnemies;
 };

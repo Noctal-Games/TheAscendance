@@ -7,6 +7,7 @@
 #include "TheAscendance/AI/Combat/States/AbstractCombatState.h"
 #include "TheAscendance/AI/Combat/States/IdleCombatState.h"
 #include "TheAscendance/AI/Combat/States/ApproachCombatState.h"
+#include "TheAscendance/AI/Combat/States/StrafeCombatState.h"
 #include "TheAscendance/AI/States/AttackCombatState.h"
 #include "TheAscendance/Characters/Enemies/BaseEnemy.h"
 #include "TheAscendance/Abilities/Components/AbilityComponent.h"
@@ -57,6 +58,12 @@ void UCombatAIComponent::Init(UPerceptionComponent* perceptionComponent, const F
 	{
 		state->Init(this);
 		m_CombatStates.Add(ECombatState::ATTACK, state);
+	}
+
+	if (UStrafeCombatState* state = NewObject<UStrafeCombatState>())
+	{
+		state->Init(this);
+		m_CombatStates.Add(ECombatState::STRAFE, state);
 	}
 
 	if (m_CombatStates.Num() != (int32)EState::MAX)
@@ -157,7 +164,7 @@ void UCombatAIComponent::LookAtTarget()
 {
 	if (m_Controller.IsValid() == false)
 	{
-		LOG_ERROR("[BASE ENEMY] Tried to set focus with invalid controller");
+		LOG_ERROR("[COMBAT AI COMPONENT] Tried to set focus with invalid controller");
 		return;
 	}
 
@@ -169,6 +176,40 @@ void UCombatAIComponent::LookAtTarget()
 	m_Controller->SetFocus(CombatContext.Target.Get());
 }
 
+void UCombatAIComponent::RequestWaitForState()
+{
+	m_WaitForState = true;
+	m_StateFinished = false;
+}
+
+void UCombatAIComponent::NotifyStateFinished()
+{
+	m_StateFinished = true;
+}
+
+void UCombatAIComponent::SetDestination(const FVector& destination)
+{
+	if (m_Controller.IsValid() == false)
+	{
+		LOG_ERROR("[COMBAT AI COMPONENT] Tried to set destination with invalid controller");
+		return;
+	}
+
+	m_Controller->SetDestination(destination);
+}
+
+void UCombatAIComponent::GetCombatRangeValues(float& PreferredEngagementRange, float& MaxEngagementRange, float& EngagementRangeTolerance)
+{
+	PreferredEngagementRange = CombatSettings.PreferredEngagementRange;
+	MaxEngagementRange = CombatSettings.MaxEngagementRange;
+	EngagementRangeTolerance = CombatSettings.EngagementRangeTolerance;
+}
+
+float UCombatAIComponent::GetAggression()
+{
+	return m_BehaviourSettings.Aggression;
+}
+
 ABaseEnemy* UCombatAIComponent::GetEnemyOwner()
 {
 	if (m_Owner.IsValid() == false)
@@ -177,6 +218,16 @@ ABaseEnemy* UCombatAIComponent::GetEnemyOwner()
 	}
 
 	return m_Owner.Get();
+}
+
+AActor* UCombatAIComponent::GetCurrentTarget()
+{
+	if (CombatContext.Target.IsValid() == false)
+	{
+		return nullptr;
+	}
+
+	return CombatContext.Target.Get();
 }
 
 // Called when the game starts
@@ -208,6 +259,19 @@ void UCombatAIComponent::TickComponent(float deltaTime, ELevelTick TickType, FAc
 		return;
 	}
 
+	if (m_WaitForState == true)
+	{
+		LOG_ONSCREEN(5, 2.0f, FColor::Yellow, "WAITNG FOR STATE, STATE FINISHED IS %s", *FString(m_StateFinished ? "TRUE" : "FALSE"));
+
+		if (m_StateFinished == false)
+		{
+			return;
+		}
+
+		m_WaitForState = false;
+		m_StateFinished = false;
+	}
+
 	if (TryConsumeReaction() == true)
 	{
 		if (m_PerceptionComponent == nullptr)
@@ -222,12 +286,18 @@ void UCombatAIComponent::TickComponent(float deltaTime, ELevelTick TickType, FAc
 
 void UCombatAIComponent::EvaluateCombat()
 {
-	float highestScore = -9999.0f;
+	float highestScore = -1.0f;
 	ECombatState desiredState = ECombatState::IDLE;
 
 	//Setup perception to monitor player and allies and query targets here
 	//Temp target only player
 	CombatContext.Target = UCoreFunctionLibrary::GetPlayerCharacter();
+
+	if (CombatContext.Target.IsValid() == false)
+	{
+		SetState(ECombatState::IDLE);
+		return;
+	}
 
 	const float attackScore = ScoreAttack();
 
@@ -258,13 +328,7 @@ void UCombatAIComponent::EvaluateCombat()
 	if (strafeScore > highestScore)
 	{
 		highestScore = strafeScore;
-		//desiredState = ECombatState::IDLE;
-	}
-
-	if (CombatContext.Target.IsValid() == false)
-	{
-		SetState(ECombatState::IDLE);
-		return;
+		desiredState = ECombatState::STRAFE;
 	}
 
 	const float distance = (GetOwner()->GetActorLocation() - CombatContext.Target->GetActorLocation()).Length();
@@ -335,6 +399,11 @@ float UCombatAIComponent::ScoreAttack() const
 		}
 	}
 
+	if (score == 0.0f)
+	{
+		return -1.0f;
+	}
+
 	return score;
 }
 
@@ -357,6 +426,11 @@ float UCombatAIComponent::ScoreSupport() const
 				score += (Ability.Weight + 1) * (goalWeight + 1);
 			}
 		}
+	}
+
+	if (score == 0.0f)
+	{
+		return -1.0f;
 	}
 
 	return score;
@@ -393,7 +467,46 @@ float UCombatAIComponent::ScoreRetreat() const
 
 float UCombatAIComponent::ScoreStrafe() const
 {
-	return 0.0f;
+	float score = 0.0f;
+
+	if (CombatContext.Target.IsValid() == false)
+	{
+		LOG_WARNING("TARGET INVALID");
+		return score;
+	}
+
+	AActor* target = CombatContext.Target.Get();
+
+	const float distance = (target->GetActorLocation() - GetOwner()->GetActorLocation()).Length();
+	const float preferredRange = CombatSettings.PreferredEngagementRange;
+
+	const float rangeDelta = distance - preferredRange;
+
+	// Strongest when far from ideal range
+	const float distanceRatio = FMath::Abs(rangeDelta) / FMath::Max(preferredRange, 1.0f);
+	const float rangeUrgency = FMath::Clamp(distanceRatio, 0.0f, 1.0f);
+
+	const float aggression = m_BehaviourSettings.Aggression;
+
+	const float defensiveWeight = 1.0f - m_BehaviourSettings.Aggression;
+
+	const float rangeTolerance = CombatSettings.EngagementRangeTolerance;
+	const float discipline = 1.0f - rangeTolerance;
+
+	score = rangeUrgency * defensiveWeight * discipline * 2.5f;
+
+	if (rangeUrgency < 0.1f)
+	{
+		score *= 0.2f;
+	}
+
+	if (score == 0.0f)
+	{
+		return -1.0f;
+	}
+	//const float randomFactor = m_BehaviourSettings.DecisionRandomness.GetRandomValue();
+
+	return score;
 }
 
 bool UCombatAIComponent::TryConsumeReaction()

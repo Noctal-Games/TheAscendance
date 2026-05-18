@@ -112,7 +112,7 @@ struct FBehaviourSettings
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "The duration that the enemy will remember where the target was when detection was lost"))
 	float DetectionMemoryDuration = 1.0f;
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "A random modifier for weighted decisions, to add variety to behaviour"))
-	float DecisionRandomnessVariance = 0.0f;
+	FFloatRangeCustom DecisionRandomness;
 };
 
 USTRUCT(BlueprintType)

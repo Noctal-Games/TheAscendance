@@ -36,8 +36,16 @@ public:
 	void SetFocus(AActor* target);
 
 	void LookAtTarget();
+	void RequestWaitForState();
+	void NotifyStateFinished();
+
+	void SetDestination(const FVector& destination);
+	void GetCombatRangeValues(float& PreferredEngagementRange, float& MaxEngagementRange, float& EngagementRangeTolerance);
+
+	float GetAggression();
 
 	ABaseEnemy* GetEnemyOwner();
+	AActor* GetCurrentTarget();
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -84,4 +92,7 @@ private:
 	float m_CurrentReactionTime = 0.0f;
 
 	bool m_IsCombatLocked = false;
+
+	bool m_WaitForState = false;
+	bool m_StateFinished = false;
 };
