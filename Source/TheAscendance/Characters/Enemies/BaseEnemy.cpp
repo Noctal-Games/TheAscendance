@@ -18,6 +18,7 @@
 #include "TheAscendance/AI/Components/PerceptionComponent.h"
 
 #include "Components/CapsuleComponent.h"
+#include "StateTree.h"
 
 ABaseEnemy::ABaseEnemy() : ABaseCharacter()
 {
@@ -291,38 +292,44 @@ void ABaseEnemy::BeginPlay()
 
 void ABaseEnemy::InitCombatAIComponent(const TArray<FEnemyAbilityData>& abilities, const UEnemyClassData* classData, const TMap<EAbilityGoal, float>& goalWeights)
 {
-	if (m_CombatAgent == nullptr)
+
+	if (m_Controller.IsValid())
 	{
-		LOG_ERROR("[BASE ENEMY] Tried to InitCombatAIComponent with invalid CombatAgent");
-		return;
+		m_Controller->TestStartStateTree(classData->CombatStateTree);
 	}
 
-	if(classData == nullptr)
-	{
-		LOG_ERROR("[BASE ENEMY] Tried to InitCombatAIComponent with invalid EnemyClassData");
-		return;
-	}
+	//if (m_CombatAgent == nullptr)
+	//{
+	//	LOG_ERROR("[BASE ENEMY] Tried to InitCombatAIComponent with invalid CombatAgent");
+	//	return;
+	//}
 
-	FLoadedCombatSettings combatSettings;
+	//if(classData == nullptr)
+	//{
+	//	LOG_ERROR("[BASE ENEMY] Tried to InitCombatAIComponent with invalid EnemyClassData");
+	//	return;
+	//}
 
-	for (const FEnemyAbilityData& abilityData : abilities)
-	{
-		FLoadedAbilityData loadedData = ProcessLoadedAbilityData(abilityData);
-		
-		if (loadedData.AbilityTag.IsValid() == false)
-		{
-			continue;
-		}
+	//FLoadedCombatSettings combatSettings;
 
-		combatSettings.Abilities.Add(MoveTemp(loadedData));
-	}
+	//for (const FEnemyAbilityData& abilityData : abilities)
+	//{
+	//	FLoadedAbilityData loadedData = ProcessLoadedAbilityData(abilityData);
+	//	
+	//	if (loadedData.AbilityTag.IsValid() == false)
+	//	{
+	//		continue;
+	//	}
 
-	combatSettings.GoalWeights = goalWeights;
-	combatSettings.MaxEngagementRange = classData->MaxEngagementRange;
-	combatSettings.PreferredEngagementRange = classData->PreferredEngagementRange;
-	combatSettings.EngagementRangeTolerance = classData->EngagementRangeTolerance;
+	//	combatSettings.Abilities.Add(MoveTemp(loadedData));
+	//}
 
-	m_CombatAgent->Init(m_PerceptionComponent, combatSettings, m_AbilityComponent);
+	//combatSettings.GoalWeights = goalWeights;
+	//combatSettings.MaxEngagementRange = classData->MaxEngagementRange;
+	//combatSettings.PreferredEngagementRange = classData->PreferredEngagementRange;
+	//combatSettings.EngagementRangeTolerance = classData->EngagementRangeTolerance;
+
+	//m_CombatAgent->Init(m_PerceptionComponent, combatSettings, m_AbilityComponent);
 }
 
 FLoadedAbilityData ABaseEnemy::ProcessLoadedAbilityData(const FEnemyAbilityData& abilityData)

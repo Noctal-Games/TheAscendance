@@ -10,6 +10,8 @@
 #include "GameplayTags.h"
 #include "EnemyData.generated.h"
 
+class UStateTree;
+
 USTRUCT(BlueprintType)
 struct FFloatRangeCustom
 {
@@ -34,6 +36,9 @@ class THEASCENDANCE_API UEnemyClassData : public UPrimaryDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UStateTree> CombatStateTree = nullptr;
+
 	UPROPERTY(EditDefaultsOnly, meta = (ToolTip = "Checks whether the enemy has abilities that fulfil these goals. A warning will be logged otherwise"))
 	TArray<EAbilityGoal> ExpectedAbilityGoals;
 

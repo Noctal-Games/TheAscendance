@@ -14,6 +14,7 @@
 #include "TheAscendance/Abilities/Components/AbilityComponent.h"
 #include "TheAscendance/AI/TAAIController.h"
 #include "TheAscendance/AI/Components/PerceptionComponent.h"
+#include "TheAscendance/Characters/Player/PlayerCharacter.h"
 
 // Sets default values for this component's properties
 UCombatAIComponent::UCombatAIComponent()
@@ -255,6 +256,11 @@ void UCombatAIComponent::TickComponent(float deltaTime, ELevelTick TickType, FAc
 {
 	Super::TickComponent(deltaTime, TickType, ThisTickFunction);
 
+	if (true)
+	{
+		return;
+	}
+
 	if (m_CombatStates.Num() != 0 && m_CombatStates[m_CurrentCombatState] != nullptr)
 	{
 		m_CombatStates[m_CurrentCombatState]->Update(deltaTime);
@@ -301,7 +307,7 @@ void UCombatAIComponent::EvaluateCombat()
 
 	//Setup perception to monitor player and allies and query targets here
 	//Temp target only player
-	CombatContext.Target = UCoreFunctionLibrary::GetPlayerCharacter();
+	CombatContext.Target = Cast<AActor>(UCoreFunctionLibrary::GetPlayerCharacter());
 
 	if (CombatContext.Target.IsValid() == false)
 	{

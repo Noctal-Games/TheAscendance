@@ -16,6 +16,7 @@ class UEnemyData;
 class UCombatAIComponent;
 class UEnemyClassData;
 class UPerceptionComponent;
+class UStateTree;
 struct FEnemyAbilityData;
 struct FLoadedAbilityData;
 
@@ -52,7 +53,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 
 private:
 	void InitCombatAIComponent(const TArray<FEnemyAbilityData>& abilities, const UEnemyClassData* classData, const TMap<EAbilityGoal, float>& goalWeights);

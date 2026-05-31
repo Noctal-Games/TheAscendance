@@ -4,6 +4,17 @@
 #include "TAAIController.h"
 #include "TheAscendance/Core/CoreMacros.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "TheAscendance/AI/StateTree/Components/CustomStateTreeComponent.h"
+
+#include "StateTree.h"
+
+ATAAIController::ATAAIController() : AAIController()
+{
+	bStartAILogicOnPossess = true;
+
+	m_StateTreeComponent = CreateDefaultSubobject<UCustomStateTreeComponent>(TEXT("StateTreeComponent"));
+	checkf(m_StateTreeComponent, TEXT("StateTreeComponent failed to initialise"));
+}
 
 void ATAAIController::SetDestination(const FVector& destination, float acceptanceRadius)
 {
@@ -41,4 +52,12 @@ void ATAAIController::SetPauseMovement(bool val)
 bool ATAAIController::HasPath() const
 {
 	return IsFollowingAPath();
+}
+
+void ATAAIController::TestStartStateTree(UStateTree* stateTree)
+{
+	if (m_StateTreeComponent != nullptr)
+	{
+		m_StateTreeComponent->StartStateTree(stateTree);
+	}
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TheAscendance/AI/Actions/Attacks/Enums/AttackType.h"
+#include "GameplayTagContainer.h"
 #include "AttackData.generated.h"
 
 class UAnimMontage;
