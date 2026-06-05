@@ -52,8 +52,8 @@ void FCombatContextEvaluator::Tick(FStateTreeExecutionContext& context, const fl
     data.TargetDetected = true;
 
     //replace with EnemyData values
-    constexpr float preferredRange = 400.f;
-    constexpr float tolerance = 100.f;
+    constexpr float preferredRange = 1000.f;
+    constexpr float tolerance = 800.f;
 
     data.TooClose = data.DistanceToTarget < (preferredRange - tolerance);
     data.TooFar = data.DistanceToTarget > (preferredRange + tolerance);

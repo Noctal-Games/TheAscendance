@@ -61,3 +61,11 @@ void ATAAIController::TestStartStateTree(UStateTree* stateTree)
 		m_StateTreeComponent->StartStateTree(stateTree);
 	}
 }
+
+void ATAAIController::SendStateTreeEvent(const FStateTreeEvent& event)
+{
+	if (m_StateTreeComponent != nullptr)
+	{
+		m_StateTreeComponent->SendStateTreeEvent(event);
+	}
+}

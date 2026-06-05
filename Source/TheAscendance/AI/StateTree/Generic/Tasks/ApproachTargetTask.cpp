@@ -3,6 +3,7 @@
 
 #include "ApproachTargetTask.h"
 #include "TheAscendance/Core/CoreMacros.h"
+#include "TheAscendance/AI/TAAIController.h"
 
 #include "StateTreeExecutionContext.h"
 
@@ -10,13 +11,19 @@ EStateTreeRunStatus FApproachTargetTask::EnterState(FStateTreeExecutionContext& 
 {
 	FInstanceDataType& data = context.GetInstanceData(*this);
 
-	if (data.Target.IsValid())
+	if (data.OwnerActor.IsValid() == false)
+	{
+		LOG_ERROR("[APPROACH TARGET TASK] OwnerActor is invalid");
+		return EStateTreeRunStatus::Failed;
+	}
+
+	if (data.Target.IsValid() == false)
 	{
 		LOG_ERROR("[APPROACH TARGET TASK] Target is invalid");
 		return EStateTreeRunStatus::Failed;
 	}
 
-	const AActor* owner = Cast<AActor>(context.GetOwner());
+	const AActor* owner = data.OwnerActor.Get();
 	const AActor* target = data.Target.Get();
 
 	const FVector ownerLocation = owner->GetActorLocation();

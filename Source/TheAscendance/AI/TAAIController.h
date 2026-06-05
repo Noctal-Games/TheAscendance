@@ -8,6 +8,7 @@
 
 class UCustomStateTreeComponent;
 class UStateTree;
+struct FStateTreeEvent;
 
 UCLASS()
 class THEASCENDANCE_API ATAAIController : public AAIController
@@ -33,7 +34,7 @@ public:
 	bool HasPath() const;
 
 	void TestStartStateTree(UStateTree* stateTree);
-
+	void SendStateTreeEvent(const FStateTreeEvent& event);
 private:
 	UPROPERTY()
 	TObjectPtr<UCustomStateTreeComponent> m_StateTreeComponent = nullptr;
