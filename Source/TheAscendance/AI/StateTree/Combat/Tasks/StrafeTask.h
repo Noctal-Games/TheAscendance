@@ -10,7 +10,7 @@
 /**
  * 
  */
-USTRUCT(meta = (DisplayName = "Strafe"))
+USTRUCT(meta = (DisplayName = "Strafe", ToolTip = "The AI strafes around the target actor."))
 struct THEASCENDANCE_API FStrafeTask : public FStateTreeTaskCommonBase
 {
 	GENERATED_BODY()

@@ -7,7 +7,7 @@
 #include "TheAscendance/AI/StateTree/Generic/Structs/MovementTaskInstanceData.h"
 #include "RetreatTask.generated.h"
 
-USTRUCT(meta = (DisplayName = "Retreat"))
+USTRUCT(meta = (DisplayName = "Retreat", ToolTip = "The AI moves away from the target actor."))
 struct THEASCENDANCE_API FRetreatTask : public FStateTreeTaskCommonBase
 {
 	GENERATED_BODY()
