@@ -13,7 +13,7 @@ struct FCombatContext
 
 	UPROPERTY(EditAnywhere, Category = "Context")
 	TWeakObjectPtr<AActor> Target = nullptr;
-
+			
 	UPROPERTY(EditAnywhere, Category = "Output")
 	bool TargetDetected = false;
 
